@@ -20,16 +20,15 @@
     "react-dom": "19.2.1"
   },
   "devDependencies": {
-    "@org/eslint-config": "workspace:*",
     "@org/prettier-config": "workspace:*",
-    "@rushstack/eslint-config": "^3.6.8",
-    "@rushstack/eslint-patch": "^1.10.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^8.57.0",
+    "eslint": "^9",
     "eslint-config-next": "16.0.10",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-simple-import-sort": "^12.1.0",
     "prettier": "^3",
     "tailwindcss": "^4",
     "typescript": "^5"
