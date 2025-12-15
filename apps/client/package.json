@@ -8,8 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
+    "fix": "pnpm format && pnpm lint:fix",
     "check": "pnpm format:check && pnpm lint"
   },
   "dependencies": {

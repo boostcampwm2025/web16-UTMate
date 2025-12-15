@@ -22,8 +22,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
+    "fix": "pnpm format && pnpm lint:fix",
     "check": "pnpm format:check && pnpm lint"
   },
   "devDependencies": {
