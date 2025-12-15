@@ -2,11 +2,15 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "prettier": "@org/prettier-config",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
+    "check": "pnpm format:check && pnpm lint"
   },
   "dependencies": {
     "next": "16.0.10",
@@ -14,12 +18,17 @@
     "react-dom": "19.2.1"
   },
   "devDependencies": {
+    "@org/eslint-config": "workspace:*",
+    "@org/prettier-config": "workspace:*",
+    "@rushstack/eslint-config": "^3.6.8",
+    "@rushstack/eslint-patch": "^1.10.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "eslint": "^8.57.0",
     "eslint-config-next": "16.0.10",
+    "prettier": "^3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
