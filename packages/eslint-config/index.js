@@ -71,5 +71,6 @@ module.exports = {
     "@typescript-eslint/explicit-member-accessibility": "off", // public/private 강제 해제
     "@typescript-eslint/typedef": "off", // 타입 명시 강제 해제
     "@typescript-eslint/explicit-function-return-type": "off", // 함수 반환 타입 강제 해제
+    "@rushstack/typedef-var": "off", // 변수 타입 명시 강제 해제
   },
 };
