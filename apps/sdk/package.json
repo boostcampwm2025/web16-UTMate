@@ -34,6 +34,7 @@
     "@rrweb/types": "2.0.0-alpha.18",
     "@rushstack/eslint-config": "^3.6.8",
     "@rushstack/eslint-patch": "^1.10.1",
+    "@types/pako": "^2.0.3",
     "eslint": "^8.57.0",
     "prettier": "^3",
     "typescript": "~5.9.3",
@@ -46,6 +47,7 @@
     }
   },
   "dependencies": {
-    "@rrweb/record": "2.0.0-alpha.18"
+    "@rrweb/record": "2.0.0-alpha.18",
+    "pako": "^2.1.0"
   }
 }
