@@ -4,7 +4,6 @@ import { useState } from 'react';
 
 import MissionPanel from '@/components/test/MissionPanel';
 import MissionSidebar from '@/components/test/MissionSidebar';
-import ProductFrame from '@/components/test/ProductFrame';
 import TestHeader from '@/components/test/TestHeader';
 import { MissionStatusMap, TestWithMissions } from '@/types/test';
 
@@ -139,13 +138,13 @@ export default function TestPage() {
     }
   };
 
-  const handleProductEvent = (event: { type: string; data: unknown }) => {
-    console.log('[TestPage] Product event:', event);
-    // TODO: 이벤트 수집 및 분석
-    // - 클릭 이벤트
-    // - 네비게이션 이벤트
-    // - 입력 이벤트 등
-  };
+  // const handleProductEvent = (event: { type: string; data: unknown }) => {
+  //   console.log('[TestPage] Product event:', event);
+  //   // TODO: 이벤트 수집 및 분석
+  //   // - 클릭 이벤트
+  //   // - 네비게이션 이벤트
+  //   // - 입력 이벤트 등
+  // };
 
   return (
     <div className="flex flex-col h-screen bg-white">
