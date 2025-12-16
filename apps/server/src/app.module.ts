@@ -1,10 +1,17 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { json, urlencoded } from 'express';
 
+import { StorageModule } from '#common/storage/storage.module';
 import { SdkModule } from '#domain/sdk/sdk.module';
 
 @Module({
-  imports: [SdkModule],
+  imports: [
+    // common modules
+    StorageModule,
+
+    // domain modules
+    SdkModule,
+  ],
   controllers: [],
   providers: [],
 })
