@@ -2,14 +2,14 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-primary-50 via-white to-secondary-50">
+    <div className="flex min-h-screen items-center justify-center from-primary-50 to-secondary-50">
       <main className="flex flex-col items-center gap-8 p-8">
         <div className="text-center space-y-4">
           <div className="text-6xl mb-4">🎯</div>
           <h1 className="text-5xl font-bold bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
             UT MVP
           </h1>
-          <p className="text-gray-600">사용자 테스트 플랫폼</p>
+          <p className="text-gray-600">사용성 테스트 플랫폼</p>
         </div>
 
         <div className="flex gap-4 mt-8">
