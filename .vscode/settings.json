@@ -12,5 +12,9 @@
   "eslint.workingDirectories": [
     { "pattern": "apps/*" },
     { "pattern": "packages/*" }
-  ]
+  ],
+
+  // TypeScript: Monorepo 환경에서 각 프로젝트의 tsconfig.json을 사용하도록 설정
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }
