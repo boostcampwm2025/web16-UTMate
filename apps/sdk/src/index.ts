@@ -2,14 +2,16 @@ import { record } from '@rrweb/record';
 import type { eventWithTime } from '@rrweb/types';
 import pako from 'pako';
 
-import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
+import { EVENT_SEND_INTERVAL, SERVER_BASE_URL } from './constants';
 
 (() => {
-  if (!checkIsLwt()) {
+  let sessionId: string | null = null;
+  let missionId: string | null = null;
+  let eventQueue: eventWithTime[] = [];
+
+  if (!checkQueryParams()) {
     return;
   }
-
-  let eventQueue: eventWithTime[] = [];
 
   record({
     emit(event) {
@@ -30,7 +32,10 @@ import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
       const compressed = pako.gzip(jsonString);
       const blob = new Blob([compressed], { type: 'application/gzip' });
       eventQueue = []; // 큐 초기화
-      navigator.sendBeacon(EVENT_SEND_URL, blob);
+      navigator.sendBeacon(
+        `${SERVER_BASE_URL}/sdk/sessions/${sessionId}/missions/${missionId}/replay_logs`,
+        blob,
+      );
     }
   });
 
@@ -38,10 +43,23 @@ import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
    * lwt 파라미터가 true인지 여부를 확인합니다.
    * @returns lwt 파라미터가 true인지 여부
    */
-  function checkIsLwt(): boolean {
+  function checkQueryParams(): boolean {
     const searchParams = new URLSearchParams(window.location.search);
     const isLwt = searchParams.get('lwt') === 'true';
-    return isLwt;
+
+    if (!isLwt) {
+      return false;
+    }
+
+    const sessionIdParam = searchParams.get('sessionId');
+    const missionIdParam = searchParams.get('missionId');
+    if (sessionIdParam === null || missionIdParam === null) {
+      return false;
+    }
+
+    sessionId = sessionIdParam;
+    missionId = missionIdParam;
+    return true;
   }
 
   async function sendEvents() {
@@ -53,7 +71,7 @@ import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
     const jsonString = JSON.stringify({ events });
     const compressed = pako.gzip(jsonString);
 
-    await fetch(EVENT_SEND_URL, {
+    await fetch(`${SERVER_BASE_URL}/sdk/sessions/${sessionId}/missions/${missionId}/replay_logs`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/gzip',
