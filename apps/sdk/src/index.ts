@@ -29,6 +29,7 @@ import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
       const jsonString = JSON.stringify({ events: eventQueue });
       const compressed = pako.gzip(jsonString);
       const blob = new Blob([compressed], { type: 'application/gzip' });
+      eventQueue = []; // 큐 초기화
       navigator.sendBeacon(EVENT_SEND_URL, blob);
     }
   });
