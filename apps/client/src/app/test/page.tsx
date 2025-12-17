@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import MissionPanel from '@/components/test/MissionPanel';
 import MissionSidebar from '@/components/test/MissionSidebar';
+import ProductFrame from '@/components/test/ProductFrame';
 import TestHeader from '@/components/test/TestHeader';
 import { MissionStatusMap, TestWithMissions } from '@/types/test';
 
@@ -11,7 +12,7 @@ import { MissionStatusMap, TestWithMissions } from '@/types/test';
 const MOCK_TEST: TestWithMissions = {
   id: 1,
   ownerId: 'user-123',
-  testUrl: 'https://example.com',
+  testUrl: 'http://localhost:5173',
   title: '사용성 테스트',
   description: '제품의 주요 기능 테스트',
   status: 'ACTIVE',
@@ -166,6 +167,8 @@ export default function TestPage() {
           onSkip={handleMissionSkip}
           onQuit={handleQuit}
         />
+
+        <ProductFrame productUrl={test.testUrl} missionId={currentMission.id} />
       </div>
     </div>
   );
