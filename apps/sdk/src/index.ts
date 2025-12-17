@@ -43,6 +43,17 @@ import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
     return isLwt;
   }
 
+  /**
+   * URL 파라미터에서 session_id와 mission_id를 추출합니다.
+   */
+  function getIdsFromUrl(): { sessionId: string | null; missionId: string | null } {
+    const searchParams = new URLSearchParams(window.location.search);
+    return {
+      sessionId: searchParams.get('session_id'),
+      missionId: searchParams.get('mission_id'),
+    };
+  }
+
   async function sendEvents() {
     if (eventQueue.length === 0) return;
 
@@ -52,11 +63,15 @@ import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
     const jsonString = JSON.stringify({ events });
     const compressed = pako.gzip(jsonString);
 
+    const { sessionId, missionId } = getIdsFromUrl();
+
     await fetch(EVENT_SEND_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/gzip',
-        credentials: 'include', //서로 다른 도메인(크로스 도메인)에 요청을 보낼 때 요청에 credential 정보(쿠키 등)를 담아서 보낼 지를 결정하는 항목
+        'X-Session-Id': sessionId || '',
+        'X-Mission-Id': missionId || '',
+        credentials: 'include',
         // 다음 헤더가 들어가면 서버가 자동으로 해제함으로 포함하면 안됨 'Content-Encoding': 'gzip',
       },
       body: compressed,

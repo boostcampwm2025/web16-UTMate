@@ -1,4 +1,4 @@
-import { Controller, Post, Req } from '@nestjs/common';
+import { Controller, Headers, Post, Req } from '@nestjs/common';
 import type { Request } from 'express';
 
 import { SdkService } from './sdk.service';
@@ -11,10 +11,16 @@ export class SdkController {
 
   @Post('/replay_logs')
   async uploadReplayLogs(
-    @Cookies('session_id') sessionId: string,
-    @Cookies('mission_id') missionId: string,
+    @Headers('x-session-id') headerSessionId: string,
+    @Headers('x-mission-id') headerMissionId: string,
+    @Cookies('session_id') cookieSessionId: string,
+    @Cookies('mission_id') cookieMissionId: string,
     @Req() req: Request,
   ) {
+    // 헤더 우선, 없으면 쿠키 사용
+    const sessionId = headerSessionId || cookieSessionId;
+    const missionId = headerMissionId || cookieMissionId;
+
     return this.sdkService.saveReplayLog(sessionId, missionId, req);
   }
 }
