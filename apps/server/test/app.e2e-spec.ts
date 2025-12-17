@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { randomUUID } from 'node:crypto';
 import * as path from 'path';
 import * as zlib from 'zlib';
 
@@ -32,16 +33,15 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 
-  describe('/sdk/replay_logs (POST)', () => {
-    it('쿠키 정보와 함께 압축된 로그 파일을 업로드하면 성공해야 한다', async () => {
-      const sessionId = 'e2e-session';
-      const missionId = 'e2e-mission';
+  describe('/sdk/sessions/:sessionId/missions/:missionId/replay_logs (POST)', () => {
+    it('압축된 로그 파일을 업로드하면 성공해야 한다', async () => {
+      const sessionId = randomUUID();
+      const missionId = randomUUID();
       const logData = JSON.stringify({ event: 'test', timestamp: Date.now() });
       const compressedData = zlib.gzipSync(logData);
 
       await request(app.getHttpServer())
-        .post('/sdk/replay_logs')
-        .set('Cookie', [`session_id=${sessionId}`, `mission_id=${missionId}`])
+        .post(`/sdk/sessions/${sessionId}/missions/${missionId}/replay_logs`)
         .set('Content-Type', 'application/gzip')
         .send(compressedData)
         .expect(201);
@@ -67,8 +67,30 @@ describe('AppController (e2e)', () => {
       }
     });
 
-    it('쿠키가 없으면 401 에러를 반환해야 한다', async () => {
-      await request(app.getHttpServer()).post('/sdk/replay_logs').send('some data').expect(401);
+    it('uuid 형식이 아닌 세션 ID로 요청시 400 에러를 반환해야 한다', async () => {
+      const sessionId = 'invalid-session-id';
+      const missionId = randomUUID();
+      const logData = JSON.stringify({ event: 'test', timestamp: Date.now() });
+      const compressedData = zlib.gzipSync(logData);
+
+      await request(app.getHttpServer())
+        .post(`/sdk/sessions/${sessionId}/missions/${missionId}/replay_logs`)
+        .set('Content-Type', 'application/gzip')
+        .send(compressedData)
+        .expect(400);
+    });
+
+    it('uuid 형식이 아닌 미션 ID로 요청시 400 에러를 반활해야 한다', async () => {
+      const sessionId = randomUUID();
+      const missionId = 'invalid-mission-id';
+      const logData = JSON.stringify({ event: 'test', timestamp: Date.now() });
+      const compressedData = zlib.gzipSync(logData);
+
+      await request(app.getHttpServer())
+        .post(`/sdk/sessions/${sessionId}/missions/${missionId}/replay_logs`)
+        .set('Content-Type', 'application/gzip')
+        .send(compressedData)
+        .expect(400);
     });
   });
 });

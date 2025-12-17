@@ -1,6 +1,5 @@
 import { Readable } from 'stream';
 
-import { UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { StorageService } from '#common/storage/storage.service';
@@ -45,24 +44,8 @@ describe('SdkService', () => {
       await service.saveReplayLog(sessionId, missionId, stream);
 
       expect(storageService.save).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /replay_log\/session-123\/mission-456\/\d+\.json\.gz/,
-        ),
+        expect.stringMatching(/replay_log\/session-123\/mission-456\/\d+\.json\.gz/),
         expect.any(Buffer),
-      );
-    });
-
-    it('세션 ID가 없으면 UnauthorizedException을 던져야 한다', async () => {
-      const stream = Readable.from(['test']);
-      await expect(service.saveReplayLog('', 'mission-123', stream)).rejects.toThrow(
-        UnauthorizedException,
-      );
-    });
-
-    it('미션 ID가 없으면 UnauthorizedException을 던져야 한다', async () => {
-      const stream = Readable.from(['test']);
-      await expect(service.saveReplayLog('session-123', '', stream)).rejects.toThrow(
-        UnauthorizedException,
       );
     });
   });

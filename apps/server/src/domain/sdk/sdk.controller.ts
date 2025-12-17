@@ -1,18 +1,16 @@
-import { Controller, Post, Req } from '@nestjs/common';
+import { Controller, Param, ParseUUIDPipe, Post, Req } from '@nestjs/common';
 import type { Request } from 'express';
 
 import { SdkService } from './sdk.service';
-
-import { Cookies } from '#common/decorators/cookies.decorator';
 
 @Controller('/sdk')
 export class SdkController {
   constructor(private readonly sdkService: SdkService) {}
 
-  @Post('/replay_logs')
+  @Post('/sessions/:sessionId/missions/:missionId/replay_logs')
   async uploadReplayLogs(
-    @Cookies('session_id') sessionId: string,
-    @Cookies('mission_id') missionId: string,
+    @Param('sessionId', ParseUUIDPipe) sessionId: string,
+    @Param('missionId', ParseUUIDPipe) missionId: string,
     @Req() req: Request,
   ) {
     return this.sdkService.saveReplayLog(sessionId, missionId, req);
