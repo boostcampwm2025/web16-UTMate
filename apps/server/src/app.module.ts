@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { json, urlencoded } from 'express';
 
 import { StorageModule } from '#common/storage/storage.module';
+import { MissionResultModule } from '#domain/mission-result/mission-result.module';
 import { SdkModule } from '#domain/sdk/sdk.module';
 
 @Module({
@@ -10,6 +11,7 @@ import { SdkModule } from '#domain/sdk/sdk.module';
     StorageModule,
 
     // domain modules
+    MissionResultModule,
     SdkModule,
   ],
   controllers: [],
