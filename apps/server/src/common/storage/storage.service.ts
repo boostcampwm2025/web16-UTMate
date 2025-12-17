@@ -1,28 +1,44 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
+import { Readable } from 'stream';
 
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class StorageService {
   private readonly uploadDir = path.join(process.cwd(), 'uploads');
+  constructor() {}
 
-  constructor() {
-    if (!fs.existsSync(this.uploadDir)) {
-      fs.mkdirSync(this.uploadDir, { recursive: true });
-    }
-  }
-
-  async save(filename: string, content: Buffer): Promise<string> {
-    // 현재 fs 모듈 사용, 외부 스토리지(object storage)로 변경 예정
+  /**
+   * @description stream 형태의 파일을 지정된 경로에 저장합니다.
+   * @param filename
+   * @param content
+   * @returns
+   */
+  async save(filename: string, content: Readable): Promise<string> {
     const filePath = path.join(this.uploadDir, filename);
     const dir = path.dirname(filePath);
 
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
+    await fs.promises.mkdir(dir, { recursive: true });
 
-    await fs.promises.writeFile(filePath, content);
+    const writeStream = fs.createWriteStream(filePath, { flags: 'a' });
+    content.pipe(writeStream);
+
+    await new Promise<void>((resolve, reject) => {
+      writeStream.on('finish', () => resolve());
+      writeStream.on('error', (error) => reject(error));
+    });
+
     return filePath;
+  }
+
+  /**
+   * @description 지정된 경로의 파일을 버퍼 형태로 반환합니다.
+   * @param filename
+   * @returns 지정된 경로의 파일 버퍼
+   */
+  async getByFilename(filename: string): Promise<Buffer> {
+    const filePath = path.join(this.uploadDir, filename);
+    return await fs.promises.readFile(filePath);
   }
 }
