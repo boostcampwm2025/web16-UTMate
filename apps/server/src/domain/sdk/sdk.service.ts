@@ -1,4 +1,5 @@
 import { Readable } from 'stream';
+import * as zlib from 'zlib';
 
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
@@ -13,19 +14,15 @@ export class SdkService {
       throw new UnauthorizedException('세션 또는 미션 정보가 없습니다.');
     }
 
-    // 스트림을 버퍼로 변환
-    const buffer = await this.streamToBuffer(stream);
+    // Gzip 압축 해제 스트림 생성
+    const gunzip = zlib.createGunzip();
+    const decompressedStream = stream.pipe(gunzip);
 
-    const filename = `replay_log/${sessionId}/${missionId}/${Date.now()}.json.gz`;
+    // 파일명 확장자 변경 (.json.gz -> .ndjson)
+    // 타임스탬프 제거하여 하나의 파일에 append 되도록 수정
+    const filename = `replay_log/${sessionId}/${missionId}/log.ndjson`;
 
-    await this.storageService.save(filename, buffer);
-  }
-
-  private async streamToBuffer(stream: Readable): Promise<Buffer> {
-    const chunks: Buffer[] = [];
-    for await (const chunk of stream) {
-      chunks.push(Buffer.from(chunk));
-    }
-    return Buffer.concat(chunks);
+    // 스트림을 그대로 StorageService에 전달
+    await this.storageService.save(filename, decompressedStream);
   }
 }

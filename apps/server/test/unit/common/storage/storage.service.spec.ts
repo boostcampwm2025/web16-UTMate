@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { Readable } from 'stream';
 
 import { Test, TestingModule } from '@nestjs/testing';
 
@@ -36,7 +37,7 @@ describe('StorageService', () => {
 
   it('파일을 지정된 경로에 저장해야 한다', async () => {
     const filename = 'test-folder/test-file.txt';
-    const content = Buffer.from('hello world');
+    const content = Readable.from(['hello world']);
 
     const savedPath = await service.save(filename, content);
 
@@ -48,7 +49,7 @@ describe('StorageService', () => {
 
   it('디렉토리가 없으면 자동으로 생성해야 한다', async () => {
     const filename = 'deep/nested/folder/file.txt';
-    const content = Buffer.from('nested content');
+    const content = Readable.from(['test']);
 
     await service.save(filename, content);
 

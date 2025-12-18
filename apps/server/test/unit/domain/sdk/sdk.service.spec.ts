@@ -1,4 +1,5 @@
 import { Readable } from 'stream';
+import { gzipSync } from 'zlib';
 
 import { UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -38,17 +39,17 @@ describe('SdkService', () => {
       const sessionId = 'session-123';
       const missionId = 'mission-456';
       const content = 'test-content';
-      const stream = Readable.from([content]);
+      // Gzip 압축된 데이터 스트림 생성
+      const compressed = gzipSync(content);
+      const stream = Readable.from(compressed);
 
       mockStorageService.save.mockResolvedValue('saved-path');
 
       await service.saveReplayLog(sessionId, missionId, stream);
 
       expect(storageService.save).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /replay_log\/session-123\/mission-456\/\d+\.json\.gz/,
-        ),
-        expect.any(Buffer),
+        `replay_log/${sessionId}/${missionId}/log.ndjson`,
+        expect.any(Object), // Stream object
       );
     });
 

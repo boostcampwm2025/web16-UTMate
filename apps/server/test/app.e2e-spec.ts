@@ -25,15 +25,11 @@ describe('AppController (e2e)', () => {
   });
 
   afterAll(async () => {
-    // 테스트로 생성된 파일 정리 (선택 사항)
-    // if (fs.existsSync(testUploadDir)) {
-    //   fs.rmSync(testUploadDir, { recursive: true, force: true });
-    // }
     await app.close();
   });
 
   describe('/sdk/replay_logs (POST)', () => {
-    it('쿠키 정보와 함께 압축된 로그 파일을 업로드하면 성공해야 한다', async () => {
+    it('쿠키와 함께 압축된 로그 파일을 업로드하면 성공해야 한다', async () => {
       const sessionId = 'e2e-session';
       const missionId = 'e2e-mission';
       const logData = JSON.stringify({ event: 'test', timestamp: Date.now() });
@@ -46,7 +42,7 @@ describe('AppController (e2e)', () => {
         .send(compressedData)
         .expect(201);
 
-      // 파일이 실제로 생성되었는지 확인 (파일명에 타임스탬프가 있어서 디렉토리까지만 확인하거나, 가장 최근 파일 확인)
+      // 파일이 실제로 생성되었는지 확인
       const expectedDir = path.join(testUploadDir, 'replay_log', sessionId, missionId);
       expect(fs.existsSync(expectedDir)).toBe(true);
 
@@ -54,11 +50,13 @@ describe('AppController (e2e)', () => {
       expect(files.length).toBeGreaterThan(0);
 
       // 저장된 파일 내용 검증
-      const savedFilePath = path.join(expectedDir, files[0]);
-      const savedContent = fs.readFileSync(savedFilePath);
-      const decompressedContent = zlib.gunzipSync(savedContent).toString();
+      // 이제 파일은 압축 해제된 상태로 저장됨 (log.ndjson)
+      const savedFilePath = path.join(expectedDir, 'log.ndjson');
+      expect(fs.existsSync(savedFilePath)).toBe(true);
 
-      expect(decompressedContent).toBe(logData);
+      const savedContent = fs.readFileSync(savedFilePath, 'utf-8');
+      // NDJSON 형식이므로 그대로 비교 가능 (줄바꿈 등 고려 필요할 수 있음)
+      expect(savedContent).toContain(logData);
 
       // 테스트 파일 정리
       fs.rmSync(savedFilePath);
