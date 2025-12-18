@@ -15,6 +15,8 @@
     "check": "pnpm format:check && pnpm lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.12",
+    "@tanstack/react-query-next-experimental": "^5.91.0",
     "next": "16.0.10",
     "react": "19.2.1",
     "react-dom": "19.2.1"
@@ -22,6 +24,8 @@
   "devDependencies": {
     "@org/prettier-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
+    "@tanstack/eslint-plugin-query": "^5.91.2",
+    "@tanstack/react-query-devtools": "^5.91.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
