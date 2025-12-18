@@ -18,11 +18,13 @@
     "@rrweb/types": "2.0.0-alpha.18",
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-query-next-experimental": "^5.91.0",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.561.0",
     "next": "16.0.10",
     "react": "19.2.1",
     "react-dom": "19.2.1",
-    "rrweb-player": "1.0.0-alpha.4"
+    "rrweb-player": "1.0.0-alpha.4",
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@org/prettier-config": "workspace:*",
