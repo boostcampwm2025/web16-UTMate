@@ -26,8 +26,12 @@ import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
   // https://developer.mozilla.org/ko/docs/Web/API/Navigator/sendBeacon 참고
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden' && eventQueue.length > 0) {
-      const jsonString = JSON.stringify({ events: eventQueue });
-      const compressed = pako.gzip(jsonString);
+      const events = [...eventQueue];
+      eventQueue = []; // 큐 초기화
+
+      const jsonl = events.map((e) => JSON.stringify(e)).join('\n');
+      const compressed = pako.gzip(jsonl);
+
       const blob = new Blob([compressed], { type: 'application/gzip' });
       navigator.sendBeacon(EVENT_SEND_URL, blob);
     }
@@ -60,13 +64,16 @@ import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
     const events = [...eventQueue];
     eventQueue = []; // 큐 초기화
 
-    const jsonString = JSON.stringify({ events });
-    const compressed = pako.gzip(jsonString);
+    const jsonl = events.map((e) => JSON.stringify(e)).join('\n');
+    // eslint-disable-next-line no-console
+    console.log('[LWT] Sending events:', jsonl);
+    const compressed = pako.gzip(jsonl);
 
     const { sessionId, missionId } = getIdsFromUrl();
 
     await fetch(EVENT_SEND_URL, {
       method: 'POST',
+      keepalive: true,
       headers: {
         'Content-Type': 'application/gzip',
         'X-Session-Id': sessionId || '',

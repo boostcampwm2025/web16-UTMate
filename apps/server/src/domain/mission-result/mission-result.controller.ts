@@ -15,10 +15,8 @@ export class MissionResultController {
   }
 
   @Get('/:missionResultId')
-  async getMissionResult(
-    @Param('missionResultId') missionResultId: number,
-  ) {
-    return await this.missionResultService.getMissionResult(missionResultId,);
+  async getMissionResult(@Param('missionResultId') missionResultId: number) {
+    return await this.missionResultService.getMissionResult(missionResultId);
   }
 
   @Post()
