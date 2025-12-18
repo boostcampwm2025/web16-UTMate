@@ -11,7 +11,9 @@ export class MissionResultRepository {
   }
 
   async save(missionResult: MissionResult): Promise<MissionResult> {
-    missionResult.id = this.currentId++;
+    if (!missionResult.id) {
+      missionResult.id = this.currentId++;
+    }
     this.missionResults.set(missionResult.id, missionResult);
     return missionResult;
   }

@@ -44,11 +44,11 @@ export class MissionResultService {
     }
 
     // 저장된 로그 스트림 조회
-    const fileName = `replay_log/missions/${missionResult.missionId}/${missionResult.participantId}.log.ndjson`;
+    const fileName = `replay_log/missions/${missionResult.missionId}/${missionResult.participantId}.log.jsonl`;
     const logStream = await this.storageService.getReadStreamByFilename(fileName);
 
     // S3에 업로드 트랜젝션 수행 전 먼저 수행
-    await this.s3StorageService.uploadToS3(fileName, logStream);
+    await this.s3StorageService.uploadToS3(fileName + '.gz', logStream);
 
     // 트랜젝션 시작
     try {
@@ -56,7 +56,7 @@ export class MissionResultService {
       this.applyStatus(missionResult, dto);
 
       // 업로드된 로그 파일 URL 저장
-      missionResult.uploadedLogFile(fileName);
+      missionResult.uploadedLogFile(fileName + '.gz');
 
       // TODO 로그 스트림을 분석 모듈에 보내 분석 후 분석 결과를 업데이드하는 로직 구현
 
