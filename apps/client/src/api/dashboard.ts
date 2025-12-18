@@ -21,20 +21,32 @@ export const getMissionResult = async (testid: string, missionResultId: string) 
   return response.json();
 };
 
-export const getMissionResultLogs = async (missionId: string, sessionId: string) => {
-  const response = await fetch(
-    `${BASE_URL}/storage/replay_log/missions/${missionId}/${sessionId}.log.jsonl`,
-  );
+export const getMissionResultLogs = async (url: string) => {
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error('Failed to fetch mission result logs');
   }
+  console.log('fetched logs from url:', url);
 
-  // .jsonl 파일은 각 줄이 하나의 JSON 객체인 형식이므로 이에 맞게 파싱
-  const text = await response.text();
-  const lines = text
-    .split('\n')
-    .filter((line) => line.trim() !== '') // 빈 줄 제거
-    .map((line) => JSON.parse(line)); // 각 줄을 JSON으로 파싱
+  try {
+    const text = await response.text();
 
-  return lines as eventWithTime[];
+    const lines = text
+      .split('\n')
+      .filter((line) => line.trim() !== '') // 빈 줄 제거
+      .map((line) => {
+        try {
+          return JSON.parse(line);
+        } catch (e) {
+          console.warn(line);
+          // 뭉쳐진 JSON 처리 시도 (예: {"a":1}{"b":2} -> {"a":1})
+          // 정규식 등으로 분리하거나, 일단은 무시하고 넘어감
+          return null;
+        }
+      });
+
+    return lines as eventWithTime[];
+  } catch (error) {
+    console.error(error);
+  }
 };

@@ -1,5 +1,3 @@
-import path from 'path';
-
 import { PickType } from '@nestjs/mapped-types';
 
 import { MissionResult, MissionResultStatus } from '../entities/mission-result.entity';
@@ -30,7 +28,7 @@ export class MissionResultDto {
     dto.createdAt = missionResult.createdAt;
     dto.updatedAt = missionResult.updatedAt;
 
-    dto.logUrl = path.join(S3_URL, missionResult.logUrl || '');
+    dto.logUrl = S3_URL + '/' + missionResult.logUrl;
     return dto;
   }
 }
