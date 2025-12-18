@@ -1,5 +1,6 @@
 import { builtinModules } from 'node:module';
 
+import reactQuery from '@tanstack/eslint-plugin-query';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
@@ -10,7 +11,7 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   prettier,
-
+  reactQuery,
   // 공통 규칙 추가
   {
     plugins: {
