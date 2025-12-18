@@ -11,12 +11,19 @@ export class MissionResultRepository {
   }
 
   async save(missionResult: MissionResult): Promise<MissionResult> {
-    missionResult.id = this.currentId++;
+    if (!missionResult.id) {
+      missionResult.id = this.currentId++;
+    }
     this.missionResults.set(missionResult.id, missionResult);
     return missionResult;
   }
 
   async findById(missionResultId: number): Promise<MissionResult | undefined> {
     return this.missionResults.get(missionResultId);
+  }
+
+  // MVP 단계에서 missionIds는 하나이므로 사용 X
+  async findAll(_missionId: string): Promise<MissionResult[]> {
+    return Array.from(this.missionResults.values());
   }
 }

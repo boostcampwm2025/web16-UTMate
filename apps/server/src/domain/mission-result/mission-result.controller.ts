@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 
 import { CreateMissionResultDto } from './dtos/create-mission-result.dto';
 import { MissionResultDto } from './dtos/mission-result.dto';
@@ -10,12 +10,12 @@ export class MissionResultController {
   constructor(private readonly missionResultService: MissionResultService) {}
 
   @Get()
-  async getMissionResults(@Query('mission-id') _missionId: string) {
-    // TODO missionId 미션 결과 전체 조회(간단하게) 로직 구현
+  async getMissionResults(@Query('mission-id') missionId: string) {
+    return await this.missionResultService.getMissionResults(missionId);
   }
 
   @Get('/:missionResultId')
-  async getMissionResult(@Param('missionResultId') missionResultId: number) {
+  async getMissionResult(@Param('missionResultId', ParseIntPipe) missionResultId: number) {
     return await this.missionResultService.getMissionResult(missionResultId);
   }
 
@@ -23,22 +23,14 @@ export class MissionResultController {
   async createMissionResult(
     @Body() createMissionResultDto: CreateMissionResultDto,
   ): Promise<MissionResultDto> {
-    Logger.log(
-      `Creating mission result for participant: ${createMissionResultDto.participantId}, mission: ${createMissionResultDto.missionId}`,
-      'MissionResultController',
-    );
     return await this.missionResultService.createMissionResult(createMissionResultDto);
   }
 
   @Patch('/:missionResultId')
   async completeMissionResult(
-    @Param('missionResultId') missionResultId: number,
+    @Param('missionResultId', ParseIntPipe) missionResultId: number,
     @Body() updateMissionResultDto: UpdateMissionResultDto,
   ) {
-    Logger.log(
-      `Updating mission result ID: ${missionResultId} with status: ${updateMissionResultDto.status}`,
-      'MissionResultController',
-    );
     return this.missionResultService.updateMissionResult(missionResultId, updateMissionResultDto);
   }
 }
