@@ -13,6 +13,7 @@ export class StorageController {
   getFile(@Param('key') key: string[], @Res({ passthrough: true }) res: Response) {
     res.set({
       'Content-Type': 'application/gzip',
+      'Content-Encoding': 'gzip',
     });
     const filePath = path.join(this.uploadDir, ...key);
     const fileStream = fs.createReadStream(filePath);

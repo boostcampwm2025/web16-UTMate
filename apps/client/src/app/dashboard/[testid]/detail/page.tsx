@@ -2,6 +2,8 @@
 
 import { notFound, useParams, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
+import { useRef, useState } from 'react';
+import type rrwebPlayer from 'rrweb-player';
 
 import { getMissionResult, getMissionResultLogs } from '@/api/dashboard';
 import { EventLogViewer } from '@/components/dashboard/EventLogViewer';
@@ -30,10 +32,12 @@ export default function TestDashboardPage() {
 
   const { data: missionResultLogs } = useQuery({
     queryKey: ['missionResultLogs', missionResultId],
-    queryFn: () =>
-      getMissionResultLogs(missionResult?.missionId ?? '', missionResult?.participantId ?? ''),
-    enabled: !!missionResult?.sessionId,
+    queryFn: () => getMissionResultLogs(missionResult?.logUrl),
+    enabled: !!missionResult?.logUrl,
   });
+
+  const [replayer, setReplayer] = useState<rrwebPlayer | null>(null);
+  const pendingGoto = useRef<number | null>(null);
 
   return (
     <div className="flex flex-col gap-2 divide-y divide-gray-200">
@@ -47,8 +51,29 @@ export default function TestDashboardPage() {
       </div>
       <div className="p-4">
         <div className="flex gap-4 justify-between">
-          <EventLogViewer logs={missionResultLogs ?? []} />
-          <EventLogPlayer logs={missionResultLogs ?? []} />
+          <EventLogViewer
+            logs={missionResultLogs ?? []}
+            onLogClick={(relativeMs) => {
+              if (replayer) {
+                replayer.goto(relativeMs);
+              } else {
+                pendingGoto.current = relativeMs;
+              }
+            }}
+          />
+          <EventLogPlayer
+            logs={missionResultLogs ?? []}
+            onPlayerReady={(player) => {
+              setReplayer((prev) => {
+                if (prev === player) return prev;
+                return player;
+              });
+              if (pendingGoto.current !== null) {
+                player.goto(pendingGoto.current);
+                pendingGoto.current = null;
+              }
+            }}
+          />
         </div>
       </div>
     </div>

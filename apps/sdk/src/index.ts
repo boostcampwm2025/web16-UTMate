@@ -29,7 +29,7 @@ import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
       const events = [...eventQueue];
       eventQueue = []; // 큐 초기화
 
-      const jsonl = events.map((e) => JSON.stringify(e)).join('\n');
+      const jsonl = events.map((e) => JSON.stringify(e)).join('\n') + '\n';
       const compressed = pako.gzip(jsonl);
 
       const blob = new Blob([compressed], { type: 'application/gzip' });
@@ -64,7 +64,7 @@ import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
     const events = [...eventQueue];
     eventQueue = []; // 큐 초기화
 
-    const jsonl = events.map((e) => JSON.stringify(e)).join('\n');
+    const jsonl = events.map((e) => JSON.stringify(e)).join('\n') + '\n';
     // eslint-disable-next-line no-console
     console.log('[LWT] Sending events:', jsonl);
     const compressed = pako.gzip(jsonl);
