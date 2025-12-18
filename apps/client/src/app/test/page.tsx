@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import MissionPanel from '@/components/test/MissionPanel';
 import MissionSidebar from '@/components/test/MissionSidebar';
@@ -84,9 +84,21 @@ export default function TestPage() {
     return statuses;
   });
 
+  const missionResultId = useRef<number | null>(null);
+
   const currentMission = test.missions[currentMissionIndex];
 
   const handleMissionComplete = () => {
+    fetch(`http://localhost:3000/mission-results/${missionResultId.current}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        status: 'COMPLETED',
+        feedback: 'good job',
+      }),
+    });
     setMissionStatuses((prev) => ({
       ...prev,
       [currentMission.id]: 'completed',
@@ -107,6 +119,18 @@ export default function TestPage() {
   };
 
   const handleMissionSkip = () => {
+    fetch(`http://localhost:3000/mission-results/${missionResultId.current}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        status: 'FAILED',
+        feedback: '너무 어려워요',
+      }),
+    }).catch(() => {
+      alert('미션 결과 생성에 실패했습니다.');
+    });
     setMissionStatuses((prev) => ({
       ...prev,
       [currentMission.id]: 'skipped',
@@ -167,7 +191,11 @@ export default function TestPage() {
           onSkip={handleMissionSkip}
           onQuit={handleQuit}
         />
-        <ProductFrame productUrl={test.testUrl} missionId={currentMission.id} />
+        <ProductFrame
+          productUrl={test.testUrl}
+          missionId={currentMission.id}
+          missionResultIdRef={missionResultId}
+        />
       </div>
     </div>
   );

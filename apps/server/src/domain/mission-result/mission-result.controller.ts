@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Patch, Post, Query } from '@nestjs/common';
 
 import { CreateMissionResultDto } from './dtos/create-mission-result.dto';
 import { MissionResultDto } from './dtos/mission-result.dto';
@@ -23,6 +23,10 @@ export class MissionResultController {
   async createMissionResult(
     @Body() createMissionResultDto: CreateMissionResultDto,
   ): Promise<MissionResultDto> {
+    Logger.log(
+      `Creating mission result for participant: ${createMissionResultDto.participantId}, mission: ${createMissionResultDto.missionId}`,
+      'MissionResultController',
+    );
     return await this.missionResultService.createMissionResult(createMissionResultDto);
   }
 
@@ -31,6 +35,10 @@ export class MissionResultController {
     @Param('missionResultId') missionResultId: number,
     @Body() updateMissionResultDto: UpdateMissionResultDto,
   ) {
+    Logger.log(
+      `Updating mission result ID: ${missionResultId} with status: ${updateMissionResultDto.status}`,
+      'MissionResultController',
+    );
     return this.missionResultService.updateMissionResult(missionResultId, updateMissionResultDto);
   }
 }

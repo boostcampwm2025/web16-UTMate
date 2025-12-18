@@ -5,9 +5,14 @@ import { useEffect, useMemo, useState } from 'react';
 interface ProductFrameProps {
   productUrl: string;
   missionId: number;
+  missionResultIdRef: React.RefObject<number | null>;
 }
 
-export default function ProductFrame({ productUrl, missionId }: ProductFrameProps) {
+export default function ProductFrame({
+  productUrl,
+  missionId,
+  missionResultIdRef,
+}: ProductFrameProps) {
   // const [isLoading, setIsLoading] = useState(true);
   // const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -51,7 +56,25 @@ export default function ProductFrame({ productUrl, missionId }: ProductFrameProp
   const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
 
   const handleNewWindow = () => {
-    window.open(iframeUrl, '_blank', `width=${windowWidth},height=${windowHeight}`);
+    fetch('http://localhost:3000/mission-results', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ missionId, participantId: sessionId }),
+    })
+      .then((results) => {
+        if (!results.ok) {
+          throw new Error('Network response was not ok');
+        }
+        results.json().then((data) => {
+          missionResultIdRef.current = data.id;
+        });
+        window.open(iframeUrl, '_blank', `width=${windowWidth},height=${windowHeight}`);
+      })
+      .catch(() => {
+        alert('미션 결과 생성에 실패했습니다. 새 창을 열 수 없습니다.');
+      });
   };
 
   return (
