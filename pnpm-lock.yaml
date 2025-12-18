@@ -14,6 +14,21 @@ importers:
 
   apps/client:
     dependencies:
+      '@rrweb/types':
+        specifier: 2.0.0-alpha.18
+        version: 2.0.0-alpha.18
+      '@tanstack/react-query':
+        specifier: ^5.90.12
+        version: 5.90.12(react@19.2.1)
+      '@tanstack/react-query-next-experimental':
+        specifier: ^5.91.0
+        version: 5.91.0(@tanstack/react-query@5.90.12(react@19.2.1))(next@16.0.10(@babel/core@7.28.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      lucide-react:
+        specifier: ^0.561.0
+        version: 0.561.0(react@19.2.1)
       next:
         specifier: 16.0.10
         version: 16.0.10(@babel/core@7.28.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -23,6 +38,12 @@ importers:
       react-dom:
         specifier: 19.2.1
         version: 19.2.1(react@19.2.1)
+      rrweb-player:
+        specifier: 1.0.0-alpha.4
+        version: 1.0.0-alpha.4
+      tailwind-merge:
+        specifier: ^3.4.0
+        version: 3.4.0
     devDependencies:
       '@org/prettier-config':
         specifier: workspace:*
@@ -30,6 +51,12 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.18
+      '@tanstack/eslint-plugin-query':
+        specifier: ^5.91.2
+        version: 5.91.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+      '@tanstack/react-query-devtools':
+        specifier: ^5.91.1
+        version: 5.91.1(@tanstack/react-query@5.90.12(react@19.2.1))(react@19.2.1)
       '@types/node':
         specifier: ^20
         version: 20.19.27
@@ -1402,6 +1429,35 @@ packages:
   '@tailwindcss/postcss@4.1.18':
     resolution: {integrity: sha512-Ce0GFnzAOuPyfV5SxjXGn0CubwGcuDB0zcdaPuCSzAa/2vII24JTkH+I6jcbXLb1ctjZMZZI6OjDaLPJQL1S0g==}
 
+  '@tanstack/eslint-plugin-query@5.91.2':
+    resolution: {integrity: sha512-UPeWKl/Acu1IuuHJlsN+eITUHqAaa9/04geHHPedY8siVarSaWprY0SVMKrkpKfk5ehRT7+/MZ5QwWuEtkWrFw==}
+    peerDependencies:
+      eslint: ^8.57.0 || ^9.0.0
+
+  '@tanstack/query-core@5.90.12':
+    resolution: {integrity: sha512-T1/8t5DhV/SisWjDnaiU2drl6ySvsHj1bHBCWNXd+/T+Hh1cf6JodyEYMd5sgwm+b/mETT4EV3H+zCVczCU5hg==}
+
+  '@tanstack/query-devtools@5.91.1':
+    resolution: {integrity: sha512-l8bxjk6BMsCaVQH6NzQEE/bEgFy1hAs5qbgXl0xhzezlaQbPk6Mgz9BqEg2vTLPOHD8N4k+w/gdgCbEzecGyNg==}
+
+  '@tanstack/react-query-devtools@5.91.1':
+    resolution: {integrity: sha512-tRnJYwEbH0kAOuToy8Ew7bJw1lX3AjkkgSlf/vzb+NpnqmHPdWM+lA2DSdGQSLi1SU0PDRrrCI1vnZnci96CsQ==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.90.10
+      react: ^18 || ^19
+
+  '@tanstack/react-query-next-experimental@5.91.0':
+    resolution: {integrity: sha512-/EbUnRBYInqoyXbPq/25fPko9JsY5r/DQVry8oR2CCU4z4hbb9ABGAOZ9jVt11OaOKxN5SGC8LE0XDSMNZCrKg==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.90.8
+      next: ^13 || ^14 || ^15 || ^16
+      react: ^18 || ^19
+
+  '@tanstack/react-query@5.90.12':
+    resolution: {integrity: sha512-graRZspg7EoEaw0a8faiUASCyJrqjKPdqJ9EwuDRUF9mEYJ1YPczI9H+/agJ0mOJkPCJDk0lsz5QTrLZ/jQ2rg==}
+    peerDependencies:
+      react: ^18 || ^19
+
   '@tokenizer/inflate@0.3.1':
     resolution: {integrity: sha512-4oeoZEBQdLdt5WmP/hx1KZ6D3/Oid/0cUb2nk4F0pTDAWy+KCH3/EnAkZF/bvckWo8I33EqBm01lIPgmgc8rCA==}
     engines: {node: '>=18'}
@@ -1420,6 +1476,9 @@ packages:
 
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
+
+  '@tsconfig/svelte@1.0.13':
+    resolution: {integrity: sha512-5lYJP45Xllo4yE/RUBccBT32eBlRDbqN8r1/MIvQbKxW3aFqaYPCNgm8D5V20X4ShHcwvYWNlKg3liDh1MlBoA==}
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -2190,6 +2249,10 @@ packages:
   clone@1.0.4:
     resolution: {integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==}
     engines: {node: '>=0.8'}
+
+  clsx@2.1.1:
+    resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
+    engines: {node: '>=6'}
 
   co@4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}
@@ -3517,6 +3580,11 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
+  lucide-react@0.561.0:
+    resolution: {integrity: sha512-Y59gMY38tl4/i0qewcqohPdEbieBy7SovpBL9IFebhc2mDd8x4PZSOsiFRkpPcOq6bj1r/mjH/Rk73gSlIJP2A==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
 
@@ -4064,6 +4132,9 @@ packages:
   rrdom@2.0.0-alpha.18:
     resolution: {integrity: sha512-fSFzFFxbqAViITyYVA4Z0o5G6p1nEqEr/N8vdgSKie9Rn0FJxDSNJgjV0yiCIzcDs0QR+hpvgFhpbdZ6JIr5Nw==}
 
+  rrweb-player@1.0.0-alpha.4:
+    resolution: {integrity: sha512-Wlmn9GZ5Fdqa37vd3TzsYdLl/JWEvXNUrLCrYpnOwEgmY409HwVIvvA5aIo7k582LoKgdRCsB87N+f0oWAR0Kg==}
+
   rrweb-snapshot@2.0.0-alpha.18:
     resolution: {integrity: sha512-hBHZL/NfgQX6wO1D9mpwqFu1NJPpim+moIcKhFEjVTZVRUfCln+LOugRc4teVTCISYHN8Cw5e2iNTWCSm+SkoA==}
 
@@ -4341,6 +4412,9 @@ packages:
   synckit@0.11.11:
     resolution: {integrity: sha512-MeQTA1r0litLUf0Rp/iisCaL8761lKAZHaimlbGK4j0HysC4PLfqygQj9srcs0m2RdtDYnF8UuYyKpbjHYp7Jw==}
     engines: {node: ^14.18.0 || >=16.0.0}
+
+  tailwind-merge@3.4.0:
+    resolution: {integrity: sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==}
 
   tailwindcss@4.1.18:
     resolution: {integrity: sha512-4+Z+0yiYyEtUVCScyfHCxOYP06L5Ne+JiHhY2IjR2KWMIWhJOYZKLSGZaP5HkZ8+bY0cxfzwDE5uOmzFXyIwxw==}
@@ -6076,6 +6150,35 @@ snapshots:
       postcss: 8.5.6
       tailwindcss: 4.1.18
 
+  '@tanstack/eslint-plugin-query@5.91.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)':
+    dependencies:
+      '@typescript-eslint/utils': 8.49.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+      eslint: 9.39.2(jiti@2.6.1)
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
+  '@tanstack/query-core@5.90.12': {}
+
+  '@tanstack/query-devtools@5.91.1': {}
+
+  '@tanstack/react-query-devtools@5.91.1(@tanstack/react-query@5.90.12(react@19.2.1))(react@19.2.1)':
+    dependencies:
+      '@tanstack/query-devtools': 5.91.1
+      '@tanstack/react-query': 5.90.12(react@19.2.1)
+      react: 19.2.1
+
+  '@tanstack/react-query-next-experimental@5.91.0(@tanstack/react-query@5.90.12(react@19.2.1))(next@16.0.10(@babel/core@7.28.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)':
+    dependencies:
+      '@tanstack/react-query': 5.90.12(react@19.2.1)
+      next: 16.0.10(@babel/core@7.28.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      react: 19.2.1
+
+  '@tanstack/react-query@5.90.12(react@19.2.1)':
+    dependencies:
+      '@tanstack/query-core': 5.90.12
+      react: 19.2.1
+
   '@tokenizer/inflate@0.3.1':
     dependencies:
       debug: 4.4.3
@@ -6093,6 +6196,8 @@ snapshots:
   '@tsconfig/node14@1.0.3': {}
 
   '@tsconfig/node16@1.0.4': {}
+
+  '@tsconfig/svelte@1.0.13': {}
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
@@ -7103,6 +7208,8 @@ snapshots:
 
   clone@1.0.4: {}
 
+  clsx@2.1.1: {}
+
   co@4.6.0: {}
 
   collect-v8-coverage@1.0.3: {}
@@ -7419,7 +7526,7 @@ snapshots:
       '@next/eslint-plugin-next': 16.0.10
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.39.2(jiti@2.6.1))
@@ -7446,7 +7553,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.3
@@ -7461,13 +7568,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)):
+  eslint-module-utils@2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -7482,7 +7589,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -8817,6 +8924,10 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
+  lucide-react@0.561.0(react@19.2.1):
+    dependencies:
+      react: 19.2.1
+
   magic-string@0.30.17:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -9344,6 +9455,11 @@ snapshots:
     dependencies:
       rrweb-snapshot: 2.0.0-alpha.18
 
+  rrweb-player@1.0.0-alpha.4:
+    dependencies:
+      '@tsconfig/svelte': 1.0.13
+      rrweb: 2.0.0-alpha.18
+
   rrweb-snapshot@2.0.0-alpha.18:
     dependencies:
       postcss: 8.5.6
@@ -9713,6 +9829,8 @@ snapshots:
   synckit@0.11.11:
     dependencies:
       '@pkgr/core': 0.2.9
+
+  tailwind-merge@3.4.0: {}
 
   tailwindcss@4.1.18: {}
 
