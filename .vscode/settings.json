@@ -1,0 +1,20 @@
+{
+  // 저장 시 Prettier로 자동 포맷팅
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+
+  // 저장 시 ESLint 자동 수정
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // Monorepo 환경에서 ESLint가 각 프로젝트의 설정 파일을 찾을 수 있도록 설정
+  "eslint.workingDirectories": [
+    { "pattern": "apps/*" },
+    { "pattern": "packages/*" }
+  ],
+
+  // TypeScript: Monorepo 환경에서 각 프로젝트의 tsconfig.json을 사용하도록 설정
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

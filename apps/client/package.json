@@ -1,0 +1,45 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "prettier": "@org/prettier-config",
+  "scripts": {
+    "dev": "next dev -p 8080",
+    "build": "next build",
+    "start": "next start -p 8080",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
+    "fix": "pnpm format && pnpm lint:fix",
+    "check": "pnpm format:check && pnpm lint"
+  },
+  "dependencies": {
+    "@rrweb/types": "2.0.0-alpha.18",
+    "@tanstack/react-query": "^5.90.12",
+    "@tanstack/react-query-next-experimental": "^5.91.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.561.0",
+    "next": "16.0.10",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "rrweb-player": "1.0.0-alpha.4",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@org/prettier-config": "workspace:*",
+    "@tailwindcss/postcss": "^4",
+    "@tanstack/eslint-plugin-query": "^5.91.2",
+    "@tanstack/react-query-devtools": "^5.91.1",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.10",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-simple-import-sort": "^12.1.0",
+    "prettier": "^3",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
