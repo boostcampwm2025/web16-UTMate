@@ -18,6 +18,7 @@ export class MissionResult {
   updatedAt: Date;
 
   // TODO 추가적으로 로그 분석하여 저장할 필드 정의
+  logUrl?: string;
 
   private constructor(participantId: string, missionId: string) {
     this.participantId = participantId;
@@ -50,5 +51,9 @@ export class MissionResult {
     this.status = MissionResultStatus.SKIPPED;
     this.duration = Date.now() - this.createdAt.getTime();
     this.updatedAt = new Date();
+  }
+
+  uploadedLogFile(url: string) {
+    this.logUrl = url;
   }
 }

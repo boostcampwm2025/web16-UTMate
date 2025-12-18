@@ -10,8 +10,8 @@ export class MissionResultController {
   constructor(private readonly missionResultService: MissionResultService) {}
 
   @Get()
-  async getMissionResults(@Query('mission-id') _missionId: string) {
-    // TODO missionId 미션 결과 전체 조회(간단하게) 로직 구현
+  async getMissionResults(@Query('mission-id') missionId: string) {
+    return await this.missionResultService.getMissionResults(missionId);
   }
 
   @Get('/:missionResultId')

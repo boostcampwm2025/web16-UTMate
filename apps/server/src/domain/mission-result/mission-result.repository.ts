@@ -19,4 +19,9 @@ export class MissionResultRepository {
   async findById(missionResultId: number): Promise<MissionResult | undefined> {
     return this.missionResults.get(missionResultId);
   }
+
+  // MVP 단계에서 missionIds는 하나이므로 사용 X
+  async findAll(_missionId: string): Promise<MissionResult[]> {
+    return Array.from(this.missionResults.values());
+  }
 }

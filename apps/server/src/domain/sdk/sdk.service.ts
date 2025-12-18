@@ -18,9 +18,7 @@ export class SdkService {
     const gunzip = zlib.createGunzip();
     const decompressedStream = stream.pipe(gunzip);
 
-    // 파일명 확장자 변경 (.json.gz -> .ndjson)
-    // 타임스탬프 제거하여 하나의 파일에 append 되도록 수정
-    const filename = `replay_log/${sessionId}/${missionId}/log.ndjson`;
+    const filename = `replay_log/missions/${missionId}/${sessionId}.log.jsonl`;
 
     // 스트림을 그대로 StorageService에 전달
     await this.storageService.save(filename, decompressedStream);
