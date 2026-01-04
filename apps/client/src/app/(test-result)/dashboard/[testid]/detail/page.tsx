@@ -13,10 +13,9 @@ import Link from 'next/link';
 import { ArrowLeftIcon } from 'lucide-react';
 
 export default function TestDashboardPage() {
+  const [replayer, setReplayer] = useState<rrwebPlayer | null>(null);
   const { testid } = useParams();
-
   const searchParams = useSearchParams();
-
   const missionResultId = searchParams.get('missionResultId');
 
   // TODO: 현재는 테스트ID가 1인 경우만 허용하고
@@ -36,8 +35,28 @@ export default function TestDashboardPage() {
     enabled: !!missionResult?.logUrl,
   });
 
-  const [replayer, setReplayer] = useState<rrwebPlayer | null>(null);
   const pendingGoto = useRef<number | null>(null);
+
+  const logs = missionResultLogs ?? [];
+
+  const handleLogClick = (relativeMs: number) => {
+    if (replayer) {
+      replayer.goto(relativeMs);
+    } else {
+      pendingGoto.current = relativeMs;
+    }
+  };
+
+  const handlePlayerReady = (player: rrwebPlayer) => {
+    setReplayer((prev) => {
+      if (prev === player) return prev;
+      return player;
+    });
+    if (pendingGoto.current !== null) {
+      player.goto(pendingGoto.current);
+      pendingGoto.current = null;
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2 divide-y divide-gray-200">
@@ -51,29 +70,8 @@ export default function TestDashboardPage() {
       </div>
       <div className="p-4">
         <div className="flex gap-4 justify-between">
-          <EventLogViewer
-            logs={missionResultLogs ?? []}
-            onLogClick={(relativeMs) => {
-              if (replayer) {
-                replayer.goto(relativeMs);
-              } else {
-                pendingGoto.current = relativeMs;
-              }
-            }}
-          />
-          <EventLogPlayer
-            logs={missionResultLogs ?? []}
-            onPlayerReady={(player) => {
-              setReplayer((prev) => {
-                if (prev === player) return prev;
-                return player;
-              });
-              if (pendingGoto.current !== null) {
-                player.goto(pendingGoto.current);
-                pendingGoto.current = null;
-              }
-            }}
-          />
+          <EventLogViewer logs={logs} onLogClick={handleLogClick} />
+          <EventLogPlayer logs={logs} onPlayerReady={handlePlayerReady} />
         </div>
       </div>
     </div>
