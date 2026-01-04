@@ -10,7 +10,7 @@ interface MissionItemProps {
   mission: Mission;
   status: MissionStatus;
   isCurrent: boolean;
-  onClick: () => void;
+  onClick: (missionId: number) => void;
 }
 
 const MISSION_TYPE_ICONS: Record<SuccessCriteriaType, string> = {
@@ -24,7 +24,7 @@ const MISSION_TYPE_ICONS: Record<SuccessCriteriaType, string> = {
 export default function MissionItem({ mission, status, isCurrent, onClick }: MissionItemProps) {
   return (
     <Button
-      onClick={onClick}
+      onClick={() => onClick(mission.id)}
       className={cn(
         'h-20 border-2 rounded-lg flex flex-col items-center justify-center',
         'text-center text-xs p-1 cursor-pointer transition-all shadow-sm hover:shadow-md',
