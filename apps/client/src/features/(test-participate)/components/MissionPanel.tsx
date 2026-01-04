@@ -12,6 +12,7 @@ interface MissionPanelProps {
   onComplete: () => void;
   onSkip: () => void;
   onQuit: () => void;
+  isMissionStarted: boolean;
 }
 
 export default function MissionPanel({
@@ -21,6 +22,7 @@ export default function MissionPanel({
   onComplete,
   onSkip,
   onQuit,
+  isMissionStarted,
 }: MissionPanelProps) {
   // 미션 완료된 갯수 계산
   const completedCount = Object.values(missionStatuses).filter(
@@ -67,11 +69,7 @@ export default function MissionPanel({
           onClick={onComplete}
           variant="outline"
           className="flex-1 border-2 border-success-400 rounded-lg bg-success-50 font-bold hover:bg-success-100 hover:border-success-500 transition-all text-sm text-success-700 shadow-sm"
-          disabled={
-            missionStatuses[currentMission.id] === 'pending' || missionStatuses[currentMission.id]
-              ? false
-              : true
-          }
+          disabled={!isMissionStarted}
         >
           ✓ 완료
         </Button>

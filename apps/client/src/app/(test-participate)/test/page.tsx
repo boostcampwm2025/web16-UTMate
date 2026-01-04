@@ -190,6 +190,7 @@ export default function TestPage() {
           onComplete={handleMissionComplete}
           onSkip={handleMissionSkip}
           onQuit={handleQuit}
+          isMissionStarted={!!missionResultId.current}
         />
         <ProductFrame
           productUrl={test.testUrl}
