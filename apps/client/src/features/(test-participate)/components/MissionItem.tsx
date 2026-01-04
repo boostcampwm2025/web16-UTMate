@@ -1,4 +1,8 @@
-import { Mission, MissionStatus, SuccessCriteriaType } from '@/types/test';
+import type {
+  Mission,
+  MissionStatus,
+  SuccessCriteriaType,
+} from '@/features/(test-participate)/types';
 
 interface MissionItemProps {
   mission: Mission;

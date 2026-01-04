@@ -1,5 +1,6 @@
-import type { SimpleMissionResult } from '@/types/dashboard';
 import type { eventWithTime } from '@rrweb/types';
+
+import type { SimpleMissionResult } from '../types';
 
 const BASE_URL = 'http://localhost:3000';
 

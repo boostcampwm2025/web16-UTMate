@@ -4,7 +4,7 @@ import { notFound, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 
-import { getTestResult } from '@/api/dashboard';
+import { getTestResult } from '@/features/(test-result)/apis';
 
 export default function TestDashboardPage() {
   const { testid } = useParams();
