@@ -3,6 +3,7 @@ import type {
   MissionStatusMap,
   TestWithMissions,
 } from '@/features/(test-participate)/types';
+import { Button } from '@/shared/components/ui/button';
 
 interface MissionPanelProps {
   test: TestWithMissions;
@@ -62,26 +63,29 @@ export default function MissionPanel({
 
       {/* Action Buttons */}
       <div className="h-24 p-3 flex gap-2 border-t-2 border-primary-100 bg-gray-50">
-        <button
+        <Button
           onClick={onComplete}
+          variant="outline"
           className="flex-1 border-2 border-success-400 rounded-lg bg-success-50 font-bold hover:bg-success-100 hover:border-success-500 transition-all text-sm text-success-700 shadow-sm"
         >
           ✓ 완료
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onSkip}
+          variant="outline"
           className="flex-1 border-2 border-secondary-400 rounded-lg bg-secondary-50 font-bold hover:bg-secondary-100 hover:border-secondary-500 transition-all text-sm text-secondary-700 shadow-sm"
         >
           × 포기
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onQuit}
+          variant="outline"
           className="flex-1 border-2 border-primary-400 rounded-lg bg-primary-50 font-bold hover:bg-primary-100 hover:border-primary-500 transition-all text-sm leading-tight text-primary-700 shadow-sm"
         >
           전체
           <br />
           포기
-        </button>
+        </Button>
       </div>
     </section>
   );

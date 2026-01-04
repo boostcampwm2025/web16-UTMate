@@ -4,6 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* 기존 테마 */
 @theme {
   /* Primary Colors */
   --color-primary-50: #eff6ff;

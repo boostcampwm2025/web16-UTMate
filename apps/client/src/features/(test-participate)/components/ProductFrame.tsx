@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { Button } from '@/shared/components/ui/button';
 
 interface ProductFrameProps {
   productUrl: string;
@@ -97,9 +98,9 @@ export default function ProductFrame({
         </div>
       )} */}
 
-      <button onClick={handleNewWindow} className="mx-auto my-auto">
+      <Button onClick={handleNewWindow} variant="default" size="lg" className="mx-auto my-auto">
         새 창 열기
-      </button>
+      </Button>
 
       {/* <iframe
 				src={iframeUrl}

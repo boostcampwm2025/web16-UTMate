@@ -8,7 +8,7 @@ import type rrwebPlayer from 'rrweb-player';
 import { getMissionResult, getMissionResultLogs } from '@/features/(test-result)/apis';
 import { EventLogViewer } from '@/features/(test-result)/components/EventLogViewer';
 import { EventLogPlayer } from '@/features/(test-result)/components/EventLogPlayer';
-import { Button } from '@/shared/components/common/Button';
+import { Button } from '@/shared/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeftIcon } from 'lucide-react';
 
