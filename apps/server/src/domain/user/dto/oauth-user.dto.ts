@@ -1,7 +1,9 @@
 import { Profile } from 'passport-github2';
 
+import { OAuthProvider, User } from '#domain/user/entities/user.entity';
+
 export class OAuthUserDto {
-  provider: string;
+  provider: OAuthProvider;
   providerId: string;
   username: string;
   email: string;
@@ -11,11 +13,21 @@ export class OAuthUserDto {
 
   static fromGithubUser(profile: Profile): OAuthUserDto {
     const dto = new OAuthUserDto();
-    dto.provider = 'github';
+    dto.provider = OAuthProvider.github;
     dto.providerId = profile.id;
     dto.username = profile.username || '';
     dto.email = profile.emails?.[0]?.value || '';
     dto.avatarUrl = profile.photos?.[0]?.value || '';
     return dto;
+  }
+
+  toUserEntity() {
+    const user = new User();
+    user.provider = this.provider;
+    user.providerId = this.providerId;
+    user.username = this.username;
+    user.email = this.email;
+    user.avatarUrl = this.avatarUrl;
+    return user;
   }
 }
