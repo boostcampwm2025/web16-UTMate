@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { nanoid } from 'nanoid';
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 export enum OAuthProvider {
   github = 'github',
@@ -10,7 +11,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ unique: true, length: 21 })
   publicId: string;
 
   @Column()
@@ -27,4 +28,11 @@ export class User {
 
   @Column()
   providerId: string;
+
+  @BeforeInsert()
+  generatePublicId() {
+    if (!this.publicId) {
+      this.publicId = nanoid();
+    }
+  }
 }
