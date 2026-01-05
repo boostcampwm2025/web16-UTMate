@@ -10,6 +10,7 @@ import { StorageModule } from '#common/storage/storage.module';
 import { AuthModule } from '#domain/auth/auth.module';
 import { MissionResultModule } from '#domain/mission-result/mission-result.module';
 import { SdkModule } from '#domain/sdk/sdk.module';
+import { UserModule } from '#domain/user/user.module';
 
 @Module({
   imports: [
@@ -39,6 +40,11 @@ import { SdkModule } from '#domain/sdk/sdk.module';
         GITHUB_CLIENT_ID: Joi.string().required(),
         GITHUB_CLIENT_SECRET: Joi.string().required(),
         GITHUB_CALLBACK_URL: Joi.string().uri().required(),
+
+        // JWT
+        JWT_SECRET: Joi.string().required(),
+        JWT_ACCESS_EXPIRES_IN: Joi.number().default(900),
+        JWT_REFRESH_EXPIRES_IN: Joi.number().default(604800),
       }),
       validationOptions: {
         abortEarly: false,
@@ -58,6 +64,7 @@ import { SdkModule } from '#domain/sdk/sdk.module';
         database: config.get<string>(ENV_KEYS.DATABASE_NAME)!,
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: config.get<string>(ENV_KEYS.NODE_ENV)! !== 'production',
+        logging: config.get<string>(ENV_KEYS.NODE_ENV)! !== 'production',
       }),
     }),
 
@@ -77,6 +84,7 @@ import { SdkModule } from '#domain/sdk/sdk.module';
 
     // domain modules
     AuthModule,
+    UserModule,
     MissionResultModule,
     SdkModule,
   ],
