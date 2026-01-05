@@ -31,7 +31,7 @@ export default function MissionSidebar({
               mission={mission}
               status={status}
               isCurrent={isCurrent}
-              onClick={() => onMissionClick(mission.id)}
+              onClick={onMissionClick}
             />
           );
         })}
