@@ -6,6 +6,7 @@ import { redisStore } from 'cache-manager-redis-store';
 import * as Joi from 'joi';
 
 import { StorageModule } from '#common/storage/storage.module';
+import { AuthModule } from '#domain/auth/auth.module';
 import { MissionResultModule } from '#domain/mission-result/mission-result.module';
 import { SdkModule } from '#domain/sdk/sdk.module';
 
@@ -32,6 +33,11 @@ import { SdkModule } from '#domain/sdk/sdk.module';
 
         // Client
         CLIENT_URL: Joi.string().uri().default('http://localhost:3000'),
+
+        // GitHub OAuth
+        GITHUB_CLIENT_ID: Joi.string().required(),
+        GITHUB_CLIENT_SECRET: Joi.string().required(),
+        GITHUB_CALLBACK_URL: Joi.string().uri().required(),
       }),
       validationOptions: {
         abortEarly: false,
@@ -69,6 +75,7 @@ import { SdkModule } from '#domain/sdk/sdk.module';
     StorageModule,
 
     // domain modules
+    AuthModule,
     MissionResultModule,
     SdkModule,
   ],
