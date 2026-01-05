@@ -5,13 +5,15 @@ import { Profile, Strategy } from 'passport-github2';
 
 import { OAuthUserDto } from '../dto/oauth-user.dto';
 
+import { ENV_KEYS } from '#common/config/env.constants';
+
 @Injectable()
 export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
-  constructor(private readonly configService: ConfigService) {
+  constructor(private readonly config: ConfigService) {
     super({
-      clientID: configService.get<string>('GITHUB_CLIENT_ID')!,
-      clientSecret: configService.get<string>('GITHUB_CLIENT_SECRET')!,
-      callbackURL: configService.get<string>('GITHUB_CALLBACK_URL')!,
+      clientID: config.get<string>(ENV_KEYS.GITHUB_CLIENT_ID)!,
+      clientSecret: config.get<string>(ENV_KEYS.GITHUB_CLIENT_SECRET)!,
+      callbackURL: config.get<string>(ENV_KEYS.GITHUB_CALLBACK_URL)!,
       scope: ['user:email'],
     });
   }

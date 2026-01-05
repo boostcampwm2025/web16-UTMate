@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { redisStore } from 'cache-manager-redis-store';
 import * as Joi from 'joi';
 
+import { ENV_KEYS } from '#common/config/env.constants';
 import { StorageModule } from '#common/storage/storage.module';
 import { AuthModule } from '#domain/auth/auth.module';
 import { MissionResultModule } from '#domain/mission-result/mission-result.module';
@@ -50,13 +51,13 @@ import { SdkModule } from '#domain/sdk/sdk.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'mysql',
-        host: config.get<string>('DATABASE_HOST')!,
-        port: config.get<number>('DATABASE_PORT')!,
-        username: config.get<string>('DATABASE_USER')!,
-        password: config.get<string>('DATABASE_PASSWORD')!,
-        database: config.get<string>('DATABASE_NAME')!,
+        host: config.get<string>(ENV_KEYS.DATABASE_HOST)!,
+        port: config.get<number>(ENV_KEYS.DATABASE_PORT)!,
+        username: config.get<string>(ENV_KEYS.DATABASE_USER)!,
+        password: config.get<string>(ENV_KEYS.DATABASE_PASSWORD)!,
+        database: config.get<string>(ENV_KEYS.DATABASE_NAME)!,
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: config.get<string>('NODE_ENV')! !== 'production',
+        synchronize: config.get<string>(ENV_KEYS.NODE_ENV)! !== 'production',
       }),
     }),
 
@@ -66,8 +67,8 @@ import { SdkModule } from '#domain/sdk/sdk.module';
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => ({
         store: redisStore as unknown,
-        host: config.get<string>('REDIS_HOST')!,
-        port: config.get<number>('REDIS_PORT')!,
+        host: config.get<string>(ENV_KEYS.REDIS_HOST)!,
+        port: config.get<number>(ENV_KEYS.REDIS_PORT)!,
       }),
     }),
 

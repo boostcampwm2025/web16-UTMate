@@ -6,6 +6,8 @@ import { OAuthUserDto } from './dto/oauth-user.dto';
 import { GithubAuthGuard } from './guards/github-auth.guard';
 import { AuthService } from './auth.service';
 
+import { ENV_KEYS } from '#common/config/env.constants';
+
 interface RequestWithUser extends Request {
   user: OAuthUserDto;
 }
@@ -14,7 +16,7 @@ interface RequestWithUser extends Request {
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly configService: ConfigService,
+    private readonly config: ConfigService,
   ) {}
 
   @Get('github')
@@ -42,6 +44,6 @@ export class AuthController {
     //   path: '/api/auth/reissue',
     // });
 
-    res.redirect(this.configService.get<string>('CLIENT_URL')!);
+    res.redirect(this.config.get<string>(ENV_KEYS.CLIENT_URL)!);
   }
 }
