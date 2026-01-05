@@ -5,10 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type rrwebPlayer from 'rrweb-player';
 
-import { getMissionResult, getMissionResultLogs } from '@/api/dashboard';
-import { EventLogViewer } from '@/components/dashboard/EventLogViewer';
-import { EventLogPlayer } from '@/components/dashboard/EventLogPlayer';
-import { Button } from '@/components/common/Button';
+import { getMissionResult, getMissionResultLogs } from '@/features/(test-result)/apis';
+import { EventLogViewer } from '@/features/(test-result)/components/EventLogViewer';
+import { EventLogPlayer } from '@/features/(test-result)/components/EventLogPlayer';
+import { Button } from '@/shared/components/common/Button';
 import Link from 'next/link';
 import { ArrowLeftIcon } from 'lucide-react';
 

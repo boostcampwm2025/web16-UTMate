@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
-import { QueryClientProviders } from '@/providers/QueryClientProvider';
+import { QueryClientProviders } from '@/shared/providers/QueryClientProvider';
 
-import './globals.css';
+import '@/styles/globals.css';
 
 export const metadata: Metadata = {
   title: 'UT MVP',

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // /test 경로에서만 동작
   if (!request.nextUrl.pathname.startsWith('/test')) {
     return NextResponse.next();

@@ -1,4 +1,8 @@
-import { Mission, MissionStatusMap, TestWithMissions } from '@/types/test';
+import type {
+  Mission,
+  MissionStatusMap,
+  TestWithMissions,
+} from '@/features/(test-participate)/types';
 
 interface MissionPanelProps {
   test: TestWithMissions;

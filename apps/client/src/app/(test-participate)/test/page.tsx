@@ -2,11 +2,11 @@
 
 import { useRef, useState } from 'react';
 
-import MissionPanel from '@/components/test/MissionPanel';
-import MissionSidebar from '@/components/test/MissionSidebar';
-import ProductFrame from '@/components/test/ProductFrame';
-import TestHeader from '@/components/test/TestHeader';
-import { MissionStatusMap, TestWithMissions } from '@/types/test';
+import MissionPanel from '@/features/(test-participate)/components/MissionPanel';
+import MissionSidebar from '@/features/(test-participate)/components/MissionSidebar';
+import ProductFrame from '@/features/(test-participate)/components/ProductFrame';
+import TestHeader from '@/features/(test-participate)/components/TestHeader';
+import type { MissionStatusMap, TestWithMissions } from '@/features/(test-participate)/types';
 
 // Mock data - 나중에 API로 대체
 const MOCK_TEST: TestWithMissions = {
