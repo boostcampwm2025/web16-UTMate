@@ -41,8 +41,14 @@
     "eslint-config-next": "16.0.10",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",
+    "msw": "^2.12.7",
     "prettier": "^3",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
