@@ -16,5 +16,10 @@
 
   // TypeScript: Monorepo 환경에서 각 프로젝트의 tsconfig.json을 사용하도록 설정
   "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // Claude Code: 모든 파일 읽기 자동 승인
+  "claude.autoApprove": {
+    "read": ["**/*"]
+  }
 }
