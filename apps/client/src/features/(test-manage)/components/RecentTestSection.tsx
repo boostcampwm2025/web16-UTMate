@@ -28,7 +28,7 @@ export function RecentTestSection() {
       {isLoading && (
         <div className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 py-16">
           <div className="text-center">
-            <Loader2 className="mb-4 h-8 w-8 animate-spin text-blue-600 mx-auto" />
+            <Loader2 className="mb-4 h-8 w-8 animate-spin text-primary mx-auto" />
             <p className="text-sm text-gray-600">테스트를 불러오는 중...</p>
           </div>
         </div>
@@ -38,10 +38,12 @@ export function RecentTestSection() {
       {error && !isLoading && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-8">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-6 w-6 shrink-0 text-red-600" />
+            <AlertTriangle className="h-6 w-6 shrink-0 text-destructive" />
             <div>
-              <h3 className="text-sm font-medium text-red-800">테스트를 불러오는데 실패했습니다</h3>
-              <p className="mt-1 text-sm text-red-700">
+              <h3 className="text-sm font-medium text-destructive-foreground">
+                테스트를 불러오는데 실패했습니다
+              </h3>
+              <p className="mt-1 text-sm text-destructive">
                 {error.message || '알 수 없는 오류가 발생했습니다.'}
               </p>
               <Button

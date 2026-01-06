@@ -1,4 +1,4 @@
-import { Test } from '@/features/(test-manage)/types';
+import type { Test } from '@/features/(test-manage)/types';
 import { TestTableRow } from './TestTableRow';
 
 interface TestTableProps {
