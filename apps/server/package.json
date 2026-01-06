@@ -95,6 +95,7 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
+      "^nanoid$": "<rootDir>/../test/mocks/nanoid.ts",
       "^#common/(.*)$": "<rootDir>/common/$1",
       "^#domain/(.*)$": "<rootDir>/domain/$1"
     }
