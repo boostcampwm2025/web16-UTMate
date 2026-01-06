@@ -1,4 +1,7 @@
-import { ClipboardList, MoreVertical } from 'lucide-react';
+'use client';
+
+import { MoreVertical } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import type { Test } from '@/features/(test-manage)/types';
 import { TestStatusBadge } from './TestStatusBadge';
 import { IntegrationIcon } from './IntegrationIcon';
@@ -9,8 +12,19 @@ interface TestTableRowProps {
 }
 
 export function TestTableRow({ test }: TestTableRowProps) {
+  const router = useRouter();
+
+  const handleRowClick = () => {
+    router.push(`/dashboard/${test.id}`);
+  };
+
+  const handleMoreClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: 더보기 메뉴 기능 구현
+  };
+
   return (
-    <tr className="hover:bg-gray-50">
+    <tr onClick={handleRowClick} className="cursor-pointer transition-colors hover:bg-gray-50">
       <td className="px-6 py-4">
         <div className="font-medium text-gray-900">{test.name}</div>
       </td>
@@ -31,7 +45,10 @@ export function TestTableRow({ test }: TestTableRowProps) {
         </div>
       </td>
       <td className="px-6 py-4">
-        <button className="text-gray-400 hover:text-gray-600">
+        <button
+          onClick={handleMoreClick}
+          className="text-gray-400 transition-colors hover:text-gray-600"
+        >
           <MoreVertical className="h-5 w-5" />
         </button>
       </td>
