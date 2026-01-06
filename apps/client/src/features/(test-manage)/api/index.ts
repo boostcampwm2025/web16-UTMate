@@ -9,3 +9,15 @@ export const getMyTestList = async (): Promise<GetTestsResponse> => {
   }
   return response.json();
 };
+
+export const createTest = async (): Promise<void> => {
+  const response = await fetch(`${BASE_URL}/tests`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create test');
+  }
+
+  return response.json();
+};
