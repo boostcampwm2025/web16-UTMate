@@ -59,8 +59,8 @@ export function CreateTestButton() {
       setTestName('');
       setIsOpen(false);
 
-      //TODO: 테스트 ID 가져오기
-      router.push(`/tests/1234`);
+      // 생성된 테스트 상세 페이지로 이동
+      router.push(`/tests/${test.id}`);
     } catch (err) {
       // 에러 처리
       const errorMessage =
