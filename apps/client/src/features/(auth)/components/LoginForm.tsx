@@ -1,20 +1,17 @@
-'use client';
-
 import SocialLoginButtons from './SocialLoginButtons';
 
+/**
+ * LoginForm - GitHub OAuth 로그인
+ *
+ * 백엔드 API로 리다이렉트만 수행
+ * - 프론트: localhost:3000/login에서 버튼 클릭 시 백엔드 API로 이동
+ * - 백엔드: localhost:8080/api/auth/github로 GET 요청
+ * - 백엔드에서 GitHub OAuth 처리 후 쿠키 설정하고 프론트로 리다이렉트
+ */
 export function LoginForm() {
-  const handleGithubLogin = () => {
-    // GitHub OAuth2 로그인 처리
-    const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
-    const redirectUri = `${window.location.origin}/api/auth/callback/github`;
-
-    // GitHub OAuth2 인증 URL로 리다이렉트
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user user:email`;
-  };
-
   return (
     <div className="w-full space-y-6">
-      <SocialLoginButtons handleGithubLogin={handleGithubLogin} />
+      <SocialLoginButtons />
     </div>
   );
 }
