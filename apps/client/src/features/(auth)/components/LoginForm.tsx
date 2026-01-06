@@ -1,3 +1,5 @@
+'use client';
+
 import SocialLoginButtons from './SocialLoginButtons';
 
 export function LoginForm() {
