@@ -54,7 +54,7 @@ export function LoginForm() {
 
   return (
     <div className="w-full space-y-6">
-      <Form {...form}>
+      {/* <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
@@ -98,18 +98,16 @@ export function LoginForm() {
             로그인
           </Button>
         </form>
-      </Form>
+      </Form> */}
 
-      <div className="relative">
+      {/* <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            또는
-          </span>
+          <span className="bg-background px-2 text-muted-foreground">또는</span>
         </div>
-      </div>
+      </div> */}
 
       <Button
         type="button"
