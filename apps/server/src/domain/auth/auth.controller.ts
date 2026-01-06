@@ -36,7 +36,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: this.config.get<number>(ENV_KEYS.JWT_ACCESS_EXPIRES_IN)!,
+      maxAge: this.config.get<number>(ENV_KEYS.JWT_ACCESS_EXPIRES_IN)! * 1000,
     });
 
     res.cookie('refresh_token', token.refreshToken, {
@@ -44,36 +44,46 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/api/auth/reissue',
-      maxAge: this.config.get<number>(ENV_KEYS.JWT_REFRESH_EXPIRES_IN)!,
+      maxAge: this.config.get<number>(ENV_KEYS.JWT_REFRESH_EXPIRES_IN)! * 1000,
     });
 
-    res.sendStatus(200);
+    res.redirect(this.config.get<string>(ENV_KEYS.CLIENT_URL)!);
   }
 
   @Post('reissue')
   @UseGuards(RtAuthGuard)
   async reissue(@RtPayload() payload: RtPayloadDto, @Res() res: Response): Promise<void> {
-    const token = await this.refreshTokenService.rotateRefreshToken(
-      payload.userId,
-      payload.familyId,
-      payload.refreshToken,
-    );
+    try {
+      const token = await this.refreshTokenService.rotateRefreshToken(
+        payload.userId,
+        payload.familyId,
+        payload.refreshToken,
+      );
 
-    res.cookie('access_token', token.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: this.config.get<number>(ENV_KEYS.JWT_ACCESS_EXPIRES_IN)!,
-    });
+      res.cookie('access_token', token.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: this.config.get<number>(ENV_KEYS.JWT_ACCESS_EXPIRES_IN)!,
+      });
 
-    res.cookie('refresh_token', token.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/api/auth/reissue',
-      maxAge: this.config.get<number>(ENV_KEYS.JWT_REFRESH_EXPIRES_IN)!,
-    });
+      res.cookie('refresh_token', token.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/api/auth/reissue',
+        maxAge: this.config.get<number>(ENV_KEYS.JWT_REFRESH_EXPIRES_IN)!,
+      });
+
+      res.sendStatus(200);
+    } catch (error) {
+      // 재발급 실패 시 쿠키 삭제
+      res.clearCookie('access_token', { path: '/' });
+      res.clearCookie('refresh_token', { path: '/api/auth/reissue' });
+
+      throw error;
+    }
   }
 
   @Post('logout')

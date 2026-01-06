@@ -26,7 +26,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@nestjs/cache-manager": "^3.1.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -35,9 +34,8 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
-    "cache-manager": "^7.2.7",
-    "cache-manager-redis-store": "^3.0.1",
     "cookie-parser": "^1.4.7",
+    "ioredis": "^5.9.0",
     "joi": "^18.0.2",
     "mysql2": "^3.16.0",
     "nanoid": "^5.1.6",
@@ -61,6 +59,7 @@
     "@rushstack/eslint-patch": "^1.10.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
+    "@types/ioredis": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
     "@types/passport-github2": "^1.2.9",

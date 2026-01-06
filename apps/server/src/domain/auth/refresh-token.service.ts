@@ -1,15 +1,16 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Cache } from 'cache-manager';
+import Redis from 'ioredis';
 
 import { TokenDto } from './dto/token.dto';
 import { TokenService } from './token.service';
 
+import { RT_REDIS } from '#common/redis/redis.module';
+
 @Injectable()
 export class RefreshTokenService {
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(RT_REDIS) private readonly redisClient: Redis,
     @Inject() private readonly config: ConfigService,
     @Inject() private readonly tokenService: TokenService,
   ) {}
@@ -25,7 +26,7 @@ export class RefreshTokenService {
 
     const ttl = this.config.get<number>('JWT_REFRESH_EXPIRES_IN')!;
 
-    await this.cacheManager.set(key, refreshToken, ttl);
+    await this.redisClient.set(key, refreshToken, 'EX', ttl);
   }
 
   /**
@@ -42,10 +43,13 @@ export class RefreshTokenService {
     refreshToken: string,
   ): Promise<TokenDto> {
     const key = `rt:${userId}:${familyId}`;
-    const existingToken = await this.cacheManager.get(key);
+    const existingToken = await this.redisClient.get(key);
 
     if (existingToken !== refreshToken) {
-      await this.cacheManager.del(key);
+      Logger.warn(
+        `Refresh token mismatch for user ${userId} and familyId ${familyId}. Possible token theft.`,
+      );
+      await this.redisClient.del(key);
       throw new UnauthorizedException('Invalid refresh token');
     }
 
