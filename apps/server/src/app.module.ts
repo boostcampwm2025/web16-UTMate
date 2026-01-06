@@ -42,8 +42,9 @@ import { UserModule } from '#domain/user/user.module';
         GITHUB_CALLBACK_URL: Joi.string().uri().required(),
 
         // JWT
-        JWT_SECRET: Joi.string().required(),
+        JWT_ACCESS_SECRET: Joi.string().required(),
         JWT_ACCESS_EXPIRES_IN: Joi.number().default(900),
+        JWT_REFRESH_SECRET: Joi.string().required(),
         JWT_REFRESH_EXPIRES_IN: Joi.number().default(604800),
       }),
       validationOptions: {
