@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { UserSummaryDto } from './dto/user-summary.dto';
 import { UserRepository } from './user.repository';
 
 import { OAuthUserDto } from '#domain/user/dto/oauth-user.dto';
@@ -34,5 +35,17 @@ export class UserService {
     const user = oauthUser.toUserEntity();
     await this.userRepository.save(user);
     return user.publicId;
+  }
+
+  async getUserSummaryById(userId: string) {
+    const user = await this.userRepository.findSummaryByPublicId(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return UserSummaryDto.fromUserEntity(user);
+  }
+
+  async deleteUser(userId: string) {
+    this.userRepository.deleteByPublicId(userId);
   }
 }

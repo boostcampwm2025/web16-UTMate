@@ -1,17 +1,35 @@
-import { Controller, Delete, Get, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
+
+import { UserService } from './user.service';
+
+import { JwtPayload } from '#domain/auth/decorator/param.decorator';
+import { JwtPayloadDto } from '#domain/auth/dto/jwt-payload.dto';
+import { JwtAuthGuard } from '#domain/auth/guards/jwt-auth.guard';
 
 @Controller('users')
 export class UserController {
-  constructor() {}
+  constructor(@Inject() private readonly userService: UserService) {}
 
   @Get('/me')
-  getProfile() {
-    throw new Error('Method not implemented.');
+  @UseGuards(JwtAuthGuard)
+  getProfile(@JwtPayload() payload: JwtPayloadDto) {
+    return this.userService.getUserSummaryById(payload.userId);
   }
 
   @Delete('/me')
-  deleteProfile() {
-    throw new Error('Method not implemented.');
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteProfile(@JwtPayload() payload: JwtPayloadDto) {
+    return this.userService.deleteUser(payload.userId);
   }
 
   @Patch()
