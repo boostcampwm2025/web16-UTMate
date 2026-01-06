@@ -11,9 +11,7 @@ export default function LoginPage() {
             {/* 로고/헤더 */}
             <div className="text-center lg:text-left">
               <div className="mb-4 inline-flex items-center justify-center lg:justify-start">
-                <div className="rounded-full bg-primary/10 p-3">
-                  <span className="text-4xl">🎯</span>
-                </div>
+                {/* TODO : UTMate 로고 이미지 */}
               </div>
               <h1 className="text-3xl font-bold tracking-tight">
                 <span className="bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
