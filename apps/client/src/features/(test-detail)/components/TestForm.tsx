@@ -26,6 +26,7 @@ export function TestForm({ initialData }: TestFormProps) {
   const [editName, setEditName] = useState(test.name);
   const [editUrl, setEditUrl] = useState(test.integrationUrl);
   const [missions, setMissions] = useState<TestMission[]>(test.missions || []);
+  const [selectedMissionIndex, setSelectedMissionIndex] = useState(0);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -58,6 +59,33 @@ export function TestForm({ initialData }: TestFormProps) {
 
   const handleDeleteMission = (id: number) => {
     setMissions(missions.filter((mission) => mission.id !== id));
+  };
+
+  const handleMissionClick = (missionId: number) => {
+    // 미션 인덱스 찾기
+    const missionIndex = missions.findIndex((m) => m.id === missionId);
+    if (missionIndex === -1) return;
+
+    // 미션 설정 스텝으로 이동
+    if (step !== TestFormStep.TEST_MISSIONS) {
+      setStep(TestFormStep.TEST_MISSIONS);
+    }
+
+    // 해당 미션 선택
+    setSelectedMissionIndex(missionIndex);
+
+    // 해당 미션으로 스크롤
+    setTimeout(() => {
+      const missionElement = document.getElementById(`mission-${missionId}`);
+      if (missionElement) {
+        missionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // 강조 효과
+        missionElement.classList.add('ring-2', 'ring-blue-500');
+        setTimeout(() => {
+          missionElement.classList.remove('ring-2', 'ring-blue-500');
+        }, 2000);
+      }
+    }, 100);
   };
 
   const handleNextStep = () => {
@@ -128,7 +156,6 @@ export function TestForm({ initialData }: TestFormProps) {
             <BackToWorkspaceButton />
             <div>
               <h1 className="text-2xl font-bold">{test.name}</h1>
-              <p className="text-sm text-gray-500">테스트 ID: {test.id}</p>
             </div>
           </div>
 
@@ -146,7 +173,12 @@ export function TestForm({ initialData }: TestFormProps) {
       {/* 메인 레이아웃 */}
       <div className="flex flex-1 overflow-hidden">
         {/* 사이드바 */}
-        <TestFormSidebar currentStep={step} missions={missions} onStepChange={setStep} />
+        <TestFormSidebar
+          currentStep={step}
+          missions={missions}
+          onStepChange={setStep}
+          onMissionClick={handleMissionClick}
+        />
 
         {/* 메인 콘텐츠 */}
         <main className="flex-1 overflow-y-auto">
@@ -165,6 +197,8 @@ export function TestForm({ initialData }: TestFormProps) {
             {step === TestFormStep.TEST_MISSIONS && (
               <TestMissionsStep
                 missions={missions}
+                selectedMissionIndex={selectedMissionIndex}
+                onSelectedMissionIndexChange={setSelectedMissionIndex}
                 onAddMission={handleAddMission}
                 onUpdateMission={handleUpdateMission}
                 onDeleteMission={handleDeleteMission}

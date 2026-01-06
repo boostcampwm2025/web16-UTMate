@@ -47,6 +47,7 @@ export function TestSdkStep({ test, onPrev, onSave, loading }: TestSdkStepProps)
             아래 코드를 테스트할 웹사이트의 {`<head>`} 태그 안에 추가하세요.
           </p>
 
+          {/* TODO: SDK 배포 우리 SDK에 맞게 내용 수정 */}
           <div className="relative">
             <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-gray-100">
               <code>{sdkCode}</code>
@@ -71,7 +72,7 @@ export function TestSdkStep({ test, onPrev, onSave, loading }: TestSdkStepProps)
         <div>
           <h3 className="mb-2 font-semibold">2. SDK 연동 확인</h3>
           <p className="mb-4 text-sm text-gray-600">아래 버튼을 눌러서 확인하세요</p>
-
+          {/* TODO: SDK 연동 확인 API 구현 후 연동 */}
           <Button variant="outline" size="sm">
             확인
           </Button>
