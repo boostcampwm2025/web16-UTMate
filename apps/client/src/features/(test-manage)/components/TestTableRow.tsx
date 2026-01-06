@@ -2,7 +2,7 @@
 
 import { MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { Test } from '@/features/(test-manage)/types';
+import { type Test, TestType } from '@/features/(test-manage)/types';
 import { TestStatusBadge } from './TestStatusBadge';
 import { IntegrationIcon } from './IntegrationIcon';
 import { UserAvatar } from './UserAvatar';
@@ -15,7 +15,12 @@ export function TestTableRow({ test }: TestTableRowProps) {
   const router = useRouter();
 
   const handleRowClick = () => {
-    router.push(`/dashboard/${test.id}`);
+    if (test.type === TestType.DRAFT) {
+      router.push(`/tests/${test.id}`);
+      return;
+    } else {
+      router.push(`/dashboard/${test.id}`);
+    }
   };
 
   const handleMoreClick = (e: React.MouseEvent) => {
