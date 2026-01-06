@@ -5,8 +5,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
   type CarouselApi,
 } from '@/shared/components/ui/carousel';
 
@@ -108,10 +106,6 @@ export function UTMateCarousel() {
             </CarouselItem>
           ))}
         </CarouselContent>
-
-        {/* 이전/다음 버튼 */}
-        <CarouselPrevious className="left-4" />
-        <CarouselNext className="right-4" />
       </Carousel>
 
       {/* 페이지네이션 인디케이터 */}
