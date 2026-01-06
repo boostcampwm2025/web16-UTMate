@@ -15,14 +15,14 @@ export default function LoginPage() {
           <LoginForm />
         </div>
 
-        <div className="text-center text-sm text-muted-foreground">
+        {/* <div className="text-center text-sm text-muted-foreground">
           <p>
             계정이 없으신가요?{' '}
             <a href="/signup" className="font-medium text-primary hover:underline">
               회원가입
             </a>
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
