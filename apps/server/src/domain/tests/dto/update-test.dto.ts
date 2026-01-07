@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { UpdateMissionDto } from './update-mission.dto';
@@ -15,5 +16,6 @@ export class UpdateTestDto {
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
+  @Type(() => UpdateMissionDto)
   missions: UpdateMissionDto[];
 }

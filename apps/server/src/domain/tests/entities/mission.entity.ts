@@ -1,4 +1,5 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { nanoid } from 'nanoid';
+import { BeforeInsert, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Test } from './test.entity';
 
@@ -40,6 +41,7 @@ export class Mission {
     name: string,
     description: string,
     url: string,
+    estimatedDuration: number,
     test: Test,
   ): Mission {
     const mission = new Mission();
@@ -47,6 +49,7 @@ export class Mission {
     mission.name = name;
     mission.description = description;
     mission.missionUrl = url;
+    mission.estimatedDuration = estimatedDuration;
     mission.test = test;
     return mission;
   }
@@ -56,5 +59,12 @@ export class Mission {
     this.name = name;
     this.description = description;
     this.missionUrl = url;
+  }
+
+  @BeforeInsert()
+  generatePublicId() {
+    if (!this.publicId) {
+      this.publicId = nanoid();
+    }
   }
 }

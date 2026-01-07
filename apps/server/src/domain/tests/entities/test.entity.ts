@@ -40,7 +40,7 @@ export class Test {
   @Column({ type: 'enum', enum: TestStatus, default: TestStatus.DRAFT })
   status: TestStatus;
 
-  @Column()
+  @Column({ nullable: true })
   url: string;
 
   @Column({ default: false })

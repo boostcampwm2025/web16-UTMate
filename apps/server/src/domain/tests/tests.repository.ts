@@ -17,7 +17,11 @@ export class TestsRepository {
 
   async findByPublicIdAndOwner(publicId: string, owner: User, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    return repo.findOneBy({ publicId, owner });
+    return repo
+      .createQueryBuilder('tests')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId: owner.id })
+      .getOne();
   }
 
   async findSummariesByOwner(owner: User, manager?: EntityManager) {
@@ -31,7 +35,7 @@ export class TestsRepository {
         'tests.sdkStatus',
         'owner.publicId',
         'owner.username',
-        'owner.email',
+        'owner.avatarUrl',
       ])
       .leftJoin('tests.owner', 'owner')
       .where('tests.owner_id = :ownerId', { ownerId: owner.id })

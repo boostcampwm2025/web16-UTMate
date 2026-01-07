@@ -20,7 +20,17 @@ export class UpdateMissionDto {
   @IsString()
   url: string;
 
+  @IsNumber()
+  estimatedDuration: number;
+
   toUserEntity(test: Test): Mission {
-    return Mission.createMission(this.order, this.name, this.description, this.url, test);
+    return Mission.createMission(
+      this.order,
+      this.name,
+      this.description,
+      this.url,
+      this.estimatedDuration,
+      test,
+    );
   }
 }

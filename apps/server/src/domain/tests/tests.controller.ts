@@ -33,11 +33,11 @@ export class TestsController {
 
   @Put('/:id')
   @UseGuards(JwtAuthGuard)
-  updateTest(
+  async updateTest(
     @JwtPayload() payload: JwtPayloadDto,
     @Param('id') publicId: string,
     @Body() updateTestDto: UpdateTestDto,
   ) {
-    this.testsService.updateTest(payload.userId, publicId, updateTestDto);
+    return await this.testsService.updateTest(payload.userId, publicId, updateTestDto);
   }
 }

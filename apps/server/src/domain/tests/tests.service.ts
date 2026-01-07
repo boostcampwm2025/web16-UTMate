@@ -30,7 +30,7 @@ export class TestsService {
     const owner = await this.usersService.getIdByPublicId(userId);
 
     // 트랜잭션 시작
-    return await this.dataSource.transaction(async (manager) => {
+    await this.dataSource.transaction(async (manager) => {
       // 테스트 업데이트
       const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner, manager);
       if (!test) {
@@ -44,7 +44,7 @@ export class TestsService {
         await this.missionsService.updateMissions(test, updateTestDto.missions, manager);
       }
 
-      return;
+      return { success: true };
     });
   }
 
@@ -58,7 +58,7 @@ export class TestsService {
   async getTestById(userId: string, publicId: string) {
     const owner = await this.usersService.getIdByPublicId(userId);
 
-    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner);
+    const test = await this.testsRepository.findWithMissionsByPublicIdAndOwner(publicId, owner);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
