@@ -82,7 +82,7 @@ export function TestFormSidebar({
                 <div
                   className={cn(
                     'flex size-12 shrink-0 items-center justify-center rounded-full',
-                    isActive && 'bg-gray-500 text-white',
+                    isActive && 'bg-primary text-white',
                     !isActive && 'bg-gray-200 text-gray-600',
                   )}
                 >
