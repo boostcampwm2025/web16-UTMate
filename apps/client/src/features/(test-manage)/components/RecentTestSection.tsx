@@ -5,6 +5,7 @@ import { Loader2, AlertTriangle, FileText } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { getMyTestList } from '@/features/(test-manage)/api';
 import { TestTable } from './TestTable';
+import { CreateTestButton } from './CreateTestButton';
 
 export function RecentTestSection() {
   const { data, isLoading, error } = useQuery({
@@ -13,6 +14,7 @@ export function RecentTestSection() {
   });
 
   const tests = data?.tests ?? [];
+
   return (
     <div className="mb-12">
       <div className="mb-6 flex items-start justify-between">
@@ -20,7 +22,7 @@ export function RecentTestSection() {
           <h2 className="text-2xl font-bold text-gray-900">테스트</h2>
         </div>
         <div className="flex gap-2">
-          <Button size="lg">새 테스트</Button>
+          <CreateTestButton />
         </div>
       </div>
 

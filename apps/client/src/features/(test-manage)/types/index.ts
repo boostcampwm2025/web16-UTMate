@@ -19,6 +19,18 @@ export interface Test {
   creator: User;
 }
 
+export interface TestMission {
+  id: number;
+  name: string;
+  description: string;
+  url: string;
+  estimatedDuration?: number; // 예상 소요시간 (분 단위)
+}
+
+export interface TestDetail extends Test {
+  missions: TestMission[];
+}
+
 export interface GetTestsResponse {
   tests: Test[];
   total: number;

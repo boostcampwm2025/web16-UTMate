@@ -39,10 +39,51 @@ const mockTests: Test[] = [
 
 export const testsHandlers = [
   // GET /tests - 스터디(테스트) 목록 조회
-  http.get('http://localhost:3000/tests?scope=me', () => {
+  http.get('http://localhost:3000/tests', ({ request }) => {
+    const url = new URL(request.url);
+    const scope = url.searchParams.get('scope');
+
+    if (scope === 'me') {
+      return HttpResponse.json({
+        tests: mockTests,
+        total: mockTests.length,
+      });
+    }
+
     return HttpResponse.json({
-      tests: mockTests,
-      total: mockTests.length,
+      tests: [],
+      total: 0,
     });
+  }),
+
+  // GET /tests/:id - 테스트 개별 조회
+  http.get('http://localhost:3000/tests/:id', ({ params }) => {
+    const { id } = params;
+    const test = mockTests.find((t) => t.id === Number(id));
+
+    if (!test) {
+      return new HttpResponse(null, {
+        status: 404,
+        statusText: 'Test not found',
+      });
+    }
+
+    return HttpResponse.json(test);
+  }),
+
+  // POST /tests - 테스트 생성
+  http.post('http://localhost:3000/tests', async () => {
+    const newTest: Test = {
+      id: mockTests.length + 1,
+      name: '새 테스트',
+      type: 'DRAFT' as TestType,
+      integrationUrl: '',
+      participants: 0,
+      creator: mockUsers[0],
+    };
+
+    mockTests.push(newTest);
+
+    return HttpResponse.json(newTest, { status: 201 });
   }),
 ];

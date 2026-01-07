@@ -1,5 +1,5 @@
 import { BASE_URL } from '@/shared/constants/api';
-import type { GetTestsResponse } from '@/features/(test-manage)/types';
+import type { GetTestsResponse, Test } from '@/features/(test-manage)/types';
 
 export const getMyTestList = async (): Promise<GetTestsResponse> => {
   const response = await fetch(`${BASE_URL}/tests?scope=me`);
@@ -7,5 +7,17 @@ export const getMyTestList = async (): Promise<GetTestsResponse> => {
   if (!response.ok) {
     throw new Error('Failed to fetch test list');
   }
+  return response.json();
+};
+
+export const createTest = async (): Promise<Test> => {
+  const response = await fetch(`${BASE_URL}/tests`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create test');
+  }
+
   return response.json();
 };
