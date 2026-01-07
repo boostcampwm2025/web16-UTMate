@@ -1,11 +1,12 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  // 기본 BodyParser 비활성화 (AppModule에서 커스텀 설정 사용)
-  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  const app = await NestFactory.create(AppModule);
+  const config = app.get(ConfigService);
 
   // 쿠키 파서 미들웨어 설정
   app.use(cookieParser());
@@ -18,6 +19,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  app.setGlobalPrefix('api');
+
+  await app.listen(config.get<number>('SERVER_PORT')!);
 }
 bootstrap();
