@@ -52,6 +52,18 @@ export class Test {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
+
+  private constructor() {}
+
+  static createTest(title: string, owner: User): Test {
+    const test = new Test();
+    test.title = title;
+    test.owner = owner;
+    return test;
+  }
+
   @BeforeInsert()
   generatePublicId() {
     if (!this.publicId) {
