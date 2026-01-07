@@ -1,8 +1,7 @@
 import type { eventWithTime } from '@rrweb/types';
 
 import type { SimpleMissionResult } from '../types';
-
-const BASE_URL = 'http://localhost:3000';
+import { BASE_URL } from '@/shared/constants/api';
 
 export const getTestResult = async (testid: string): Promise<SimpleMissionResult[]> => {
   // TODO: 현재 임시 API이므로 나중에 API로 대체해야 합니다.
