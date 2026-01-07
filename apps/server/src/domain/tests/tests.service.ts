@@ -1,6 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
+import { TestDto } from './dto/test.dto';
+import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test } from './entities/test.entity';
 import { MissionsService } from './missions.service';
@@ -44,5 +46,22 @@ export class TestsService {
 
       return;
     });
+  }
+
+  async getMyTests(userId: string) {
+    const owner = await this.usersService.getIdByPublicId(userId);
+
+    const test = await this.testsRepository.findSummariesByOwner(owner);
+    return TestSummaryDto.fromTestEntities(test);
+  }
+
+  async getTestById(userId: string, publicId: string) {
+    const owner = await this.usersService.getIdByPublicId(userId);
+
+    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return TestDto.fromTestEntity(test);
   }
 }

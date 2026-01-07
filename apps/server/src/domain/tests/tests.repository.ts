@@ -17,6 +17,34 @@ export class TestsRepository {
 
   async findByPublicIdAndOwner(publicId: string, owner: User, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    return repo.findOne({ where: { publicId, owner } });
+    return repo.findOneBy({ publicId, owner });
+  }
+
+  async findSummariesByOwner(owner: User, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
+    return repo
+      .createQueryBuilder('tests')
+      .select([
+        'tests.publicId',
+        'tests.title',
+        'tests.status',
+        'tests.sdkStatus',
+        'owner.publicId',
+        'owner.username',
+        'owner.email',
+      ])
+      .leftJoin('tests.owner', 'owner')
+      .where('tests.owner_id = :ownerId', { ownerId: owner.id })
+      .getMany();
+  }
+
+  async findWithMissionsByPublicIdAndOwner(publicId: string, owner: User, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
+    return repo
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.missions', 'mission')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId: owner.id })
+      .getOne();
   }
 }

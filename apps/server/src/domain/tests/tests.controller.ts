@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Put, UseGuards } from '@nestjs/common';
 
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
@@ -11,6 +11,18 @@ import { JwtAuthGuard } from '#domain/auth/guards/jwt-auth.guard';
 @Controller('tests')
 export class TestsController {
   constructor(@Inject() private readonly testsService: TestsService) {}
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async getTests(@JwtPayload() payload: JwtPayloadDto) {
+    return this.testsService.getMyTests(payload.userId);
+  }
+
+  @Get('/:id')
+  @UseGuards(JwtAuthGuard)
+  async getTestById(@JwtPayload() payload: JwtPayloadDto, @Param('id') publicId: string) {
+    return this.testsService.getTestById(payload.userId, publicId);
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)
