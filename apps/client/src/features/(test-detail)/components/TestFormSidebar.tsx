@@ -47,6 +47,9 @@ interface TestFormSidebarProps {
   selectedMissionIndex: number;
   onStepChange: (step: TestFormStep) => void;
   onMissionClick: (missionId: number) => void;
+  onAddMission: () => void;
+  onDeleteMission: (missionId: number) => void;
+  onMoveMission: (fromIndex: number, toIndex: number) => void;
 }
 
 export function TestFormSidebar({
@@ -55,6 +58,9 @@ export function TestFormSidebar({
   selectedMissionIndex,
   onStepChange,
   onMissionClick,
+  onAddMission,
+  onDeleteMission,
+  onMoveMission,
 }: TestFormSidebarProps) {
   return (
     <aside className="w-80 shrink-0 border-r px-4 py-6">
@@ -102,6 +108,8 @@ export function TestFormSidebar({
                   missions={missions}
                   selectedMissionIndex={selectedMissionIndex}
                   onMissionClick={onMissionClick}
+                  onAddMission={onAddMission}
+                  onMoveMission={onMoveMission}
                 />
               )}
             </div>

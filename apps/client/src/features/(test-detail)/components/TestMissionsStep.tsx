@@ -2,7 +2,6 @@ import type { TestMission } from '@/features/(test-manage)/types';
 import { Button } from '@/shared/components/ui/button';
 
 import { MissionItemForm } from './MissionItemForm';
-import { MissionTabs } from './MissionTabs';
 
 interface TestMissionsStepProps {
   missions: TestMission[];
@@ -44,15 +43,6 @@ export function TestMissionsStep({
         <h2 className="mb-2 text-2xl font-bold">미션 설정</h2>
         <p className="text-gray-600">테스트 참여자가 수행할 미션을 입력해주세요.</p>
       </div>
-
-      {/* 미션 탭 컴포넌트 */}
-      <MissionTabs
-        missions={missions}
-        selectedMissionIndex={selectedMissionIndex}
-        onSelectedMissionIndexChange={onSelectedMissionIndexChange}
-        onAddMission={onAddMission}
-        onMoveMission={onMoveMission}
-      />
 
       {missions.length === 0 ? (
         <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-12 text-center">

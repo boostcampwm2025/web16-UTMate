@@ -13,6 +13,7 @@ import { TestFormSidebar, TestFormStep } from './TestFormSidebar';
 import { TestInfoStep } from './TestInfoStep';
 import { TestMissionsStep } from './TestMissionsStep';
 import { TestSdkStep } from './TestSdkStep';
+import { MAX_MISSIONS } from '../constants';
 
 interface TestFormProps {
   initialData: TestDetail;
@@ -42,6 +43,13 @@ export function TestForm({ initialData }: TestFormProps) {
   };
 
   const handleAddMission = () => {
+    // 미션 개수 제한 (최대 5개)
+    if (missions.length >= MAX_MISSIONS) {
+      setError(`미션은 최대 ${MAX_MISSIONS}개까지만 추가할 수 있습니다.`);
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
     const newMission: TestMission = {
       id: Date.now(), // 임시 ID
       description: '',
@@ -49,6 +57,8 @@ export function TestForm({ initialData }: TestFormProps) {
       estimatedDuration: undefined,
     };
     setMissions([...missions, newMission]);
+    // 새로 추가된 미션을 선택
+    setSelectedMissionIndex(missions.length);
   };
 
   const handleUpdateMission = (id: number, updatedMission: Partial<TestMission>) => {
@@ -58,7 +68,17 @@ export function TestForm({ initialData }: TestFormProps) {
   };
 
   const handleDeleteMission = (id: number) => {
+    const deletedIndex = missions.findIndex((mission) => mission.id === id);
     setMissions(missions.filter((mission) => mission.id !== id));
+
+    // 선택된 미션 인덱스 업데이트
+    if (selectedMissionIndex > deletedIndex) {
+      // 삭제된 미션보다 뒤에 있던 미션을 선택했다면 인덱스 감소
+      setSelectedMissionIndex(selectedMissionIndex - 1);
+    } else if (selectedMissionIndex === deletedIndex) {
+      // 선택된 미션을 삭제했다면 이전 미션 선택 (없으면 0)
+      setSelectedMissionIndex(Math.max(0, deletedIndex - 1));
+    }
   };
 
   const handleMoveMission = (fromIndex: number, toIndex: number) => {
@@ -66,6 +86,28 @@ export function TestForm({ initialData }: TestFormProps) {
     const [movedMission] = newMissions.splice(fromIndex, 1);
     newMissions.splice(toIndex, 0, movedMission);
     setMissions(newMissions);
+
+    // 선택된 미션 인덱스도 함께 업데이트
+    let newSelectedIndex = selectedMissionIndex;
+
+    if (selectedMissionIndex === fromIndex) {
+      // 선택된 미션 자체가 이동하는 경우
+      newSelectedIndex = toIndex;
+    } else if (fromIndex < toIndex) {
+      // 아래로 이동하는 경우
+      if (selectedMissionIndex > fromIndex && selectedMissionIndex <= toIndex) {
+        // 선택된 미션이 이동 범위 내에 있으면 위로 한 칸 이동
+        newSelectedIndex = selectedMissionIndex - 1;
+      }
+    } else {
+      // 위로 이동하는 경우
+      if (selectedMissionIndex >= toIndex && selectedMissionIndex < fromIndex) {
+        // 선택된 미션이 이동 범위 내에 있으면 아래로 한 칸 이동
+        newSelectedIndex = selectedMissionIndex + 1;
+      }
+    }
+
+    setSelectedMissionIndex(newSelectedIndex);
   };
 
   const handleMissionClick = (missionId: number) => {
@@ -189,6 +231,9 @@ export function TestForm({ initialData }: TestFormProps) {
           selectedMissionIndex={selectedMissionIndex}
           onStepChange={setStep}
           onMissionClick={handleMissionClick}
+          onAddMission={handleAddMission}
+          onDeleteMission={handleDeleteMission}
+          onMoveMission={handleMoveMission}
         />
 
         {/* 메인 콘텐츠 */}
