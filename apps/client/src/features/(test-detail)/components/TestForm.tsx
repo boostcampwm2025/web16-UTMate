@@ -86,11 +86,6 @@ export function TestForm({ initialData }: TestFormProps) {
       const missionElement = document.getElementById(`mission-${missionId}`);
       if (missionElement) {
         missionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // 강조 효과
-        missionElement.classList.add('ring-2', 'ring-blue-500');
-        setTimeout(() => {
-          missionElement.classList.remove('ring-2', 'ring-blue-500');
-        }, 2000);
       }
     }, 100);
   };
