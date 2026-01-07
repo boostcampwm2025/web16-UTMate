@@ -84,19 +84,20 @@
       "json",
       "ts"
     ],
-    "rootDir": ".",
-    "testRegex": "test/unit/.*\\.spec\\.ts$",
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "src/**/*.(t|j)s"
+      "**/*.(t|j)s"
     ],
-    "coverageDirectory": "./coverage",
+    "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^#common/(.*)$": "<rootDir>/src/common/$1",
-      "^#domain/(.*)$": "<rootDir>/src/domain/$1"
+      "^nanoid$": "<rootDir>/../test/mocks/nanoid.ts",
+      "^#common/(.*)$": "<rootDir>/common/$1",
+      "^#domain/(.*)$": "<rootDir>/domain/$1"
     }
   }
 }

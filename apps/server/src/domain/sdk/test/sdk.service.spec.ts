@@ -48,8 +48,8 @@ describe('SdkService', () => {
       await service.saveReplayLog(sessionId, missionId, stream);
 
       expect(storageService.save).toHaveBeenCalledWith(
-        `replay_log/${sessionId}/${missionId}/log.ndjson`,
-        expect.any(Object), // Stream object
+        `replay_log/missions/${missionId}/${sessionId}.log.jsonl`,
+        expect.any(Object), // Stream object (decompressed)
       );
     });
 
