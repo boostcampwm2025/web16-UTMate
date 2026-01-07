@@ -1,6 +1,7 @@
-import { Body, Controller, Inject, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Inject, Param, Post, Put, UseGuards } from '@nestjs/common';
 
 import { CreateTestDto } from './dto/create-test.dto';
+import { UpdateTestDto } from './dto/update-test.dto';
 import { TestsService } from './tests.service';
 
 import { JwtPayload } from '#domain/auth/decorator/param.decorator';
@@ -19,7 +20,12 @@ export class TestsController {
   }
 
   @Put('/:id')
-  updateTest() {
-    return { message: 'Test updated' };
+  @UseGuards(JwtAuthGuard)
+  updateTest(
+    @JwtPayload() payload: JwtPayloadDto,
+    @Param('id') publicId: string,
+    @Body() updateTestDto: UpdateTestDto,
+  ) {
+    this.testsService.updateTest(payload.userId, publicId, updateTestDto);
   }
 }

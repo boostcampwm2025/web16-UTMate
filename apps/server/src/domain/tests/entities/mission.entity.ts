@@ -32,4 +32,29 @@ export class Mission {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
+
+  private constructor() {}
+
+  static createMission(
+    order: number,
+    name: string,
+    description: string,
+    url: string,
+    test: Test,
+  ): Mission {
+    const mission = new Mission();
+    mission.order = order;
+    mission.name = name;
+    mission.description = description;
+    mission.missionUrl = url;
+    mission.test = test;
+    return mission;
+  }
+
+  update(order: number, name: string, description: string, url: string) {
+    this.order = order;
+    this.name = name;
+    this.description = description;
+    this.missionUrl = url;
+  }
 }

@@ -1,0 +1,19 @@
+import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+
+import { UpdateMissionDto } from './update-mission.dto';
+
+export class UpdateTestDto {
+  @IsString()
+  title: string;
+
+  @IsString()
+  description: string;
+
+  @IsString()
+  url: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  missions: UpdateMissionDto[];
+}

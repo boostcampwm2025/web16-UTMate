@@ -64,6 +64,12 @@ export class Test {
     return test;
   }
 
+  update(title: string, description: string, url: string) {
+    this.title = title;
+    this.description = description;
+    this.url = url;
+  }
+
   @BeforeInsert()
   generatePublicId() {
     if (!this.publicId) {
