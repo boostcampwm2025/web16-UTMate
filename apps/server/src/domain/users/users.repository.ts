@@ -16,15 +16,23 @@ export class UsersRepository {
     return this.usersRepository.findOneBy({ providerId, provider });
   }
 
-  async findSummaryByPublicId(userId: string) {
+  async findSummaryByPublicId(publicId: string) {
     return this.usersRepository
-      .createQueryBuilder('user')
-      .select(['user.publicId', 'user.username', 'user.avatarUrl'])
-      .where('user.publicId = :userId', { userId })
+      .createQueryBuilder('users')
+      .select(['users.publicId', 'users.username', 'users.avatarUrl'])
+      .where('users.publicId = :publicId', { publicId })
       .getOne();
   }
 
-  async deleteByPublicId(userId: string) {
-    await this.usersRepository.delete({ publicId: userId });
+  async deleteByPublicId(publicId: string) {
+    await this.usersRepository.delete({ publicId });
+  }
+
+  async findIdByPublicId(publicId: string) {
+    return this.usersRepository
+      .createQueryBuilder('users')
+      .select(['users.id'])
+      .where('users.publicId = :publicId', { publicId })
+      .getOne();
   }
 }

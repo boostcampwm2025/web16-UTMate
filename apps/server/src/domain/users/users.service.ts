@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { UserSummaryDto } from './dto/user-summary.dto';
+import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 
 import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
@@ -37,15 +38,38 @@ export class UsersService {
     return user.publicId;
   }
 
-  async getUserSummaryById(userId: string) {
-    const user = await this.usersRepository.findSummaryByPublicId(userId);
+  /**
+   * 토큰 파싱 후 나온 publicId를 기반으로 사용자 요약 정보를 반환합니다.
+   * @param publicId 토큰을 파싱하여 나온 publicId
+   * @returns UserSummaryDto - 사용자 요약 정보
+   */
+  async getUserSummary(publicId: string) {
+    const user = await this.usersRepository.findSummaryByPublicId(publicId);
     if (!user) {
       throw new BadRequestException('User not found');
     }
     return UserSummaryDto.fromUserEntity(user);
   }
 
-  async deleteUser(userId: string) {
-    this.usersRepository.deleteByPublicId(userId);
+  /**
+   * 토큰 파싱 후 나온 publicId를 기반으로 사용자를 삭제합니다.
+   * @param publicId 토큰을 파싱하여 나온 publicId
+   */
+  async deleteUser(publicId: string) {
+    this.usersRepository.deleteByPublicId(publicId);
+  }
+
+  /**
+   * 토큰 파싱 후 나온 publicId를 기반으로 사용자의 id를 반환합니다.
+   * 커버링 인덱스를 사용하여 id만 조회합니다.
+   * @param publicId 토큰을 파싱하여 나온 publicId
+   * @returns User - id만 가진 User 엔티티
+   */
+  async getIdByPublicId(publicId: string): Promise<User> {
+    const user = await this.usersRepository.findIdByPublicId(publicId);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return user;
   }
 }

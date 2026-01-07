@@ -22,7 +22,7 @@ export class UsersController {
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   getProfile(@JwtPayload() payload: JwtPayloadDto) {
-    return this.usersService.getUserSummaryById(payload.userId);
+    return this.usersService.getUserSummary(payload.userId);
   }
 
   @Delete('/me')

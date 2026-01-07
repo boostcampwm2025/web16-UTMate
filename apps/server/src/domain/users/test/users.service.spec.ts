@@ -105,7 +105,7 @@ describe('UserService', () => {
 
       mockUserRepository.findSummaryByPublicId.mockResolvedValue(mockUser);
 
-      const result = await service.getUserSummaryById('user-123');
+      const result = await service.getUserSummary('user-123');
 
       expect(repository.findSummaryByPublicId).toHaveBeenCalledWith('user-123');
       expect(result).toBeInstanceOf(UserSummaryDto);
@@ -117,8 +117,8 @@ describe('UserService', () => {
     it('사용자가 존재하지 않으면 BadRequestException을 던져야 한다', async () => {
       mockUserRepository.findSummaryByPublicId.mockResolvedValue(null);
 
-      await expect(service.getUserSummaryById('non-existent')).rejects.toThrow(BadRequestException);
-      await expect(service.getUserSummaryById('non-existent')).rejects.toThrow('User not found');
+      await expect(service.getUserSummary('non-existent')).rejects.toThrow(BadRequestException);
+      await expect(service.getUserSummary('non-existent')).rejects.toThrow('User not found');
     });
   });
 
