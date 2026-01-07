@@ -86,4 +86,28 @@ export const testsHandlers = [
 
     return HttpResponse.json(newTest, { status: 201 });
   }),
+
+  // PUT /tests/:id - 테스트 수정
+  http.put('http://localhost:3000/tests/:id', async ({ params, request }) => {
+    const { id } = params;
+    const testIndex = mockTests.findIndex((t) => t.id === Number(id));
+
+    if (testIndex === -1) {
+      return new HttpResponse(null, {
+        status: 404,
+        statusText: 'Test not found',
+      });
+    }
+
+    const body = await request.json();
+    const updatedTest = {
+      ...mockTests[testIndex],
+      ...(body as Partial<Test>),
+      id: Number(id), // ID는 변경되지 않도록
+    };
+
+    mockTests[testIndex] = updatedTest;
+
+    return HttpResponse.json(updatedTest);
+  }),
 ];

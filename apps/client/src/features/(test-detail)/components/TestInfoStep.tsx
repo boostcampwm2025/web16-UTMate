@@ -16,7 +16,7 @@ interface TestInfoStepProps {
   error: string;
   onNameChange: (value: string) => void;
   onUrlChange: (value: string) => void;
-  onNext: () => void;
+  onNext: () => void | Promise<void>;
 }
 
 export function TestInfoStep({
@@ -74,7 +74,7 @@ export function TestInfoStep({
 
       {/* 네비게이션 버튼 */}
       <div className="flex justify-end border-t pt-6">
-        <Button onClick={onNext}>다음</Button>
+        <Button onClick={() => void onNext()}>다음</Button>
       </div>
     </div>
   );

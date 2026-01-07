@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import type { TestDetail, TestMission } from '@/features/(test-manage)/types';
+import { updateTest } from '@/features/(test-manage)/api';
 import { Button } from '@/shared/components/ui/button';
 
 import { BackToWorkspaceButton } from './BackToWorkspaceButton';
@@ -94,7 +95,10 @@ export function TestForm({ initialData }: TestFormProps) {
     }, 100);
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
+    // 다음 스텝으로 이동하기 전에 저장
+    await handleSave();
+
     if (step < TestFormStep.TEST_SDK) {
       setStep(step + 1);
     }
@@ -125,15 +129,18 @@ export function TestForm({ initialData }: TestFormProps) {
     setSuccess(false);
 
     try {
-      // TODO: API 호출 - updateTest(test.id, updatedFields)
-      // 임시로 클라이언트 상태만 업데이트
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // 실제 저장되는 느낌을 주기 위한 의도적인 지연 시작
+      const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 600));
 
-      const updatedTest = {
-        ...test,
+      // API 함수를 사용하여 테스트 업데이트
+      const updatePromise = updateTest(test.id, {
         name: editName,
         integrationUrl: editUrl,
-      };
+        missions,
+      });
+
+      // 최소 로딩 시간과 API 호출이 모두 완료될 때까지 대기
+      const [updatedTest] = await Promise.all([updatePromise, minLoadingTime]);
 
       setTest(updatedTest);
 

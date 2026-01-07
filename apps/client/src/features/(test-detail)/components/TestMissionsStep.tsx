@@ -13,7 +13,7 @@ interface TestMissionsStepProps {
   onDeleteMission: (id: number) => void;
   onMoveMission: (fromIndex: number, toIndex: number) => void;
   onPrev: () => void;
-  onNext: () => void;
+  onNext: () => void | Promise<void>;
 }
 
 export function TestMissionsStep({
@@ -77,7 +77,7 @@ export function TestMissionsStep({
           <Button variant="outline" onClick={onPrev}>
             이전
           </Button>
-          <Button onClick={onNext}>다음</Button>
+          <Button onClick={() => void onNext()}>다음</Button>
         </div>
       </div>
     </div>
