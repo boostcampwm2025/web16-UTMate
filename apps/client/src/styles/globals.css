@@ -129,3 +129,14 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Sidebar collapsed 상태에서 텍스트 완전히 숨기기 */
+@layer components {
+  [data-collapsible="icon"] [data-sidebar="menu-button"] > span:not([class*="sr-only"]) {
+    display: none;
+  }
+
+  [data-collapsible="icon"] [data-sidebar="menu-button"] > span[class*="ml-auto"] {
+    display: none;
+  }
+}

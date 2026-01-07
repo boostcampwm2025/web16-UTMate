@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+import { SidebarTrigger } from '@/shared/components/ui/sidebar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,12 +15,12 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { SearchIcon } from '@/shared/components/icons/SearchIcon';
 import { BellIcon } from '@/shared/components/icons/BellIcon';
-import { MenuIcon } from '@/shared/components/icons/MenuIcon';
 
 /**
  * GlobalNavigationBar - 로그인 후 상단 네비게이션 바
  *
  * 구성 요소:
+ * - Sidebar Toggle 버튼 (접기/펼치기)
  * - 로고/서비스명 (UTMate)
  * - 검색 기능
  * - 알림 아이콘
@@ -27,7 +28,6 @@ import { MenuIcon } from '@/shared/components/icons/MenuIcon';
  */
 
 interface GlobalNavigationBarProps {
-  onMenuClick?: () => void;
   user?: {
     name: string;
     email: string;
@@ -35,7 +35,7 @@ interface GlobalNavigationBarProps {
   };
 }
 
-export function GlobalNavigationBar({ onMenuClick, user }: GlobalNavigationBarProps) {
+export function GlobalNavigationBar({ user }: GlobalNavigationBarProps) {
   // 임시 사용자 데이터 (실제로는 인증 컨텍스트나 세션에서 가져옴)
   const currentUser = user || {
     name: 'Test User',
@@ -52,16 +52,8 @@ export function GlobalNavigationBar({ onMenuClick, user }: GlobalNavigationBarPr
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center gap-4 px-4 lg:px-6">
-        {/* 모바일 메뉴 버튼 */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="lg:hidden"
-          onClick={onMenuClick}
-          aria-label="Toggle menu"
-        >
-          <MenuIcon className="h-5 w-5" />
-        </Button>
+        {/* Sidebar Toggle 버튼 */}
+        <SidebarTrigger />
 
         {/* 로고/서비스명 */}
         <Link href="/dashboard" className="flex items-center gap-2">
