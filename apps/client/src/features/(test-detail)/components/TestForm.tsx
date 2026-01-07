@@ -43,7 +43,6 @@ export function TestForm({ initialData }: TestFormProps) {
   const handleAddMission = () => {
     const newMission: TestMission = {
       id: Date.now(), // 임시 ID
-      name: '',
       description: '',
       url: '',
       estimatedDuration: undefined,
@@ -59,6 +58,13 @@ export function TestForm({ initialData }: TestFormProps) {
 
   const handleDeleteMission = (id: number) => {
     setMissions(missions.filter((mission) => mission.id !== id));
+  };
+
+  const handleMoveMission = (fromIndex: number, toIndex: number) => {
+    const newMissions = [...missions];
+    const [movedMission] = newMissions.splice(fromIndex, 1);
+    newMissions.splice(toIndex, 0, movedMission);
+    setMissions(newMissions);
   };
 
   const handleMissionClick = (missionId: number) => {
@@ -147,6 +153,8 @@ export function TestForm({ initialData }: TestFormProps) {
     }
   };
 
+  const displayTestName = editName ? editName : test.name;
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* 헤더 */}
@@ -155,7 +163,7 @@ export function TestForm({ initialData }: TestFormProps) {
           <div className="flex items-center gap-3">
             <BackToWorkspaceButton />
             <div>
-              <h1 className="text-2xl font-bold">{test.name}</h1>
+              <h1 className="text-2xl font-bold">{displayTestName}</h1>
             </div>
           </div>
 
@@ -176,6 +184,7 @@ export function TestForm({ initialData }: TestFormProps) {
         <TestFormSidebar
           currentStep={step}
           missions={missions}
+          selectedMissionIndex={selectedMissionIndex}
           onStepChange={setStep}
           onMissionClick={handleMissionClick}
         />
@@ -202,6 +211,7 @@ export function TestForm({ initialData }: TestFormProps) {
                 onAddMission={handleAddMission}
                 onUpdateMission={handleUpdateMission}
                 onDeleteMission={handleDeleteMission}
+                onMoveMission={handleMoveMission}
                 onPrev={handlePrevStep}
                 onNext={handleNextStep}
               />

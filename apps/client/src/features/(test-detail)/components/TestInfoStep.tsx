@@ -58,15 +58,17 @@ export function TestInfoStep({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="integration-url">통합 URL</FieldLabel>
+          <FieldLabel htmlFor="integration-url">서비스 URL</FieldLabel>
           <Input
             id="integration-url"
-            placeholder="https://example.com"
+            placeholder="https://www.utmate.me"
             value={integrationUrl}
             onChange={handleUrlChange}
             autoComplete="off"
           />
-          <FieldDescription>테스트할 웹사이트 URL을 입력해주세요.</FieldDescription>
+          <FieldDescription>
+            운영 중인 서비스의 URL을 입력해주세요. 통계 및 서비스 개선에 사용됩니다.
+          </FieldDescription>
         </Field>
       </FieldGroup>
 
