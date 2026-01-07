@@ -5,7 +5,7 @@ export enum OAuthProvider {
   github = 'github',
 }
 
-@Entity('user')
+@Entity('users')
 @Unique(['providerId', 'provider'])
 export class User {
   @PrimaryGeneratedColumn()

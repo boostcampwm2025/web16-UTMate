@@ -4,14 +4,14 @@ import { TokenDto } from './dto/token.dto';
 import { RefreshTokenService } from './refresh-token.service';
 import { TokenService } from './token.service';
 
-import { OAuthUserDto } from '#domain/user/dto/oauth-user.dto';
-import { UserService } from '#domain/user/user.service';
+import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
+import { UsersService } from '#domain/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject() private readonly refreshTokenService: RefreshTokenService,
-    @Inject() private readonly userService: UserService,
+    @Inject() private readonly usersService: UsersService,
     @Inject() private readonly tokenService: TokenService,
   ) {}
 
@@ -22,7 +22,7 @@ export class AuthService {
    * @returns TokenDto : 액세스 토큰과 리프레시 토큰
    */
   async login(oAuthUserDto: OAuthUserDto): Promise<TokenDto> {
-    const publicId = await this.userService.registerOrUpdateUser(oAuthUserDto);
+    const publicId = await this.usersService.registerOrUpdateUser(oAuthUserDto);
 
     // RTR을 위한 토큰 패밀리 식별자
     const familyId = crypto.randomUUID();

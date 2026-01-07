@@ -11,7 +11,7 @@ import { AuthService } from './auth.service';
 import { RefreshTokenService } from './refresh-token.service';
 
 import { ENV_KEYS } from '#common/config/env.constants';
-import { OAuthUserDto } from '#domain/user/dto/oauth-user.dto';
+import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
 
 @Controller('auth')
 export class AuthController {

@@ -2,7 +2,7 @@ import { createParamDecorator } from '@nestjs/common';
 
 import { JwtPayloadDto, RtPayloadDto } from '../dto/jwt-payload.dto';
 
-import { OAuthUserDto } from '#domain/user/dto/oauth-user.dto';
+import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
 
 export const OAuthUser = createParamDecorator((data, ctx) => {
   return ctx.switchToHttp().getRequest().user as OAuthUserDto;

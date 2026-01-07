@@ -1,6 +1,6 @@
 import { Profile } from 'passport-github2';
 
-import { OAuthProvider, User } from '#domain/user/entities/user.entity';
+import { OAuthProvider, User } from '#domain/users/entities/user.entity';
 
 export class OAuthUserDto {
   provider: OAuthProvider;

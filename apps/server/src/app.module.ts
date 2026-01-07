@@ -9,7 +9,7 @@ import { StorageModule } from '#common/storage/storage.module';
 import { AuthModule } from '#domain/auth/auth.module';
 import { MissionResultModule } from '#domain/mission-result/mission-result.module';
 import { SdkModule } from '#domain/sdk/sdk.module';
-import { UserModule } from '#domain/user/user.module';
+import { UsersModule } from '#domain/users/users.module';
 
 @Module({
   imports: [
@@ -74,7 +74,7 @@ import { UserModule } from '#domain/user/user.module';
 
     // domain modules
     AuthModule,
-    UserModule,
+    UsersModule,
     MissionResultModule,
     SdkModule,
   ],

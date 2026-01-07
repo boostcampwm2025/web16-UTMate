@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { UserSummaryDto } from './dto/user-summary.dto';
-import { UserRepository } from './user.repository';
+import { UsersRepository } from './users.repository';
 
-import { OAuthUserDto } from '#domain/user/dto/oauth-user.dto';
+import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
 
 @Injectable()
-export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+export class UsersService {
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   /**
    * OAuthUserDto를 기반으로 사용자를 등록하거나 업데이트합니다.
@@ -16,7 +16,7 @@ export class UserService {
    */
   async registerOrUpdateUser(oauthUser: OAuthUserDto): Promise<string> {
     // 기존 사용자 조회
-    const findUser = await this.userRepository.findByOAuth(
+    const findUser = await this.usersRepository.findByOAuth(
       oauthUser.providerId,
       oauthUser.provider,
     );
@@ -27,18 +27,18 @@ export class UserService {
       findUser.email = oauthUser.email;
       findUser.avatarUrl = oauthUser.avatarUrl;
 
-      await this.userRepository.save(findUser);
+      await this.usersRepository.save(findUser);
       return findUser.publicId;
     }
 
     // 사용자가 존재하지 않는 경우 새로 등록
     const user = oauthUser.toUserEntity();
-    await this.userRepository.save(user);
+    await this.usersRepository.save(user);
     return user.publicId;
   }
 
   async getUserSummaryById(userId: string) {
-    const user = await this.userRepository.findSummaryByPublicId(userId);
+    const user = await this.usersRepository.findSummaryByPublicId(userId);
     if (!user) {
       throw new BadRequestException('User not found');
     }
@@ -46,6 +46,6 @@ export class UserService {
   }
 
   async deleteUser(userId: string) {
-    this.userRepository.deleteByPublicId(userId);
+    this.usersRepository.deleteByPublicId(userId);
   }
 }

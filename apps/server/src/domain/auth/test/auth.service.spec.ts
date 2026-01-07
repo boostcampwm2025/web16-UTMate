@@ -5,17 +5,17 @@ import { TokenDto } from '../dto/token.dto';
 import { RefreshTokenService } from '../refresh-token.service';
 import { TokenService } from '../token.service';
 
-import { OAuthUserDto } from '#domain/user/dto/oauth-user.dto';
-import { OAuthProvider } from '#domain/user/entities/user.entity';
-import { UserService } from '#domain/user/user.service';
+import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
+import { OAuthProvider } from '#domain/users/entities/user.entity';
+import { UsersService } from '#domain/users/users.service';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let userService: UserService;
+  let usersService: UsersService;
   let tokenService: TokenService;
   let refreshTokenService: RefreshTokenService;
 
-  const mockUserService = {
+  const mockUsersService = {
     registerOrUpdateUser: jest.fn(),
   };
 
@@ -32,8 +32,8 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         {
-          provide: UserService,
-          useValue: mockUserService,
+          provide: UsersService,
+          useValue: mockUsersService,
         },
         {
           provide: TokenService,
@@ -47,7 +47,7 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    userService = module.get<UserService>(UserService);
+    usersService = module.get<UsersService>(UsersService);
     tokenService = module.get<TokenService>(TokenService);
     refreshTokenService = module.get<RefreshTokenService>(RefreshTokenService);
 
@@ -74,13 +74,13 @@ describe('AuthService', () => {
         refreshToken: 'refresh-token',
       };
 
-      mockUserService.registerOrUpdateUser.mockResolvedValue(publicId);
+      mockUsersService.registerOrUpdateUser.mockResolvedValue(publicId);
       mockTokenService.generateTokenPair.mockResolvedValue(tokenDto);
       mockRefreshTokenService.saveRefreshToken.mockResolvedValue(undefined);
 
       const result = await service.login(oauthUserDto);
 
-      expect(userService.registerOrUpdateUser).toHaveBeenCalledWith(oauthUserDto);
+      expect(usersService.registerOrUpdateUser).toHaveBeenCalledWith(oauthUserDto);
       expect(tokenService.generateTokenPair).toHaveBeenCalledWith(
         publicId,
         expect.any(String), // familyId (UUID)
@@ -102,7 +102,7 @@ describe('AuthService', () => {
         avatarUrl: 'https://avatar.url',
       } as OAuthUserDto;
 
-      mockUserService.registerOrUpdateUser.mockResolvedValue('user-id');
+      mockUsersService.registerOrUpdateUser.mockResolvedValue('user-id');
       mockTokenService.generateTokenPair.mockResolvedValue({
         accessToken: 'token1',
         refreshToken: 'token2',
