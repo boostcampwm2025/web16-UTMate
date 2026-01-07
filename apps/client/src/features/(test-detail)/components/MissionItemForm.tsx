@@ -1,3 +1,5 @@
+import { Trash2 } from 'lucide-react';
+
 import type { TestMission } from '@/features/(test-manage)/types';
 import { Button } from '@/shared/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
@@ -47,9 +49,10 @@ export function MissionItemForm({
           variant="ghost"
           size="sm"
           onClick={handleDeleteMission}
-          className="text-red-600 hover:bg-red-50 hover:text-red-700"
+          className="group text-red-600 hover:bg-red-50 hover:text-red-700"
         >
-          삭제
+          <Trash2 className="size-4" />
+          <span className="ml-1 hidden group-hover:inline">삭제</span>
         </Button>
       </div>
 
