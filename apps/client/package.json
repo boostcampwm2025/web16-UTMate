@@ -15,9 +15,11 @@
     "check": "pnpm format:check && pnpm lint"
   },
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.11",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@rrweb/types": "2.0.0-alpha.18",
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-query-next-experimental": "^5.91.0",
@@ -46,8 +48,14 @@
     "eslint-config-next": "16.0.10",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",
+    "msw": "^2.12.7",
     "prettier": "^3",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
