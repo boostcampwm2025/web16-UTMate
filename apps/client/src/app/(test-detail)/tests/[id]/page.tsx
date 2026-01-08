@@ -8,6 +8,7 @@ export default async function TestDetailPage({ params }: { params: Promise<{ id:
   const { id } = await params;
 
   try {
+    //TODO : 테스트 개별 조회도 리액트 쿼리로 관리하도록 설정 필요
     const initialData = await getTestById(id);
 
     return <TestForm initialData={initialData} />;
