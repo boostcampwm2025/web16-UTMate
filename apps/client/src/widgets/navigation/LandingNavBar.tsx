@@ -13,10 +13,12 @@ import { Button } from '@/shared/components/ui/button';
  * 로그인되지 않은 사용자를 위한 심플한 네비게이션
  */
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
 export function LandingNavBar() {
   const handleLogin = () => {
     // GitHub OAuth 로그인 페이지로 이동
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/github`;
+    window.location.href = `${API_URL}/api/auth/github`;
   };
 
   return (
