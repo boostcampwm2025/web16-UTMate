@@ -60,7 +60,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
 
     steps:
       - name: Checkout code
@@ -73,9 +73,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # 작업 디렉토리 생성
-            mkdir -p /app/web16-UTMate
-            cd /app/web16-UTMate
+            # 작업 디렉토리 생성 (홈 디렉토리 사용)
+            mkdir -p ~/web16-UTMate
+            cd ~/web16-UTMate
 
             # .env 파일 생성 (전체 내용 시크릿에서 전달)
             cat > .env << 'ENV_EOF'
@@ -90,11 +90,11 @@ jobs:
             # GitHub Container Registry 로그인
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            # 최신 이미지 pull
-            docker-compose pull
+            # 최신 이미지 pull (docker compose v2 사용)
+            docker compose pull
 
             # 서비스 재시작
-            docker-compose up -d
+            docker compose up -d
 
             # 사용하지 않는 이미지 정리
             docker image prune -f
