@@ -38,7 +38,6 @@ services:
     networks:
       - utmate-network
     depends_on:
-      - postgres
       - redis
 
   client:

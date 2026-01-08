@@ -24,7 +24,6 @@ jobs:
             dockerfile: docker/client/Dockerfile
             build-args: |
               NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
-              NEXT_PUBLIC_SDK_URL=${{ vars.NEXT_PUBLIC_SDK_URL }}
 
     steps:
       - name: Checkout code
@@ -60,7 +59,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create .env file and deploy
+      - name: Create .env from secret and deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -71,17 +70,10 @@ jobs:
             mkdir -p /app/web16-UTMate
             cd /app/web16-UTMate
 
-            # .env 파일 생성
-            cat > .env << EOF
-            DATABASE_HOST=${{ secrets.DATABASE_HOST }}
-            DATABASE_PORT=${{ secrets.DATABASE_PORT }}
-            DATABASE_USER=${{ secrets.DATABASE_USER }}
-            DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
-            DATABASE_NAME=${{ secrets.DATABASE_NAME }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            REDIS_HOST=redis
-            REDIS_PORT=6379
-            EOF
+            # .env 파일 생성 (전체 내용 시크릿에서 전달)
+            cat > .env << 'ENV_EOF'
+            ${{ secrets.ENV_FILE_CONTENT }}
+            ENV_EOF
 
             # docker-compose.yml 복사
             cat > docker-compose.yml << 'COMPOSE_EOF'
