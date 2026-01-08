@@ -56,7 +56,7 @@ export function GlobalNavigationBar() {
   const handleLogout = async () => {
     try {
       await logout();
-      router.push('/login');
+      router.push('/'); // 랜딩 페이지로 리다이렉트
     } catch (error) {
       console.error('로그아웃 실패:', error);
     }
