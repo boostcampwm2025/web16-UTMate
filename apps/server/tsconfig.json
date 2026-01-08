@@ -25,5 +25,13 @@
       "#common/*": ["src/common/*"],
       "#domain/*": ["src/domain/*"]
     }
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "experimentalDecorators": true, // 데코레이터 허용 (핵심)
+      "emitDecoratorMetadata": true, // 메타데이터 허용 (핵심)
+      "strictPropertyInitialization": false // 초기값 없는 변수 에러 무시 (id: number 에러 해결)
+    }
   }
 }
