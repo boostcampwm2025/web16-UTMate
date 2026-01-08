@@ -14,7 +14,7 @@ import {
 import { deleteTest } from '@/features/(test-manage)/api';
 
 interface TestActionButtonProps {
-  testId: number;
+  testId: string;
 }
 
 export function TestActionButton({ testId }: TestActionButtonProps) {

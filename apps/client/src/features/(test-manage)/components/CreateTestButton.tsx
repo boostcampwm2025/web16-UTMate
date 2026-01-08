@@ -60,7 +60,7 @@ export function CreateTestButton() {
       setIsOpen(false);
 
       // 생성된 테스트 상세 페이지로 이동
-      router.push(`/tests/${test.id}?mode=create`);
+      router.push(`/tests/${test.publicId}?mode=create`);
     } catch (err) {
       // 에러 처리
       const errorMessage =

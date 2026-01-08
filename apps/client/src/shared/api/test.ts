@@ -4,13 +4,17 @@ import type { TestDetail } from '@/features/(test-manage)/types';
 import type { TestMission } from '@/features/(test-manage)/types';
 
 interface UpdateTestParams {
-  name?: string;
-  integrationUrl?: string;
-  missions?: TestMission[];
+  title: string;
+  description: string;
+  url: string;
+  missions: TestMission[];
 }
 
-export const updateTest = async (id: number, data: UpdateTestParams): Promise<TestDetail> => {
-  const response = await fetch(`${CLIENT_BASE_URL}/tests/${id}`, {
+export const updateTest = async (
+  publicId: string,
+  data: UpdateTestParams,
+): Promise<TestDetail> => {
+  const response = await fetch(`${CLIENT_BASE_URL}/tests/${publicId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',

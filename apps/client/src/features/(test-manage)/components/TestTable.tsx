@@ -21,7 +21,7 @@ export function TestTable({ tests }: TestTableProps) {
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
           {tests.map((test) => (
-            <TestTableRow key={test.id} test={test} />
+            <TestTableRow key={test.publicId} test={test} />
           ))}
         </tbody>
       </table>

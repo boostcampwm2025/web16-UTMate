@@ -9,8 +9,8 @@ import { Textarea } from '@/shared/components/ui/textarea';
 interface MissionItemFormProps {
   mission: TestMission;
   missionIndex: number;
-  onUpdateMission: (id: number, mission: Partial<TestMission>) => void;
-  onDeleteMission: (id: number) => void;
+  onUpdateMission: (publicId: string, mission: Partial<TestMission>) => void;
+  onDeleteMission: (publicId: string) => void;
 }
 
 export function MissionItemForm({
@@ -20,31 +20,32 @@ export function MissionItemForm({
   onDeleteMission,
 }: MissionItemFormProps) {
   const handleDeleteMission = () => {
-    onDeleteMission(mission.id);
+    onDeleteMission(mission.publicId);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdateMission(mission.id, { name: e.target.value });
+    onUpdateMission(mission.publicId, { name: e.target.value });
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onUpdateMission(mission.id, { description: e.target.value });
+    onUpdateMission(mission.publicId, { description: e.target.value });
   };
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdateMission(mission.id, { url: e.target.value });
+    onUpdateMission(mission.publicId, { missionUrl: e.target.value });
   };
 
   const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdateMission(mission.id, {
-      estimatedDuration: e.target.value ? Number(e.target.value) : undefined,
+    const value = Number(e.target.value);
+    onUpdateMission(mission.publicId, {
+      estimatedDuration: value || 0,
     });
   };
 
   return (
     <div
-      key={mission.id}
-      id={`mission-${mission.id}`}
+      key={mission.publicId}
+      id={`mission-${mission.publicId}`}
       className="rounded-lg border bg-white p-6 transition-all"
     >
       <div className="mb-4 flex items-center justify-between">
@@ -62,10 +63,10 @@ export function MissionItemForm({
 
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor={`mission-name-${mission.id}`}>미션 이름 *</FieldLabel>
+          <FieldLabel htmlFor={`mission-name-${mission.publicId}`}>미션 이름 *</FieldLabel>
           <Input
             type="text"
-            id={`mission-name-${mission.id}`}
+            id={`mission-name-${mission.publicId}`}
             placeholder="카페 예약하기"
             value={mission.name}
             onChange={handleNameChange}
@@ -76,9 +77,9 @@ export function MissionItemForm({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor={`mission-description-${mission.id}`}>미션 설명 *</FieldLabel>
+          <FieldLabel htmlFor={`mission-description-${mission.publicId}`}>미션 설명 *</FieldLabel>
           <Textarea
-            id={`mission-description-${mission.id}`}
+            id={`mission-description-${mission.publicId}`}
             placeholder="당신은 두바이쫀득쿠키를 구매하려고 합니다. 두바이쫀득쿠키를 판매하는 카페를 찾아 예약을 진행해주세요. "
             value={mission.description}
             onChange={handleDescriptionChange}
@@ -88,12 +89,12 @@ export function MissionItemForm({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor={`mission-url-${mission.id}`}>대상 URL *</FieldLabel>
+          <FieldLabel htmlFor={`mission-url-${mission.publicId}`}>대상 URL *</FieldLabel>
           <Input
             type="url"
-            id={`mission-url-${mission.id}`}
+            id={`mission-url-${mission.publicId}`}
             placeholder="https://maps.com/search"
-            value={mission.url}
+            value={mission.missionUrl}
             onChange={handleUrlChange}
             className="h-10"
             required
@@ -102,19 +103,20 @@ export function MissionItemForm({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor={`mission-duration-${mission.id}`}>예상 소요시간</FieldLabel>
+          <FieldLabel htmlFor={`mission-duration-${mission.publicId}`}>예상 소요시간 *</FieldLabel>
           <div className="flex items-center gap-2">
             <Input
               type="number"
-              id={`mission-duration-${mission.id}`}
+              id={`mission-duration-${mission.publicId}`}
               min="1"
               value={mission.estimatedDuration || ''}
               onChange={handleDurationChange}
               className="h-10 w-24"
+              required
             />
             <span className="text-sm text-gray-600">분</span>
           </div>
-          <FieldDescription>미션에 소요되는 예상 시간을 입력해주세요. (선택사항)</FieldDescription>
+          <FieldDescription>미션에 소요되는 예상 시간을 입력해주세요.</FieldDescription>
         </Field>
       </FieldGroup>
     </div>

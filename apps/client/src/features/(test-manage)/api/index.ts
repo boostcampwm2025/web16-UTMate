@@ -30,7 +30,7 @@ export const createTest = async (): Promise<Test> => {
   return response.json();
 };
 
-export const deleteTest = async (testId: number): Promise<void> => {
+export const deleteTest = async (testId: string): Promise<void> => {
   const response = await fetch(`${CLIENT_BASE_URL}/tests/${testId}`, {
     method: 'DELETE',
   });

@@ -1,30 +1,32 @@
-export const enum TestType {
+export const enum TestStatus {
   DRAFT = 'DRAFT',
-  LIVE = 'LIVE',
-  COMPLETED = 'COMPLETED',
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
 }
 
-export interface User {
-  id: number;
-  name: string;
-  profileImageUrl: string | null;
+export interface UserSummary {
+  publicId: string;
+  username: string;
+  avatarUrl: string;
 }
 
 export interface Test {
-  id: number;
-  name: string;
-  type: TestType;
-  integrationUrl: string;
-  participants: number;
-  creator: User;
+  publicId: string;
+  title: string;
+  description: string;
+  status: TestStatus;
+  url: string;
+  sdkStatus: boolean;
+  owner: UserSummary;
 }
 
 export interface TestMission {
-  id: number;
+  publicId: string;
+  order: number;
   name: string;
   description: string;
-  url: string;
-  estimatedDuration?: number; // 예상 소요시간 (분 단위)
+  missionUrl: string;
+  estimatedDuration: number; // 예상 소요시간 (분 단위)
 }
 
 export interface TestDetail extends Test {

@@ -46,9 +46,9 @@ interface TestFormSidebarProps {
   missions: TestMission[];
   selectedMissionIndex: number;
   onStepChange: (step: TestFormStep) => void;
-  onMissionClick: (missionId: number) => void;
+  onMissionClick: (missionPublicId: string) => void;
   onAddMission: () => void;
-  onDeleteMission: (missionId: number) => void;
+  onDeleteMission: (missionPublicId: string) => void;
   onMoveMission: (fromIndex: number, toIndex: number) => void;
 }
 

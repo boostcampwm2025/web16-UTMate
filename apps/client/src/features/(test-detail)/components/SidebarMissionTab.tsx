@@ -8,7 +8,7 @@ import { SidebarMissionTabItem } from './SidebarMissionTabItem';
 interface SidebarMissionTabProps {
   missions: TestMission[];
   selectedMissionIndex: number;
-  onMissionClick: (missionId: number) => void;
+  onMissionClick: (missionPublicId: string) => void;
   onAddMission: () => void;
   onMoveMission: (fromIndex: number, toIndex: number) => void;
 }
@@ -32,7 +32,7 @@ export function SidebarMissionTab({
         missions.length > 0 &&
         missions.map((mission, index) => (
           <SidebarMissionTabItem
-            key={mission.id}
+            key={mission.publicId}
             mission={mission}
             index={index}
             isActive={selectedMissionIndex === index}
