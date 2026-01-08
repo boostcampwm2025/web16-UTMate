@@ -9,27 +9,27 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 
 import { JwtPayload } from '#domain/auth/decorator/param.decorator';
 import { JwtPayloadDto } from '#domain/auth/dto/jwt-payload.dto';
 import { JwtAuthGuard } from '#domain/auth/guards/jwt-auth.guard';
 
 @Controller('users')
-export class UserController {
-  constructor(@Inject() private readonly userService: UserService) {}
+export class UsersController {
+  constructor(@Inject() private readonly usersService: UsersService) {}
 
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   getProfile(@JwtPayload() payload: JwtPayloadDto) {
-    return this.userService.getUserSummaryById(payload.userId);
+    return this.usersService.getUserSummary(payload.userId);
   }
 
   @Delete('/me')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteProfile(@JwtPayload() payload: JwtPayloadDto) {
-    return this.userService.deleteUser(payload.userId);
+    return this.usersService.deleteUser(payload.userId);
   }
 
   @Patch()

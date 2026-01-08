@@ -3,14 +3,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { UserSummaryDto } from '../dto/user-summary.dto';
 import { OAuthProvider, User } from '../entities/user.entity';
-import { UserRepository } from '../user.repository';
-import { UserService } from '../user.service';
+import { UsersRepository } from '../users.repository';
+import { UsersService } from '../users.service';
 
-import { OAuthUserDto } from '#domain/user/dto/oauth-user.dto';
+import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
 
 describe('UserService', () => {
-  let service: UserService;
-  let repository: UserRepository;
+  let service: UsersService;
+  let repository: UsersRepository;
 
   const mockUserRepository = {
     findByOAuth: jest.fn(),
@@ -22,16 +22,16 @@ describe('UserService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UserService,
+        UsersService,
         {
-          provide: UserRepository,
+          provide: UsersRepository,
           useValue: mockUserRepository,
         },
       ],
     }).compile();
 
-    service = module.get<UserService>(UserService);
-    repository = module.get<UserRepository>(UserRepository);
+    service = module.get<UsersService>(UsersService);
+    repository = module.get<UsersRepository>(UsersRepository);
 
     jest.clearAllMocks();
   });
@@ -105,7 +105,7 @@ describe('UserService', () => {
 
       mockUserRepository.findSummaryByPublicId.mockResolvedValue(mockUser);
 
-      const result = await service.getUserSummaryById('user-123');
+      const result = await service.getUserSummary('user-123');
 
       expect(repository.findSummaryByPublicId).toHaveBeenCalledWith('user-123');
       expect(result).toBeInstanceOf(UserSummaryDto);
@@ -117,8 +117,8 @@ describe('UserService', () => {
     it('사용자가 존재하지 않으면 BadRequestException을 던져야 한다', async () => {
       mockUserRepository.findSummaryByPublicId.mockResolvedValue(null);
 
-      await expect(service.getUserSummaryById('non-existent')).rejects.toThrow(BadRequestException);
-      await expect(service.getUserSummaryById('non-existent')).rejects.toThrow('User not found');
+      await expect(service.getUserSummary('non-existent')).rejects.toThrow(BadRequestException);
+      await expect(service.getUserSummary('non-existent')).rejects.toThrow('User not found');
     });
   });
 

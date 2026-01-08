@@ -12,7 +12,7 @@ import { RefreshTokenService } from './refresh-token.service';
 import { TokenService } from './token.service';
 
 import { ENV_KEYS } from '#common/config/env.constants';
-import { UserModule } from '#domain/user/user.module';
+import { UsersModule } from '#domain/users/users.module';
 
 @Module({
   imports: [
@@ -26,9 +26,16 @@ import { UserModule } from '#domain/user/user.module';
         },
       }),
     }),
-    UserModule,
+    UsersModule,
   ],
   controllers: [AuthController],
-  providers: [GithubStrategy, JwtStrategy, RtStrategy, AuthService, RefreshTokenService, TokenService],
+  providers: [
+    GithubStrategy,
+    JwtStrategy,
+    RtStrategy,
+    AuthService,
+    RefreshTokenService,
+    TokenService,
+  ],
 })
 export class AuthModule {}

@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-github2';
 
 import { ENV_KEYS } from '#common/config/env.constants';
-import { OAuthUserDto } from '#domain/user/dto/oauth-user.dto';
+import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
 
 @Injectable()
 export class GithubStrategy extends PassportStrategy(Strategy, 'github') {

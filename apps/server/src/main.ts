@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
@@ -7,6 +8,15 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
+
+  // 전역 Validation Pipe 설정
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // DTO에 정의되지 않은 속성 제거
+      forbidNonWhitelisted: true, // 정의되지 않은 속성이 있으면 요청 거부
+      transform: true, // 요청 데이터를 DTO 인스턴스로 자동 변환
+    }),
+  );
 
   // 쿠키 파서 미들웨어 설정
   app.use(cookieParser());
