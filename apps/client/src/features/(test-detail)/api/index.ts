@@ -1,10 +1,19 @@
-import { CLIENT_BASE_URL } from '@/shared/constants/api';
+import { cookies } from 'next/headers';
+
+import { SERVER_BASE_URL } from '@/shared/constants/api';
 import type { TestDetail } from '@/features/(test-manage)/types';
 import type { ApiErrorResponse } from '@/shared/types/api';
 
 export const getTestById = async (id: string): Promise<TestDetail> => {
-  const response = await fetch(`${CLIENT_BASE_URL}/tests/${id}`, {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token');
+
+  const response = await fetch(`${SERVER_BASE_URL}/tests/${id}`, {
     credentials: 'include',
+    headers: {
+      Cookie: accessToken ? `access_token=${accessToken.value}` : '',
+    },
+    cache: 'no-store',
   });
 
   if (!response.ok) {
