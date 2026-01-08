@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [main, release/*]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -60,7 +60,6 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
 
     steps:
       - name: Checkout code
