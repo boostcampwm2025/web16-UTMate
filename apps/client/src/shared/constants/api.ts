@@ -1,5 +1,10 @@
-//TODO : 환경변수에 따라 배포환경과 개발환경에 따라 다른 URL로 설정
-export const CLIENT_BASE_URL = 'http://localhost:8080/api';
+// 클라이언트(브라우저)에서 사용하는 API URL
+// 개발: http://localhost:8080/api
+// 배포: http://utmate.me/api
+export const CLIENT_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
-//TODO : 환경변수에 따라 배포환경과 개발환경에 따라 다른 URL로 설정
-export const SERVER_BASE_URL = `http://localhost:8080/api`;
+// 서버 사이드에서 사용하는 API URL (SSR)
+// 개발: http://localhost:8080/api
+// 배포: http://server/api (내부 통신)
+export const SERVER_BASE_URL =
+  process.env.NEXT_PUBLIC_INTERNAL_API_URL || 'http://localhost:8080/api';
