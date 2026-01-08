@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: ghcr.io/boostcampwm2025/web16-utmate/nginx:latest
+    container_name: utmate-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    depends_on:
+      - client
+      - server
+    restart: unless-stopped
+    networks:
+      - utmate-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: utmate-certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - utmate-network
+
+  server:
+    image: ghcr.io/boostcampwm2025/web16-utmate/server:latest
+    container_name: utmate-server
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - utmate-network
+    depends_on:
+      - redis
+
+  client:
+    image: ghcr.io/boostcampwm2025/web16-utmate/client:latest
+    container_name: utmate-client
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - utmate-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: utmate-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - utmate-network
+
+volumes:
+  redis-data:
+
+networks:
+  utmate-network:
+    driver: bridge

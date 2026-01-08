@@ -7,10 +7,10 @@ export default defineConfig({
     lib: {
       // Could also be a dictionary or array of multiple entry points
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'MySDK',
+      name: 'UtmateSDK',
       // the proper extensions will be added
-      fileName: 'my-sdk',
-      formats: ['es', 'umd', 'iife'],
+      fileName: 'utmate-sdk',
+      formats: ['iife'],
     },
   },
   plugins: [dts({ rollupTypes: true })],

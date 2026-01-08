@@ -1,0 +1,60 @@
+# Dependencies
+
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+
+.next/
+dist/
+build/
+
+# Testing
+
+coverage/
+.nyc_output/
+
+# Misc
+
+.DS_Store
+_.log
+_.env
+_.env.local
+_.env.development.local
+_.env.test.local
+_.env.production.local
+
+# IDE
+
+.vscode/
+.idea/
+_.swp
+_.swo
+\*~
+
+# Git
+
+.git/
+.gitignore
+
+# Docker
+
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# CI/CD
+
+.github/
+
+# Documentation
+
+\*.md
+web16-UTMate.wiki/
+
+# Test files
+
+test/
+_.spec.ts
+_.test.ts
