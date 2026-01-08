@@ -1,5 +1,6 @@
 import { Button } from '@/shared/components/ui/button';
 import { GithubIcon } from '@/shared/components/icons/GithubIcon';
+import { CLIENT_BASE_URL } from '@/shared/constants/api';
 
 /**
  * SocialLoginButtons - GitHub OAuth 로그인 버튼
@@ -11,11 +12,10 @@ import { GithubIcon } from '@/shared/components/icons/GithubIcon';
  */
 export default function SocialLoginButtons() {
   // 환경변수에서 백엔드 API URL 가져오기
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
   return (
     <Button asChild variant="outline" size="lg" className="w-full">
-      <a href={`${backendUrl}/api/auth/github`}>
+      <a href={`${CLIENT_BASE_URL}/auth/github`}>
         <GithubIcon className="mr-2 h-4 w-4" />
         GitHub로 로그인
       </a>
