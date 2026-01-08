@@ -8,7 +8,7 @@ interface SidebarMissionTabItemProps {
   index: number;
   isActive: boolean;
   totalMissions: number;
-  onMissionClick: (missionId: number) => void;
+  onMissionClick: (missionPublicId: string) => void;
   onMoveMission: (fromIndex: number, toIndex: number) => void;
 }
 
@@ -20,10 +20,10 @@ export function SidebarMissionTabItem({
   onMissionClick,
   onMoveMission,
 }: SidebarMissionTabItemProps) {
-  const displayName = mission.description ? mission.description : `미션 ${index + 1}`;
+  const displayName = mission.name ? mission.name : `미션 ${index + 1}`;
 
   const handleMissionClick = () => {
-    onMissionClick(mission.id);
+    onMissionClick(mission.publicId);
   };
 
   const handleMoveUp = (e: React.MouseEvent) => {

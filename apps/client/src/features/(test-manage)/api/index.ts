@@ -1,50 +1,42 @@
-import { BASE_URL } from '@/shared/constants/api';
+import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import type {
   GetTestsResponse,
   Test,
   TestDetail,
   TestMission,
 } from '@/features/(test-manage)/types';
+import type { ApiErrorResponse } from '@/shared/types/api';
 
 export const getMyTestList = async (): Promise<GetTestsResponse> => {
-  const response = await fetch(`${BASE_URL}/tests?scope=me`);
+  const response = await fetch(`${CLIENT_BASE_URL}/tests?scope=me`);
 
   if (!response.ok) {
-    throw new Error('Failed to fetch test list');
+    const error = (await response.json()) as ApiErrorResponse;
+    throw new Error(error.message || '테스트 목록을 불러오는데 실패했습니다.');
   }
   return response.json();
 };
 
 export const createTest = async (): Promise<Test> => {
-  const response = await fetch(`${BASE_URL}/tests`, {
+  const response = await fetch(`${CLIENT_BASE_URL}/tests`, {
     method: 'POST',
   });
 
   if (!response.ok) {
-    throw new Error('Failed to create test');
+    const error = (await response.json()) as ApiErrorResponse;
+    throw new Error(error.message || '테스트를 생성하는데 실패했습니다.');
   }
 
   return response.json();
 };
 
-export interface UpdateTestParams {
-  name?: string;
-  integrationUrl?: string;
-  missions?: TestMission[];
-}
-
-export const updateTest = async (id: number, data: UpdateTestParams): Promise<TestDetail> => {
-  const response = await fetch(`${BASE_URL}/tests/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
+export const deleteTest = async (testId: string): Promise<void> => {
+  const response = await fetch(`${CLIENT_BASE_URL}/tests/${testId}`, {
+    method: 'DELETE',
   });
 
   if (!response.ok) {
-    throw new Error('Failed to update test');
+    const error = (await response.json()) as ApiErrorResponse;
+    throw new Error(error.message || '테스트를 삭제하는데 실패했습니다.');
   }
-
-  return response.json();
 };

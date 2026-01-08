@@ -9,26 +9,35 @@ import {
   FieldLabel,
 } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
+import { Textarea } from '@/shared/components/ui/textarea';
 
 interface TestInfoStepProps {
-  name: string;
-  integrationUrl: string;
+  title: string;
+  description: string;
+  url: string;
   error: string;
-  onNameChange: (value: string) => void;
+  onTitleChange: (value: string) => void;
+  onDescriptionChange: (value: string) => void;
   onUrlChange: (value: string) => void;
   onNext: () => void | Promise<void>;
 }
 
 export function TestInfoStep({
-  name,
-  integrationUrl,
+  title,
+  description,
+  url,
   error,
-  onNameChange,
+  onTitleChange,
+  onDescriptionChange,
   onUrlChange,
   onNext,
 }: TestInfoStepProps) {
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onNameChange(e.target.value);
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onTitleChange(e.target.value);
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onDescriptionChange(e.target.value);
   };
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,12 +53,12 @@ export function TestInfoStep({
 
       <FieldGroup>
         <Field data-invalid={!!error}>
-          <FieldLabel htmlFor="test-name">테스트 이름 *</FieldLabel>
+          <FieldLabel htmlFor="test-title">테스트 이름 *</FieldLabel>
           <Input
-            id="test-name"
+            id="test-title"
             placeholder="예: 주식모으기 서비스 테스트"
-            value={name}
-            onChange={handleNameChange}
+            value={title}
+            onChange={handleTitleChange}
             aria-invalid={!!error}
             autoComplete="off"
           />
@@ -58,16 +67,29 @@ export function TestInfoStep({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="integration-url">서비스 URL</FieldLabel>
+          <FieldLabel htmlFor="test-description">테스트 설명</FieldLabel>
+          <Textarea
+            id="test-description"
+            placeholder="테스트에 대한 설명을 입력해주세요."
+            value={description}
+            onChange={handleDescriptionChange}
+            rows={3}
+          />
+          <FieldDescription>테스트의 목적과 내용을 간단히 설명해주세요.</FieldDescription>
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="test-url">서비스 URL *</FieldLabel>
           <Input
-            id="integration-url"
+            id="test-url"
             placeholder="https://www.utmate.me"
-            value={integrationUrl}
+            value={url}
             onChange={handleUrlChange}
             autoComplete="off"
+            required
           />
           <FieldDescription>
-            운영 중인 서비스의 URL을 입력해주세요. 통계 및 서비스 개선에 사용됩니다.
+            테스트할 서비스의 URL을 입력해주세요.
           </FieldDescription>
         </Field>
       </FieldGroup>

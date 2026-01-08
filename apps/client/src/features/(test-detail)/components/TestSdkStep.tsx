@@ -3,23 +3,22 @@
 import { Copy, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
-import type { Test } from '@/features/(test-manage)/types';
 import { Button } from '@/shared/components/ui/button';
 
 interface TestSdkStepProps {
-  test: Test;
+  testPublicId: string;
   onPrev: () => void;
   onSave: () => Promise<void>;
   loading: boolean;
 }
 
-export function TestSdkStep({ test, onPrev, onSave, loading }: TestSdkStepProps) {
+export function TestSdkStep({ testPublicId, onPrev, onSave, loading }: TestSdkStepProps) {
   const [copied, setCopied] = useState(false);
 
   const sdkCode = `<script src="https://cdn.utmate.com/sdk.js"></script>
 <script>
   UTMate.init({
-    testId: '${test.id}',
+    testId: '${testPublicId}',
   });
 </script>`;
 

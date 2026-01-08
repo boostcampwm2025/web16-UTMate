@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import type { TestDetail, TestMission } from '@/features/(test-manage)/types';
-import { updateTest } from '@/features/(test-manage)/api';
+import { updateTest } from '@/shared/api/test';
 import { Button } from '@/shared/components/ui/button';
 
 import { BackToWorkspaceButton } from './BackToWorkspaceButton';
@@ -25,17 +25,22 @@ export function TestForm({ initialData }: TestFormProps) {
   const [step, setStep] = useState<TestFormStep>(TestFormStep.TEST_INFO);
 
   // 폼 상태
-  const [editName, setEditName] = useState(test.name);
-  const [editUrl, setEditUrl] = useState(test.integrationUrl);
+  const [editTitle, setEditTitle] = useState(test.title);
+  const [editDescription, setEditDescription] = useState(test.description);
+  const [editUrl, setEditUrl] = useState(test.url);
   const [missions, setMissions] = useState<TestMission[]>(test.missions || []);
   const [selectedMissionIndex, setSelectedMissionIndex] = useState(0);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleNameChange = (value: string) => {
-    setEditName(value);
+  const handleTitleChange = (value: string) => {
+    setEditTitle(value);
     if (error) setError('');
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    setEditDescription(value);
   };
 
   const handleUrlChange = (value: string) => {
@@ -51,25 +56,29 @@ export function TestForm({ initialData }: TestFormProps) {
     }
 
     const newMission: TestMission = {
-      id: Date.now(), // 임시 ID
+      publicId: `temp-${Date.now()}`, // 임시 ID
+      order: missions.length,
+      name: '',
       description: '',
-      url: '',
-      estimatedDuration: undefined,
+      missionUrl: '',
+      estimatedDuration: 0,
     };
     setMissions([...missions, newMission]);
     // 새로 추가된 미션을 선택
     setSelectedMissionIndex(missions.length);
   };
 
-  const handleUpdateMission = (id: number, updatedMission: Partial<TestMission>) => {
+  const handleUpdateMission = (publicId: string, updatedMission: Partial<TestMission>) => {
     setMissions(
-      missions.map((mission) => (mission.id === id ? { ...mission, ...updatedMission } : mission)),
+      missions.map((mission) =>
+        mission.publicId === publicId ? { ...mission, ...updatedMission } : mission,
+      ),
     );
   };
 
-  const handleDeleteMission = (id: number) => {
-    const deletedIndex = missions.findIndex((mission) => mission.id === id);
-    setMissions(missions.filter((mission) => mission.id !== id));
+  const handleDeleteMission = (publicId: string) => {
+    const deletedIndex = missions.findIndex((mission) => mission.publicId === publicId);
+    setMissions(missions.filter((mission) => mission.publicId !== publicId));
 
     // 선택된 미션 인덱스 업데이트
     if (selectedMissionIndex > deletedIndex) {
@@ -110,9 +119,9 @@ export function TestForm({ initialData }: TestFormProps) {
     setSelectedMissionIndex(newSelectedIndex);
   };
 
-  const handleMissionClick = (missionId: number) => {
+  const handleMissionClick = (missionPublicId: string) => {
     // 미션 인덱스 찾기
-    const missionIndex = missions.findIndex((m) => m.id === missionId);
+    const missionIndex = missions.findIndex((m) => m.publicId === missionPublicId);
     if (missionIndex === -1) return;
 
     // 미션 설정 스텝으로 이동
@@ -125,7 +134,7 @@ export function TestForm({ initialData }: TestFormProps) {
 
     // 해당 미션으로 스크롤
     setTimeout(() => {
-      const missionElement = document.getElementById(`mission-${missionId}`);
+      const missionElement = document.getElementById(`mission-${missionPublicId}`);
       if (missionElement) {
         missionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -150,12 +159,12 @@ export function TestForm({ initialData }: TestFormProps) {
   const handleSave = async () => {
     // 유효성 검사
     if (step === TestFormStep.TEST_INFO) {
-      if (!editName.trim()) {
+      if (!editTitle.trim()) {
         setError('테스트 이름을 입력해주세요.');
         return;
       }
 
-      if (editName.length < 2) {
+      if (editTitle.length < 2) {
         setError('테스트 이름은 최소 2자 이상이어야 합니다.');
         return;
       }
@@ -169,11 +178,18 @@ export function TestForm({ initialData }: TestFormProps) {
       // 실제 저장되는 느낌을 주기 위한 의도적인 지연 시작
       const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 600));
 
+      // missions에 order 업데이트
+      const missionsWithOrder = missions.map((mission, index) => ({
+        ...mission,
+        order: index,
+      }));
+
       // API 함수를 사용하여 테스트 업데이트
-      const updatePromise = updateTest(test.id, {
-        name: editName,
-        integrationUrl: editUrl,
-        missions,
+      const updatePromise = updateTest(test.publicId, {
+        title: editTitle,
+        description: editDescription,
+        url: editUrl,
+        missions: missionsWithOrder,
       });
 
       // 최소 로딩 시간과 API 호출이 모두 완료될 때까지 대기
@@ -182,7 +198,7 @@ export function TestForm({ initialData }: TestFormProps) {
       setTest(updatedTest);
 
       // 쿼리 무효화
-      await queryClient.invalidateQueries({ queryKey: ['tests', test.id] });
+      await queryClient.invalidateQueries({ queryKey: ['tests', test.publicId] });
       await queryClient.invalidateQueries({ queryKey: ['tests'] });
 
       setSuccess(true);
@@ -197,7 +213,7 @@ export function TestForm({ initialData }: TestFormProps) {
     }
   };
 
-  const displayTestName = editName ? editName : test.name;
+  const displayTestName = editTitle ? editTitle : test.title;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -241,10 +257,12 @@ export function TestForm({ initialData }: TestFormProps) {
           <div className="mx-auto max-w-4xl px-8 py-8">
             {step === TestFormStep.TEST_INFO && (
               <TestInfoStep
-                name={editName}
-                integrationUrl={editUrl}
+                title={editTitle}
+                description={editDescription}
+                url={editUrl}
                 error={error}
-                onNameChange={handleNameChange}
+                onTitleChange={handleTitleChange}
+                onDescriptionChange={handleDescriptionChange}
                 onUrlChange={handleUrlChange}
                 onNext={handleNextStep}
               />
@@ -266,7 +284,7 @@ export function TestForm({ initialData }: TestFormProps) {
 
             {step === TestFormStep.TEST_SDK && (
               <TestSdkStep
-                test={test}
+                testPublicId={test.publicId}
                 onPrev={handlePrevStep}
                 onSave={handleSave}
                 loading={loading}

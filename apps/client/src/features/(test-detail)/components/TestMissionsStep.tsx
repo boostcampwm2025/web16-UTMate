@@ -8,8 +8,8 @@ interface TestMissionsStepProps {
   selectedMissionIndex: number;
   onSelectedMissionIndexChange: (index: number) => void;
   onAddMission: () => void;
-  onUpdateMission: (id: number, mission: Partial<TestMission>) => void;
-  onDeleteMission: (id: number) => void;
+  onUpdateMission: (publicId: string, mission: Partial<TestMission>) => void;
+  onDeleteMission: (publicId: string) => void;
   onMoveMission: (fromIndex: number, toIndex: number) => void;
   onPrev: () => void;
   onNext: () => void | Promise<void>;
@@ -26,9 +26,9 @@ export function TestMissionsStep({
   onPrev,
   onNext,
 }: TestMissionsStepProps) {
-  const handleDeleteMission = (id: number) => {
-    const index = missions.findIndex((m) => m.id === id);
-    onDeleteMission(id);
+  const handleDeleteMission = (publicId: string) => {
+    const index = missions.findIndex((m) => m.publicId === publicId);
+    onDeleteMission(publicId);
     // 삭제 후 이전 미션으로 선택 (없으면 0)
     if (selectedMissionIndex >= missions.length - 1) {
       onSelectedMissionIndexChange(Math.max(0, missions.length - 2));
