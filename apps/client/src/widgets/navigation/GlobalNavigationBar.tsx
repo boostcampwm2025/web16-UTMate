@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
@@ -15,6 +17,8 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { SearchIcon } from '@/shared/components/icons/SearchIcon';
 import { BellIcon } from '@/shared/components/icons/BellIcon';
+import { getCurrentUser, logout } from '@/features/(auth)/apis';
+import type { User } from '@/features/(auth)/types';
 
 /**
  * GlobalNavigationBar - 로그인 후 상단 네비게이션 바
@@ -27,23 +31,42 @@ import { BellIcon } from '@/shared/components/icons/BellIcon';
  * - 사용자 프로필 드롭다운 (프로필, 설정, 로그아웃)
  */
 
-interface GlobalNavigationBarProps {
-  user?: {
-    name: string;
-    email: string;
-    avatarUrl?: string;
-  };
-}
+export function GlobalNavigationBar() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-export function GlobalNavigationBar({ user }: GlobalNavigationBarProps) {
-  // 임시 사용자 데이터 (실제로는 인증 컨텍스트나 세션에서 가져옴)
-  const currentUser = user || {
-    name: 'Test User',
-    email: 'test@example.com',
-    avatarUrl: undefined,
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const userData = await getCurrentUser();
+        setUser(userData);
+      } catch (error) {
+        console.error('사용자 정보 조회 실패:', error);
+        // 인증 실패 시 로그인 페이지로 리다이렉트
+        router.push('/login');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchUser();
+  }, [router]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/login');
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    }
   };
 
-  const userInitials = currentUser.name
+  if (isLoading || !user) {
+    return null; // 또는 스켈레톤 UI
+  }
+
+  const userInitials = user.name
     .split(' ')
     .map(n => n[0])
     .join('')
@@ -85,7 +108,7 @@ export function GlobalNavigationBar({ user }: GlobalNavigationBarProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
+                <AvatarImage src={user.avatarUrl} alt={user.name} />
                 <AvatarFallback className="bg-primary text-primary-foreground">
                   {userInitials}
                 </AvatarFallback>
@@ -95,9 +118,9 @@ export function GlobalNavigationBar({ user }: GlobalNavigationBarProps) {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{currentUser.name}</p>
+                <p className="text-sm font-medium leading-none">{user.name}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  {currentUser.email}
+                  {user.email}
                 </p>
               </div>
             </DropdownMenuLabel>
@@ -109,7 +132,10 @@ export function GlobalNavigationBar({ user }: GlobalNavigationBarProps) {
               <Link href="/settings">설정</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive focus:text-destructive">
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={handleLogout}
+            >
               로그아웃
             </DropdownMenuItem>
           </DropdownMenuContent>
