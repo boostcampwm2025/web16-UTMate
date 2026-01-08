@@ -1,14 +1,11 @@
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
-import type {
-  GetTestsResponse,
-  Test,
-  TestDetail,
-  TestMission,
-} from '@/features/(test-manage)/types';
+import type { GetTestsResponse, Test } from '@/features/(test-manage)/types';
 import type { ApiErrorResponse } from '@/shared/types/api';
 
 export const getMyTestList = async (): Promise<GetTestsResponse> => {
-  const response = await fetch(`${CLIENT_BASE_URL}/tests?scope=me`);
+  const response = await fetch(`${CLIENT_BASE_URL}/tests?scope=me`, {
+    credentials: 'include',
+  });
 
   if (!response.ok) {
     const error = (await response.json()) as ApiErrorResponse;
@@ -20,6 +17,7 @@ export const getMyTestList = async (): Promise<GetTestsResponse> => {
 export const createTest = async (): Promise<Test> => {
   const response = await fetch(`${CLIENT_BASE_URL}/tests`, {
     method: 'POST',
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -33,6 +31,7 @@ export const createTest = async (): Promise<Test> => {
 export const deleteTest = async (testId: string): Promise<void> => {
   const response = await fetch(`${CLIENT_BASE_URL}/tests/${testId}`, {
     method: 'DELETE',
+    credentials: 'include',
   });
 
   if (!response.ok) {

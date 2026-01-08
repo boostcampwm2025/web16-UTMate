@@ -16,7 +16,9 @@ export const getTestResult = async (testid: string): Promise<SimpleMissionResult
 
 export const getMissionResult = async (testid: string, missionResultId: string) => {
   // TODO: 현재 임시 API이므로 나중에 API로 대체해야 합니다.
-  const response = await fetch(`${CLIENT_BASE_URL}/mission-results/${missionResultId}`);
+  const response = await fetch(`${CLIENT_BASE_URL}/mission-results/${missionResultId}`, {
+    credentials: 'include',
+  });
   if (!response.ok) {
     const error = (await response.json()) as ApiErrorResponse;
     throw new Error(error.message || '미션 결과를 불러오는데 실패했습니다.');
@@ -25,7 +27,9 @@ export const getMissionResult = async (testid: string, missionResultId: string) 
 };
 
 export const getMissionResultLogs = async (url: string) => {
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    credentials: 'include',
+  });
   if (!response.ok) {
     const error = (await response.json()) as ApiErrorResponse;
     throw new Error(error.message || '미션 결과 로그를 불러오는데 실패했습니다.');
