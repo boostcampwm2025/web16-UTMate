@@ -47,7 +47,9 @@ export class AuthController {
       maxAge: this.config.get<number>(ENV_KEYS.JWT_REFRESH_EXPIRES_IN)! * 1000,
     });
 
-    res.redirect(this.config.get<string>(ENV_KEYS.CLIENT_URL)!);
+    // 로그인 성공 시 workspace 페이지로 리다이렉트
+    const clientUrl = this.config.get<string>(ENV_KEYS.CLIENT_URL)!;
+    res.redirect(`${clientUrl}/workspace`);
   }
 
   @Post('reissue')
