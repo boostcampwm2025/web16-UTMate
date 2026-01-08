@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "pnpm -r dev",
     "build": "pnpm -r build",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "db:up": "docker compose -f docker-compose.dev.yml up -d",
+    "db:down": "docker compose -f docker-compose.dev.yml down",
+    "db:restart": "docker compose -f docker-compose.dev.yml down && docker compose -f docker-compose.dev.yml up -d"
   },
   "devDependencies": {
     "turbo": "latest"
