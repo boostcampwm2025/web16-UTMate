@@ -14,7 +14,7 @@ export const getMyTestList = async (): Promise<GetTestsResponse> => {
   return response.json();
 };
 
-export const createTest = async (title: string): Promise<Test> => {
+export const createTest = async (title: string): Promise<string> => {
   const response = await fetch(`${CLIENT_BASE_URL}/tests`, {
     method: 'POST',
     credentials: 'include',
@@ -29,7 +29,8 @@ export const createTest = async (title: string): Promise<Test> => {
     throw new Error(error.message || '테스트를 생성하는데 실패했습니다.');
   }
 
-  return response.json();
+  const data = await response.json();
+  return data.testId;
 };
 
 export const deleteTest = async (testId: string): Promise<void> => {

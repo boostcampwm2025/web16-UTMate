@@ -50,7 +50,7 @@ export function CreateTestButton() {
 
     try {
       // API 호출
-      const test = await createTest(testName);
+      const testId = await createTest(testName);
 
       // 성공 시 쿼리 무효화
       await queryClient.invalidateQueries({ queryKey: ['tests'] });
@@ -60,7 +60,7 @@ export function CreateTestButton() {
       setIsOpen(false);
 
       // 생성된 테스트 상세 페이지로 이동
-      router.push(`/tests/${test.publicId}?mode=create`);
+      router.push(`/tests/${testId}?mode=create`);
     } catch (err) {
       // 에러 처리
       const errorMessage =
