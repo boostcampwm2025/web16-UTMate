@@ -182,7 +182,7 @@ export function TestForm({ initialData }: TestFormProps) {
 
       // missions에 order 업데이트
       const missionsWithOrder: UpdateTestMission[] = missions.map((mission, index) => ({
-        publicId: mission.publicId ?? undefined,
+        publicId: mission.publicId.startsWith('temp-') ? undefined : mission.publicId,
         order: index,
         name: mission.name,
         description: mission.description,
