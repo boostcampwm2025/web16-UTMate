@@ -1,11 +1,12 @@
 'use client';
 
-import { MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { type Test, TestType } from '@/features/(test-manage)/types';
+
 import { TestStatusBadge } from './TestStatusBadge';
 import { IntegrationIcon } from './IntegrationIcon';
 import { UserAvatar } from './UserAvatar';
+import { TestActionButton } from './TestActionButton';
 
 interface TestTableRowProps {
   test: Test;
@@ -23,9 +24,9 @@ export function TestTableRow({ test }: TestTableRowProps) {
     }
   };
 
-  const handleMoreClick = (e: React.MouseEvent) => {
+  const handleActionClick = (e: React.MouseEvent) => {
+    //액션 버튼 클릭시 행 클릭 이벤트 발생하지 않도록 처리
     e.stopPropagation();
-    // TODO: 더보기 메뉴 기능 구현
   };
 
   return (
@@ -49,13 +50,8 @@ export function TestTableRow({ test }: TestTableRowProps) {
           <UserAvatar name={test.creator.name} imageUrl={test.creator.profileImageUrl} />
         </div>
       </td>
-      <td className="px-6 py-4">
-        <button
-          onClick={handleMoreClick}
-          className="text-gray-400 transition-colors hover:text-gray-600"
-        >
-          <MoreVertical className="h-5 w-5" />
-        </button>
+      <td className="px-6 py-4" onClick={handleActionClick}>
+        <TestActionButton testId={test.id} />
       </td>
     </tr>
   );
