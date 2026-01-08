@@ -18,22 +18,21 @@ RUN pnpm install --filter client --frozen-lockfile
 # 소스 복사 후 빌드
 COPY apps/client ./apps/client
 COPY packages ./packages
-COPY tsconfig.json ./
 COPY apps/client/tsconfig.json ./apps/client/tsconfig.json
 RUN pnpm --filter client build
 
 # --- 런타임 이미지 ---
 FROM node:24-alpine AS runner
-WORKDIR /app/apps/client
+WORKDIR /app
 
-# Next.js standalone 출력만 복사
+# Next.js standalone 출력 복사 (워크스페이스 구조 유지)
 COPY --from=builder /app/apps/client/.next/standalone ./
-COPY --from=builder /app/apps/client/.next/static ./.next/static
-COPY --from=builder /app/apps/client/public ./public
+COPY --from=builder /app/apps/client/.next/static ./apps/client/.next/static
+COPY --from=builder /app/apps/client/public ./apps/client/public
 
 ENV NODE_ENV=production
 ENV PORT=3000
 EXPOSE 3000
 
-# Next standalone entry (short path)
-CMD ["node", "server.js"]
+# Next standalone entry (워크스페이스 경로)
+CMD ["node", "apps/client/server.js"]
