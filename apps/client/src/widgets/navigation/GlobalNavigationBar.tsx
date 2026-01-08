@@ -66,7 +66,7 @@ export function GlobalNavigationBar() {
     return null; // 또는 스켈레톤 UI
   }
 
-  const userInitials = user.name
+  const userInitials = user.username
     .split(' ')
     .map(n => n[0])
     .join('')
@@ -108,7 +108,7 @@ export function GlobalNavigationBar() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={user.avatarUrl} alt={user.name} />
+                <AvatarImage src={user.avatarUrl} alt={user.username} />
                 <AvatarFallback className="bg-primary text-primary-foreground">
                   {userInitials}
                 </AvatarFallback>
@@ -118,9 +118,9 @@ export function GlobalNavigationBar() {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user.name}</p>
+                <p className="text-sm font-medium leading-none">{user.username}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  {user.email}
+                  ID: {user.publicId}
                 </p>
               </div>
             </DropdownMenuLabel>

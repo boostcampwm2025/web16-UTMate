@@ -86,7 +86,7 @@ export default function ProfilePage() {
     return null;
   }
 
-  const userInitials = user.name
+  const userInitials = user.username
     .split(' ')
     .map(n => n[0])
     .join('')
@@ -110,15 +110,14 @@ export default function ProfilePage() {
         <CardContent className="space-y-6">
           <div className="flex items-center gap-6">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={user.avatarUrl} alt={user.name} />
+              <AvatarImage src={user.avatarUrl} alt={user.username} />
               <AvatarFallback className="bg-primary text-2xl text-primary-foreground">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
             <div className="space-y-1">
-              <h3 className="text-2xl font-semibold">{user.name}</h3>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-              <p className="text-xs text-muted-foreground">GitHub ID: {user.githubId}</p>
+              <h3 className="text-2xl font-semibold">{user.username}</h3>
+              <p className="text-sm text-muted-foreground">User ID: {user.publicId}</p>
             </div>
           </div>
 
@@ -126,20 +125,12 @@ export default function ProfilePage() {
 
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">이름</Label>
-              <Input id="name" value={user.name} disabled />
+              <Label htmlFor="username">사용자 이름</Label>
+              <Input id="username" value={user.username} disabled />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="email">이메일</Label>
-              <Input id="email" type="email" value={user.email} disabled />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="joined">가입일</Label>
-              <Input
-                id="joined"
-                value={new Date(user.createdAt).toLocaleDateString('ko-KR')}
-                disabled
-              />
+              <Label htmlFor="publicId">Public ID</Label>
+              <Input id="publicId" value={user.publicId} disabled />
             </div>
           </div>
         </CardContent>
