@@ -21,6 +21,7 @@ export interface Test {
 
 export interface TestMission {
   id: number;
+  name: string;
   description: string;
   url: string;
   estimatedDuration?: number; // 예상 소요시간 (분 단위)

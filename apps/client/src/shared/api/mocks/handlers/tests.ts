@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { Test, TestType, User } from '@/features/(test-manage)/types';
+import type { Test, TestDetail, TestMission, TestType, User } from '@/features/(test-manage)/types';
 
 // Mock 데이터
 const mockUsers: User[] = [
@@ -9,6 +9,34 @@ const mockUsers: User[] = [
     profileImageUrl: null,
   },
 ];
+
+const mockMissions: Record<number, TestMission[]> = {
+  1: [
+    {
+      id: 1,
+      name: '메인 페이지 탐색',
+      description: '웹사이트의 메인 페이지를 둘러보고 주요 기능을 확인해주세요.',
+      url: 'https://notion.so',
+      estimatedDuration: 5,
+    },
+    {
+      id: 2,
+      name: '검색 기능 테스트',
+      description: '검색 기능을 사용하여 원하는 정보를 찾아보세요.',
+      url: 'https://notion.so/search',
+      estimatedDuration: 10,
+    },
+  ],
+  3: [
+    {
+      id: 3,
+      name: '플래너 작성',
+      description: '새로운 플래너를 작성하고 저장해주세요.',
+      url: 'https://example.com/planner',
+      estimatedDuration: 15,
+    },
+  ],
+};
 
 const mockTests: Test[] = [
   {
@@ -68,7 +96,12 @@ export const testsHandlers = [
       });
     }
 
-    return HttpResponse.json(test);
+    const testDetail: TestDetail = {
+      ...test,
+      missions: mockMissions[Number(id)] || [],
+    };
+
+    return HttpResponse.json(testDetail);
   }),
 
   // POST /tests - 테스트 생성

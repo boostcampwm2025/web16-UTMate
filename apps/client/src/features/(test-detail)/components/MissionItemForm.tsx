@@ -23,6 +23,10 @@ export function MissionItemForm({
     onDeleteMission(mission.id);
   };
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onUpdateMission(mission.id, { name: e.target.value });
+  };
+
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onUpdateMission(mission.id, { description: e.target.value });
   };
@@ -57,6 +61,20 @@ export function MissionItemForm({
       </div>
 
       <FieldGroup>
+        <Field>
+          <FieldLabel htmlFor={`mission-name-${mission.id}`}>미션 이름 *</FieldLabel>
+          <Input
+            type="text"
+            id={`mission-name-${mission.id}`}
+            placeholder="카페 예약하기"
+            value={mission.name}
+            onChange={handleNameChange}
+            className="h-10"
+            required
+          />
+          <FieldDescription>미션의 이름을 입력해주세요.</FieldDescription>
+        </Field>
+
         <Field>
           <FieldLabel htmlFor={`mission-description-${mission.id}`}>미션 설명 *</FieldLabel>
           <Textarea

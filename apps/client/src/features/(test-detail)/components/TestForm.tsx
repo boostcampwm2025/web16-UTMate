@@ -52,6 +52,7 @@ export function TestForm({ initialData }: TestFormProps) {
 
     const newMission: TestMission = {
       id: Date.now(), // 임시 ID
+      name: '',
       description: '',
       url: '',
       estimatedDuration: undefined,
