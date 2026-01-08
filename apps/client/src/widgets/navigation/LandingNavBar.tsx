@@ -23,7 +23,7 @@ export function LandingNavBar() {
 
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
-      <div className="container flex h-16 items-center justify-between px-4 lg:px-6">
+      <div className="flex h-16 items-center justify-between px-4 lg:px-6">
         {/* 로고/서비스명 */}
         <Link href="/" className="flex items-center gap-2">
           <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
