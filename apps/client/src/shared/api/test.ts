@@ -10,15 +10,13 @@ interface UpdateTestParams {
   missions: TestMission[];
 }
 
-export const updateTest = async (
-  publicId: string,
-  data: UpdateTestParams,
-): Promise<TestDetail> => {
+export const updateTest = async (publicId: string, data: UpdateTestParams): Promise<TestDetail> => {
   const response = await fetch(`${CLIENT_BASE_URL}/tests/${publicId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(data),
   });
 

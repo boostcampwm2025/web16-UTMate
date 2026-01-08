@@ -33,7 +33,4 @@ export interface TestDetail extends Test {
   missions: TestMission[];
 }
 
-export interface GetTestsResponse {
-  tests: Test[];
-  total: number;
-}
+export type GetTestsResponse = Test[];
