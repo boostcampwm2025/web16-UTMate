@@ -2,7 +2,6 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "prettier": "@org/prettier-config",
   "scripts": {
     "dev": "next dev -p 8080",
     "build": "next build",
@@ -52,7 +51,8 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",
     "msw": "^2.12.7",
-    "prettier": "^3",
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
