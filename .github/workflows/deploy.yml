@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
         include:
@@ -77,7 +80,7 @@ jobs:
 
             # docker-compose.yml 복사
             cat > docker-compose.yml << 'COMPOSE_EOF'
-            ${{ secrets.DOCKER_COMPOSE_CONTENT }}
+            ${{ vars.DOCKER_COMPOSE_CONTENT }}
             COMPOSE_EOF
 
             # GitHub Container Registry 로그인
