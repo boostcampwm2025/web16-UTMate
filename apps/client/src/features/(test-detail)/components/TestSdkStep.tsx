@@ -37,7 +37,10 @@ export function TestSdkStep({ test, onPrev, onSave, loading }: TestSdkStepProps)
     <div className="space-y-8">
       <div>
         <h2 className="mb-2 text-2xl font-bold">SDK 연동</h2>
-        <p className="text-gray-600">대충 SDK를 왜 연결해야하는지 설명</p>
+        <p className="text-gray-600">
+          스크립트를 웹사이트에 추가하고 사용자 로그를 확인하세요. 해당 스크립트는 테스트 환경에서만
+          실행됩니다.
+        </p>
       </div>
 
       <div className="space-y-4">
@@ -56,7 +59,7 @@ export function TestSdkStep({ test, onPrev, onSave, loading }: TestSdkStepProps)
               variant="outline"
               size="sm"
               onClick={handleCopy}
-              className="absolute right-2 top-2"
+              className="absolute top-2 right-2"
             >
               {copied ? (
                 <>✓ 복사됨</>

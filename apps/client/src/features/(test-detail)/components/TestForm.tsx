@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import type { TestDetail, TestMission } from '@/features/(test-manage)/types';
+import { updateTest } from '@/features/(test-manage)/api';
 import { Button } from '@/shared/components/ui/button';
 
 import { BackToWorkspaceButton } from './BackToWorkspaceButton';
@@ -12,6 +13,7 @@ import { TestFormSidebar, TestFormStep } from './TestFormSidebar';
 import { TestInfoStep } from './TestInfoStep';
 import { TestMissionsStep } from './TestMissionsStep';
 import { TestSdkStep } from './TestSdkStep';
+import { MAX_MISSIONS } from '../constants';
 
 interface TestFormProps {
   initialData: TestDetail;
@@ -41,14 +43,22 @@ export function TestForm({ initialData }: TestFormProps) {
   };
 
   const handleAddMission = () => {
+    // 미션 개수 제한 (최대 5개)
+    if (missions.length >= MAX_MISSIONS) {
+      setError(`미션은 최대 ${MAX_MISSIONS}개까지만 추가할 수 있습니다.`);
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
     const newMission: TestMission = {
       id: Date.now(), // 임시 ID
-      name: '',
       description: '',
       url: '',
       estimatedDuration: undefined,
     };
     setMissions([...missions, newMission]);
+    // 새로 추가된 미션을 선택
+    setSelectedMissionIndex(missions.length);
   };
 
   const handleUpdateMission = (id: number, updatedMission: Partial<TestMission>) => {
@@ -58,7 +68,46 @@ export function TestForm({ initialData }: TestFormProps) {
   };
 
   const handleDeleteMission = (id: number) => {
+    const deletedIndex = missions.findIndex((mission) => mission.id === id);
     setMissions(missions.filter((mission) => mission.id !== id));
+
+    // 선택된 미션 인덱스 업데이트
+    if (selectedMissionIndex > deletedIndex) {
+      // 삭제된 미션보다 뒤에 있던 미션을 선택했다면 인덱스 감소
+      setSelectedMissionIndex(selectedMissionIndex - 1);
+    } else if (selectedMissionIndex === deletedIndex) {
+      // 선택된 미션을 삭제했다면 이전 미션 선택 (없으면 0)
+      setSelectedMissionIndex(Math.max(0, deletedIndex - 1));
+    }
+  };
+
+  const handleMoveMission = (fromIndex: number, toIndex: number) => {
+    const newMissions = [...missions];
+    const [movedMission] = newMissions.splice(fromIndex, 1);
+    newMissions.splice(toIndex, 0, movedMission);
+    setMissions(newMissions);
+
+    // 선택된 미션 인덱스도 함께 업데이트
+    let newSelectedIndex = selectedMissionIndex;
+
+    if (selectedMissionIndex === fromIndex) {
+      // 선택된 미션 자체가 이동하는 경우
+      newSelectedIndex = toIndex;
+    } else if (fromIndex < toIndex) {
+      // 아래로 이동하는 경우
+      if (selectedMissionIndex > fromIndex && selectedMissionIndex <= toIndex) {
+        // 선택된 미션이 이동 범위 내에 있으면 위로 한 칸 이동
+        newSelectedIndex = selectedMissionIndex - 1;
+      }
+    } else {
+      // 위로 이동하는 경우
+      if (selectedMissionIndex >= toIndex && selectedMissionIndex < fromIndex) {
+        // 선택된 미션이 이동 범위 내에 있으면 아래로 한 칸 이동
+        newSelectedIndex = selectedMissionIndex + 1;
+      }
+    }
+
+    setSelectedMissionIndex(newSelectedIndex);
   };
 
   const handleMissionClick = (missionId: number) => {
@@ -79,16 +128,14 @@ export function TestForm({ initialData }: TestFormProps) {
       const missionElement = document.getElementById(`mission-${missionId}`);
       if (missionElement) {
         missionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // 강조 효과
-        missionElement.classList.add('ring-2', 'ring-blue-500');
-        setTimeout(() => {
-          missionElement.classList.remove('ring-2', 'ring-blue-500');
-        }, 2000);
       }
     }, 100);
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
+    // 다음 스텝으로 이동하기 전에 저장
+    await handleSave();
+
     if (step < TestFormStep.TEST_SDK) {
       setStep(step + 1);
     }
@@ -119,15 +166,18 @@ export function TestForm({ initialData }: TestFormProps) {
     setSuccess(false);
 
     try {
-      // TODO: API 호출 - updateTest(test.id, updatedFields)
-      // 임시로 클라이언트 상태만 업데이트
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // 실제 저장되는 느낌을 주기 위한 의도적인 지연 시작
+      const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 600));
 
-      const updatedTest = {
-        ...test,
+      // API 함수를 사용하여 테스트 업데이트
+      const updatePromise = updateTest(test.id, {
         name: editName,
         integrationUrl: editUrl,
-      };
+        missions,
+      });
+
+      // 최소 로딩 시간과 API 호출이 모두 완료될 때까지 대기
+      const [updatedTest] = await Promise.all([updatePromise, minLoadingTime]);
 
       setTest(updatedTest);
 
@@ -147,6 +197,8 @@ export function TestForm({ initialData }: TestFormProps) {
     }
   };
 
+  const displayTestName = editName ? editName : test.name;
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* 헤더 */}
@@ -155,7 +207,7 @@ export function TestForm({ initialData }: TestFormProps) {
           <div className="flex items-center gap-3">
             <BackToWorkspaceButton />
             <div>
-              <h1 className="text-2xl font-bold">{test.name}</h1>
+              <h1 className="text-2xl font-bold">{displayTestName}</h1>
             </div>
           </div>
 
@@ -176,8 +228,12 @@ export function TestForm({ initialData }: TestFormProps) {
         <TestFormSidebar
           currentStep={step}
           missions={missions}
+          selectedMissionIndex={selectedMissionIndex}
           onStepChange={setStep}
           onMissionClick={handleMissionClick}
+          onAddMission={handleAddMission}
+          onDeleteMission={handleDeleteMission}
+          onMoveMission={handleMoveMission}
         />
 
         {/* 메인 콘텐츠 */}
@@ -202,6 +258,7 @@ export function TestForm({ initialData }: TestFormProps) {
                 onAddMission={handleAddMission}
                 onUpdateMission={handleUpdateMission}
                 onDeleteMission={handleDeleteMission}
+                onMoveMission={handleMoveMission}
                 onPrev={handlePrevStep}
                 onNext={handleNextStep}
               />

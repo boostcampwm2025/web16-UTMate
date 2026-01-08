@@ -1,5 +1,10 @@
 import { BASE_URL } from '@/shared/constants/api';
-import type { GetTestsResponse, Test } from '@/features/(test-manage)/types';
+import type {
+  GetTestsResponse,
+  Test,
+  TestDetail,
+  TestMission,
+} from '@/features/(test-manage)/types';
 
 export const getMyTestList = async (): Promise<GetTestsResponse> => {
   const response = await fetch(`${BASE_URL}/tests?scope=me`);
@@ -17,6 +22,28 @@ export const createTest = async (): Promise<Test> => {
 
   if (!response.ok) {
     throw new Error('Failed to create test');
+  }
+
+  return response.json();
+};
+
+export interface UpdateTestParams {
+  name?: string;
+  integrationUrl?: string;
+  missions?: TestMission[];
+}
+
+export const updateTest = async (id: number, data: UpdateTestParams): Promise<TestDetail> => {
+  const response = await fetch(`${BASE_URL}/tests/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update test');
   }
 
   return response.json();

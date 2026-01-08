@@ -16,7 +16,7 @@ export function TestTableRow({ test }: TestTableRowProps) {
 
   const handleRowClick = () => {
     if (test.type === TestType.DRAFT) {
-      router.push(`/tests/${test.id}`);
+      router.push(`/tests/${test.id}?mode=edit`);
       return;
     } else {
       router.push(`/dashboard/${test.id}`);
