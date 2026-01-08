@@ -13,7 +13,7 @@ export function RecentTestSection() {
     queryFn: getMyTestList,
   });
 
-  const tests = data?.tests ?? [];
+  const tests = data ?? [];
 
   return (
     <div className="mb-12">
@@ -30,7 +30,7 @@ export function RecentTestSection() {
       {isLoading && (
         <div className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 py-16">
           <div className="text-center">
-            <Loader2 className="mb-4 h-8 w-8 animate-spin text-primary mx-auto" />
+            <Loader2 className="text-primary mx-auto mb-4 h-8 w-8 animate-spin" />
             <p className="text-sm text-gray-600">테스트를 불러오는 중...</p>
           </div>
         </div>
@@ -40,12 +40,12 @@ export function RecentTestSection() {
       {error && !isLoading && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-8">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-6 w-6 shrink-0 text-destructive" />
+            <AlertTriangle className="text-destructive h-6 w-6 shrink-0" />
             <div>
-              <h3 className="text-sm font-medium text-destructive-foreground">
+              <h3 className="text-destructive-foreground text-sm font-medium">
                 테스트를 불러오는데 실패했습니다
               </h3>
-              <p className="mt-1 text-sm text-destructive">
+              <p className="text-destructive mt-1 text-sm">
                 {error.message || '알 수 없는 오류가 발생했습니다.'}
               </p>
               <Button

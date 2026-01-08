@@ -6,6 +6,9 @@ import { UserSummaryDto } from '#domain/users/dto/user-summary.dto';
 
 export class TestSummaryDto {
   @IsString()
+  publicId: string;
+
+  @IsString()
   title: string;
 
   @IsEnum(TestStatus)
@@ -21,6 +24,7 @@ export class TestSummaryDto {
 
   static fromTestEntity(test: Test) {
     const dto = new TestSummaryDto();
+    dto.publicId = test.publicId;
     dto.title = test.title;
     dto.status = test.status;
     dto.sdkStatus = test.sdkStatus;

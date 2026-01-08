@@ -8,3 +8,12 @@ export const CLIENT_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localh
 // 배포: http://server/api (내부 통신)
 export const SERVER_BASE_URL =
   process.env.NEXT_PUBLIC_INTERNAL_API_URL || 'http://localhost:8080/api';
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public code: number,
+  ) {
+    super(message);
+  }
+}
