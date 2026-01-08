@@ -3,15 +3,12 @@
  */
 
 /**
- * 사용자 정보
+ * 사용자 정보 (백엔드 UserSummaryDto와 일치)
  */
 export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatarUrl?: string;
-  githubId: string;
-  createdAt: string;
+  publicId: string;
+  username: string;
+  avatarUrl: string;
 }
 
 /**
