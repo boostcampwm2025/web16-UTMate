@@ -14,12 +14,7 @@ export default function SocialLoginButtons() {
   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
   return (
-    <Button
-      asChild
-      variant="outline"
-      size="lg"
-      className="w-full"
-    >
+    <Button asChild variant="outline" size="lg" className="w-full">
       <a href={`${backendUrl}/api/auth/github`}>
         <GithubIcon className="mr-2 h-4 w-4" />
         GitHub로 로그인
