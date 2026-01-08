@@ -1,12 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  type CarouselApi,
-} from '@/shared/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/shared/components/ui/carousel';
 
 /**
  * UTMate 소개 Carousel
@@ -70,14 +65,14 @@ export function UTMateCarousel() {
   ];
 
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-8 p-8">
+    <div className='flex h-full flex-col items-center justify-center gap-8 p-8'>
       <Carousel
         setApi={setApi}
         opts={{
           align: 'start',
           loop: true,
         }}
-        className="w-full max-w-lg"
+        className='w-full max-w-lg'
       >
         <CarouselContent>
           {slides.map((slide, index) => (
@@ -86,22 +81,18 @@ export function UTMateCarousel() {
                 className={`flex h-125 flex-col items-center justify-center gap-6 rounded-2xl bg-linear-to-br ${slide.gradient} p-12 text-center`}
               >
                 {/* 이미지 영역 (나중에 실제 이미지로 교체) */}
-                <div className="mb-4 flex h-48 w-full items-center justify-center rounded-xl bg-white/50 backdrop-blur-sm">
-                  <div className="text-center">
-                    <div className="mb-2 text-6xl">{slide.imagePlaceholder}</div>
-                    <p className="text-xs text-muted-foreground">
-                      이미지 영역 (추후 교체)
-                    </p>
+                <div className='mb-4 flex h-48 w-full items-center justify-center rounded-xl bg-white/50 backdrop-blur-sm'>
+                  <div className='text-center'>
+                    <div className='mb-2 text-6xl'>{slide.imagePlaceholder}</div>
+                    <p className='text-xs text-muted-foreground'>이미지 영역 (추후 교체)</p>
                   </div>
                 </div>
 
                 {/* 타이틀 */}
-                <h3 className="text-2xl font-bold text-foreground">{slide.title}</h3>
+                <h3 className='text-2xl font-bold text-foreground'>{slide.title}</h3>
 
                 {/* 설명 */}
-                <p className="text-base leading-relaxed text-muted-foreground">
-                  {slide.description}
-                </p>
+                <p className='text-base leading-relaxed text-muted-foreground'>{slide.description}</p>
               </div>
             </CarouselItem>
           ))}
@@ -109,15 +100,13 @@ export function UTMateCarousel() {
       </Carousel>
 
       {/* 페이지네이션 인디케이터 */}
-      <div className="flex gap-2">
+      <div className='flex gap-2'>
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => api?.scrollTo(index)}
             className={`h-2 rounded-full transition-all ${
-              index === current
-                ? 'w-8 bg-primary'
-                : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
+              index === current ? 'w-8 bg-primary' : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
             }`}
             aria-label={`슬라이드 ${index + 1}로 이동`}
           />
