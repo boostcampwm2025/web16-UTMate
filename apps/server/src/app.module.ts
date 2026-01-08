@@ -16,7 +16,6 @@ import { UsersModule } from '#domain/users/users.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '../../.env',
       validationSchema: Joi.object({
         // Server
         NODE_ENV: Joi.string().valid('development', 'production').default('development'),
@@ -64,6 +63,8 @@ import { UsersModule } from '#domain/users/users.module';
         password: config.get<string>(ENV_KEYS.DATABASE_PASSWORD)!,
         database: config.get<string>(ENV_KEYS.DATABASE_NAME)!,
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        migrations: [__dirname + '/migrations/*{.ts,.js}'],
+        migrationsRun: config.get<string>(ENV_KEYS.NODE_ENV)! === 'production',
         synchronize: config.get<string>(ENV_KEYS.NODE_ENV)! !== 'production',
         logging: config.get<string>(ENV_KEYS.NODE_ENV)! !== 'production',
       }),
