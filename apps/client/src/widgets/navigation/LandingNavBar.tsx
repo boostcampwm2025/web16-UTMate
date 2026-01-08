@@ -18,16 +18,16 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 export function LandingNavBar() {
   const handleLogin = () => {
     // GitHub OAuth 로그인 페이지로 이동
-    window.location.href = `${API_URL}/api/auth/github`;
+    window.location.href = `${API_URL}/login`;
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="container flex h-16 items-center justify-between px-4 lg:px-6">
         {/* 로고/서비스명 */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-primary-foreground">UT</span>
+          <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
+            <span className="text-primary-foreground text-sm font-bold">UT</span>
           </div>
           <span className="text-lg font-bold">UTMate</span>
         </Link>
