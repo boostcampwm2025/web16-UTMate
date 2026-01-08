@@ -50,7 +50,7 @@ export function CreateTestButton() {
 
     try {
       // API 호출
-      const test = await createTest();
+      const test = await createTest(testName);
 
       // 성공 시 쿼리 무효화
       await queryClient.invalidateQueries({ queryKey: ['tests'] });

@@ -14,10 +14,14 @@ export const getMyTestList = async (): Promise<GetTestsResponse> => {
   return response.json();
 };
 
-export const createTest = async (): Promise<Test> => {
+export const createTest = async (title: string): Promise<Test> => {
   const response = await fetch(`${CLIENT_BASE_URL}/tests`, {
     method: 'POST',
     credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ title }),
   });
 
   if (!response.ok) {
