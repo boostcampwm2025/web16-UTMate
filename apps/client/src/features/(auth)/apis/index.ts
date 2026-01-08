@@ -49,7 +49,7 @@ export async function logout(): Promise<void> {
  * 현재 로그인한 사용자 정보 가져오기
  */
 export async function getCurrentUser(): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+  const response = await fetch(`${API_BASE_URL}/api/users/me`, {
     credentials: 'include',
   });
 
