@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import type { TestDetail, TestMission } from '@/features/(test-manage)/types';
-import { updateTest } from '@/features/(test-manage)/api';
+import { updateTest } from '@/shared/api/test';
 import { Button } from '@/shared/components/ui/button';
 
 import { BackToWorkspaceButton } from './BackToWorkspaceButton';
