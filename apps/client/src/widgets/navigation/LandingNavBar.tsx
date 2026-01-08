@@ -13,7 +13,7 @@ import { Button } from '@/shared/components/ui/button';
  * 로그인되지 않은 사용자를 위한 심플한 네비게이션
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export function LandingNavBar() {
   const handleLogin = () => {
