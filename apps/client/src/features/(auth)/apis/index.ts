@@ -59,3 +59,20 @@ export async function getCurrentUser(): Promise<User> {
 
   return response.json();
 }
+
+/**
+ * 회원 탈퇴
+ */
+export async function deleteUser(): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('회원 탈퇴에 실패했습니다.');
+  }
+
+  // 로컬 스토리지 정리
+  localStorage.removeItem('auth_token');
+}
