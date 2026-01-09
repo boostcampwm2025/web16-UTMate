@@ -84,17 +84,16 @@ export function AppSidebar() {
             <SidebarMenu>
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive =
-                  pathname === item.href || pathname.startsWith(`${item.href}/`);
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={isActive} size="lg" tooltip={item.title}>
                       <Link href={item.href}>
-                        <Icon className="h-5 w-5" />
+                        <Icon className="h-6! w-6!" />
                         <span>{item.title}</span>
                         {item.badge && (
-                          <span className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                          <span className="bg-primary/10 text-primary ml-auto rounded-full px-2 py-0.5 text-xs font-medium">
                             {item.badge}
                           </span>
                         )}
@@ -114,14 +113,13 @@ export function AppSidebar() {
           {/* Settings 메뉴 */}
           {bottomNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
             return (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton asChild isActive={isActive} size="lg" tooltip={item.title}>
                   <Link href={item.href}>
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-6! w-6!" />
                     <span>{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
@@ -131,16 +129,21 @@ export function AppSidebar() {
 
           {/* 로고 & Trigger 버튼 */}
           <SidebarMenuItem>
-            <div className="flex items-center justify-between p-2">
+            <div className="flex items-center justify-between px-2 py-1">
               {/* 로고 - 접혔을 때는 숨김 */}
-              <Link href="/dashboard" className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
-                <div className="flex h-7 w-7 items-center justify-center rounded bg-primary">
-                  <span className="text-sm font-bold text-primary-foreground">UT</span>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 group-data-[collapsible=icon]:hidden"
+              >
+                <div className="bg-primary flex h-7 w-7 items-center justify-center rounded">
+                  <span className="text-primary-foreground text-sm font-bold">UT</span>
                 </div>
                 <span className="text-base font-semibold">UTMate</span>
               </Link>
-              {/* Trigger 버튼 */}
-              <SidebarTrigger />
+              {/* Trigger 버튼 - 접혔을 때 가운데 정렬 */}
+              <div className="group-data-[collapsible=icon]:mx-auto [&_svg]:h-6! [&_svg]:w-6!">
+                <SidebarTrigger />
+              </div>
             </div>
           </SidebarMenuItem>
         </SidebarMenu>
