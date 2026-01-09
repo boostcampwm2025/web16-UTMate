@@ -27,7 +27,7 @@
 - 이번 배포 단계의 마이그레이션을 만듭니다.
 
 ```
-  pnpm run migration:generate src/migrations/Release_vx.x.x
+  pnpm run migration:generate src/migrations/Release_vx_x_x
 ```
 
 ### 마이그레이션 테스트

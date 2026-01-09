@@ -18,22 +18,22 @@ import { UsersModule } from '#domain/users/users.module';
       isGlobal: true,
       validationSchema: Joi.object({
         // Server
-        NODE_ENV: Joi.string().valid('development', 'production').default('development'),
-        SERVER_PORT: Joi.number().default(8080),
+        NODE_ENV: Joi.string().valid('development', 'production').required(),
+        SERVER_PORT: Joi.number().default(8080).required(),
 
         // Database
-        DATABASE_HOST: Joi.string().default('localhost'),
+        DATABASE_HOST: Joi.string().required(),
         DATABASE_PORT: Joi.number().default(3306),
         DATABASE_USER: Joi.string().required(),
         DATABASE_PASSWORD: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),
 
         // Redis
-        REDIS_HOST: Joi.string().default('localhost'),
-        REDIS_PORT: Joi.number().default(6379),
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.number().required(),
 
         // Client
-        CLIENT_URL: Joi.string().uri().default('http://localhost:3000'),
+        CLIENT_URL: Joi.string().uri().required(),
 
         // GitHub OAuth
         GITHUB_CLIENT_ID: Joi.string().required(),
