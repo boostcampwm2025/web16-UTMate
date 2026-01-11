@@ -8,7 +8,7 @@
 
 사용자 테스트를 더 쉽고 효율적으로 만드는 통합 플랫폼
 
-[🏠 Wiki 홈](https://github.com/boostcampwm2025/web16-UTMate/wiki) | [📄 프로젝트 기획서](https://github.com/boostcampwm2025/web16-UTMate/wiki/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EA%B8%B0%ED%9A%8D%EC%84%9C) | [💻 기술 스택]([https://github.com/boostcampwm2025/web16-UTMate/wiki/TechStack-Overview/](https://github.com/boostcampwm2025/web16-UTMate/wiki#%EA%B8%B0%EC%88%A0%EC%8A%A4%ED%83%9D))
+[🏠 Wiki 홈](https://github.com/boostcampwm2025/web16-UTMate/wiki) | [📄 프로젝트 기획서](https://github.com/boostcampwm2025/web16-UTMate/wiki/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EA%B8%B0%ED%9A%8D%EC%84%9C) | [💻 기술 스택]([https://github.com/boostcampwm2025/web16-UTMate/wiki/TechStack-Overview/](https://github.com/boostcampwm2025/web16-UTMate/wiki#%EA%B8%B0%EC%88%A0%EC%8A%A4%ED%83%9D)
 
 </div>
 
