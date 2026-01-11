@@ -1,4 +1,4 @@
-# 🍪 UTMate - User Test Mate
+# 🍪 UTMate
 
 > **Boostcamp Web·Mobile 10기 | 그룹 프로젝트**
 
