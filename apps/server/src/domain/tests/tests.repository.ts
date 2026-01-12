@@ -51,4 +51,9 @@ export class TestsRepository {
       .andWhere('tests.owner_id = :ownerId', { ownerId: owner.id })
       .getOne();
   }
+
+  async remove(test: Test, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
+    return repo.remove(test);
+  }
 }

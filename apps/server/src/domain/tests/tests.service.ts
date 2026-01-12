@@ -64,4 +64,16 @@ export class TestsService {
     }
     return TestDto.fromTestEntity(test);
   }
+
+  async deleteTest(userId: string, publicId: string) {
+    const owner = await this.usersService.getIdByPublicId(userId);
+
+    // 테스트 삭제
+    // 관련된 미션들은 Test 엔티티의 onDelete: 'CASCADE' 옵션에 의해 자동 삭제됨
+    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    await this.testsRepository.remove(test);
+  }
 }
