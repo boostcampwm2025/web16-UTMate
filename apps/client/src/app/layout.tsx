@@ -16,8 +16,8 @@ if (
 }
 
 export const metadata: Metadata = {
-  title: 'UT MVP',
-  description: 'User Testing MVP',
+  title: 'UTMate',
+  description: '당신을 위한 사용성 테스트 솔루션',
 };
 
 export default function RootLayout({
