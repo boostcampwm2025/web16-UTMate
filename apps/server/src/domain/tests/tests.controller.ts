@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, Post, Put, UseGuards } from '@nestjs/common';
 
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
@@ -39,5 +39,11 @@ export class TestsController {
     @Body() updateTestDto: UpdateTestDto,
   ) {
     return await this.testsService.updateTest(payload.userId, publicId, updateTestDto);
+  }
+
+  @Delete('/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteTest(@JwtPayload() payload: JwtPayloadDto, @Param('id') publicId: string) {
+    return await this.testsService.deleteTest(payload.userId, publicId);
   }
 }
