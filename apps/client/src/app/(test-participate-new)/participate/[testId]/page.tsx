@@ -125,7 +125,24 @@ export default function TestParticipatePage() {
   };
 
   // 시작 버튼 클릭
-  const handleStart = () => {
+  const handleStart = async () => {
+    // API 연동 시 주석 해제
+    // import { startTestParticipation } from '@/features/(test-participate-new)/api';
+    //
+    // try {
+    //   const { participantId } = await startTestParticipation(testId);
+    //   setSession((prev) => ({
+    //     ...prev,
+    //     currentStep: 'mission',
+    //     currentMissionIndex: 0,
+    //     participantId,
+    //   }));
+    // } catch (error) {
+    //   console.error('Failed to start test:', error);
+    //   alert('테스트 시작에 실패했습니다.');
+    // }
+
+    // 현재는 Mock으로 동작
     setSession((prev) => ({
       ...prev,
       currentStep: 'mission',
