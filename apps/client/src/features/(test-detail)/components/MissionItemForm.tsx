@@ -89,7 +89,7 @@ export function MissionItemForm({
           <Input
             type="url"
             id={`mission-url-${field.id}`}
-            placeholder="https://maps.com/search"
+            placeholder="https://www.maps.com/search"
             {...register(`missions.${missionIndex}.missionUrl`)}
             className="h-10"
             aria-invalid={!!missionErrors?.missionUrl}
