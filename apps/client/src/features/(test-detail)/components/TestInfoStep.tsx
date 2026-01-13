@@ -71,7 +71,7 @@ export function TestInfoStep({ register, errors, onNext }: TestInfoStepProps) {
 
       {/* 네비게이션 버튼 */}
       <div className="flex justify-end border-t pt-6">
-        <Button onClick={() => void onNext()}>다음</Button>
+        <Button onClick={onNext}>다음</Button>
       </div>
     </div>
   );
