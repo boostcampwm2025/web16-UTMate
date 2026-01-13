@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
@@ -108,7 +108,6 @@ export class TestsService {
 
   private async verifySdkInstallationLogic(destination: string): Promise<boolean> {
     try {
-      Logger.log(`Verifying SDK installation at: ${destination}`);
       const response = await fetch(destination);
       if (!response.ok) {
         return false;
@@ -125,7 +124,7 @@ export class TestsService {
         return false;
       }
 
-      // SDK URL 확인 (예: SDK 도메인이 포함되어 있는지)
+      // SDK URL 확인
       const sdkDomain = this.configService.get(ENV_KEYS.SDK_DOMAIN); // SDK 도메인 패턴
       return matches.some((match) => match.toLowerCase().includes(sdkDomain));
     } catch (error) {
