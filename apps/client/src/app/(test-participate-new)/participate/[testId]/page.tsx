@@ -150,8 +150,30 @@ export default function TestParticipatePage() {
     }));
   };
 
-  // 미션 완료
-  const handleMissionComplete = (completed: boolean, feedback?: string) => {
+  // 미션 완료 (다음 버튼 클릭 시 MissionStep에서 호출됨)
+  const handleMissionComplete = async (
+    completed: boolean,
+    feedback?: string,
+    missionResultId?: string
+  ) => {
+    // API 연동 시 주석 해제
+    // import { submitMissionResult } from '@/features/(test-participate-new)/api';
+    //
+    // try {
+    //   if (missionResultId) {
+    //     await submitMissionResult(
+    //       missionResultId,
+    //       completed ? 'SUCCESS' : 'FAILED',
+    //       feedback
+    //     );
+    //   }
+    // } catch (error) {
+    //   console.error('Failed to submit mission result:', error);
+    //   alert('미션 결과 제출에 실패했습니다.');
+    //   return;
+    // }
+
+    // 현재는 Mock으로 동작
     const missionResult: MissionResult = {
       missionPublicId: testInfo.missions[session.currentMissionIndex].publicId,
       completed,
@@ -168,6 +190,7 @@ export default function TestParticipatePage() {
       setSession((prev) => ({
         ...prev,
         currentMissionIndex: prev.currentMissionIndex + 1,
+        currentMissionResultId: undefined, // 새 미션 시작 시 초기화
       }));
     } else {
       setSession((prev) => ({
