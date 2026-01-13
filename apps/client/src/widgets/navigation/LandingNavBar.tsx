@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/shared/components/ui/button';
+import { useRouter } from 'next/navigation'
 
 /**
  * LandingNavBar - 랜딩 페이지 전용 네비게이션 바
@@ -13,12 +14,13 @@ import { Button } from '@/shared/components/ui/button';
  * 로그인되지 않은 사용자를 위한 심플한 네비게이션
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export function LandingNavBar() {
+
+  const router = useRouter();
+
   const handleLogin = () => {
-    // GitHub OAuth 로그인 페이지로 이동
-    window.location.href = `${API_URL}/login`;
+    router.push('/login');
   };
 
   return (

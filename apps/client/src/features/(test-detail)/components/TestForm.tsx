@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 import type { TestDetail, TestMission } from '@/features/(test-manage)/types';
 import { updateTest } from '@/shared/api/test';
 import { Button } from '@/shared/components/ui/button';
+import type { UpdateTestMission } from '@/shared/api/test';
 
 import { BackToWorkspaceButton } from './BackToWorkspaceButton';
 import { TestFormSidebar, TestFormStep } from './TestFormSidebar';
@@ -20,7 +21,8 @@ interface TestFormProps {
 }
 
 export function TestForm({ initialData }: TestFormProps) {
-  const queryClient = useQueryClient();
+  const router = useRouter();
+
   const [test, setTest] = useState<TestDetail>(initialData);
   const [step, setStep] = useState<TestFormStep>(TestFormStep.TEST_INFO);
 
@@ -179,9 +181,13 @@ export function TestForm({ initialData }: TestFormProps) {
       const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 600));
 
       // missions에 order 업데이트
-      const missionsWithOrder = missions.map((mission, index) => ({
-        ...mission,
+      const missionsWithOrder: UpdateTestMission[] = missions.map((mission, index) => ({
+        publicId: mission.publicId.startsWith('temp-') ? undefined : mission.publicId,
         order: index,
+        name: mission.name,
+        description: mission.description,
+        url: mission.missionUrl,
+        estimatedDuration: mission.estimatedDuration,
       }));
 
       // API 함수를 사용하여 테스트 업데이트
@@ -193,16 +199,12 @@ export function TestForm({ initialData }: TestFormProps) {
       });
 
       // 최소 로딩 시간과 API 호출이 모두 완료될 때까지 대기
-      const [updatedTest] = await Promise.all([updatePromise, minLoadingTime]);
-
-      setTest(updatedTest);
-
-      // 쿼리 무효화
-      await queryClient.invalidateQueries({ queryKey: ['tests', test.publicId] });
-      await queryClient.invalidateQueries({ queryKey: ['tests'] });
+      await Promise.all([updatePromise, minLoadingTime]);
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 2000);
+
+      router.push(`/tests/${test.publicId}`);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : '저장에 실패했습니다. 다시 시도해주세요.';

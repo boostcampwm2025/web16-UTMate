@@ -58,4 +58,14 @@ export class RefreshTokenService {
 
     return newTokenDto;
   }
+
+  /**
+   * Refresh Token을 삭제합니다.
+   * @param userId Redis key의 일부로 사용됩니다.
+   * @param familyId Redis key의 일부로 사용됩니다.
+   */
+  async deleteRefreshToken(userId: string, familyId: string) {
+    const key = `rt:${userId}:${familyId}`;
+    await this.redisClient.del(key);
+  }
 }

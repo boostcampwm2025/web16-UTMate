@@ -3,15 +3,14 @@
  */
 
 import type { User } from '../types';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+import { CLIENT_BASE_URL } from '@/shared/constants/api';
 
 /**
  * GitHub OAuth 콜백 처리
  * GitHub에서 받은 code를 백엔드로 전송하여 사용자 정보와 토큰을 받아옴
  */
 export async function handleGithubCallback(code: string): Promise<{ user: User; token: string }> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/github/callback`, {
+  const response = await fetch(`${CLIENT_BASE_URL}/auth/github/callback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -32,7 +31,7 @@ export async function handleGithubCallback(code: string): Promise<{ user: User; 
  * 로그아웃
  */
 export async function logout(): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+  const response = await fetch(`${CLIENT_BASE_URL}/auth/logout`, {
     method: 'POST',
     credentials: 'include',
   });
@@ -49,7 +48,7 @@ export async function logout(): Promise<void> {
  * 현재 로그인한 사용자 정보 가져오기
  */
 export async function getCurrentUser(): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+  const response = await fetch(`${CLIENT_BASE_URL}/users/me`, {
     credentials: 'include',
   });
 
@@ -64,7 +63,7 @@ export async function getCurrentUser(): Promise<User> {
  * 회원 탈퇴
  */
 export async function deleteUser(): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+  const response = await fetch(`${CLIENT_BASE_URL}/users/me`, {
     method: 'DELETE',
     credentials: 'include',
   });
