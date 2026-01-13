@@ -33,4 +33,6 @@ export interface TestSession {
   currentMissionIndex: number;
   missionResults: MissionResult[];
   overallFeedback?: string;
+  participantId?: string; // API 연동 시 사용
+  currentMissionResultId?: string; // 현재 미션의 결과 ID
 }
