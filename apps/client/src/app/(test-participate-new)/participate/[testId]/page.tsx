@@ -253,6 +253,11 @@ export default function TestParticipatePage() {
               mission={testInfo.missions[session.currentMissionIndex]}
               missionNumber={session.currentMissionIndex + 1}
               totalMissions={testInfo.missions.length}
+              participantId={session.participantId}
+              missionResultId={session.currentMissionResultId}
+              onMissionResultIdChange={(id) =>
+                setSession((prev) => ({ ...prev, currentMissionResultId: id }))
+              }
               onNext={handleMissionComplete}
             />
           )}
