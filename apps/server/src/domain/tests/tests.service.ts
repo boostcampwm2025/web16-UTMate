@@ -65,6 +65,16 @@ export class TestsService {
     return TestDto.fromTestEntity(test);
   }
 
+  async getSdkStatus(userId: string, publicId: string) {
+    const owner = await this.usersService.getIdByPublicId(userId);
+
+    const test = await this.testsRepository.findSdkStatusByPublicIdAndOwner(publicId, owner);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return { sdkStatus: test.sdkStatus };
+  }
+
   async deleteTest(userId: string, publicId: string) {
     const owner = await this.usersService.getIdByPublicId(userId);
 

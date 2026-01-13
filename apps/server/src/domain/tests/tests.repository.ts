@@ -42,6 +42,16 @@ export class TestsRepository {
       .getMany();
   }
 
+  async findSdkStatusByPublicIdAndOwner(publicId: string, owner: User, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
+    return repo
+      .createQueryBuilder('tests')
+      .select(['tests.sdkStatus'])
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId: owner.id })
+      .getOne();
+  }
+
   async findWithMissionsByPublicIdAndOwner(publicId: string, owner: User, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo

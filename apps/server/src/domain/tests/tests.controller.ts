@@ -24,6 +24,12 @@ export class TestsController {
     return this.testsService.getTestById(payload.userId, publicId);
   }
 
+  @Get('/:id/sdkStatus')
+  @UseGuards(JwtAuthGuard)
+  async getSdkStatus(@JwtPayload() payload: JwtPayloadDto, @Param('id') publicId: string) {
+    return this.testsService.getSdkStatus(payload.userId, publicId);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   async createTest(@JwtPayload() payload: JwtPayloadDto, @Body() body: CreateTestDto) {
