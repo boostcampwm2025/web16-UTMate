@@ -1,7 +1,5 @@
 import type { UseFormRegister, FieldErrors, FieldArrayWithId } from 'react-hook-form';
 
-import { Button } from '@/shared/components/ui/button';
-
 import { MissionItemForm } from './MissionItemForm';
 import type { TestFormValues } from '../schemas/testForm';
 
@@ -12,8 +10,6 @@ interface TestMissionsStepProps {
   errors: FieldErrors<TestFormValues>;
   onSelectedMissionIndexChange: (index: number) => void;
   onDeleteMission: (publicId: string) => void;
-  onPrev: () => void;
-  onNext: () => void | Promise<void>;
 }
 
 export function TestMissionsStep({
@@ -23,8 +19,6 @@ export function TestMissionsStep({
   errors,
   onSelectedMissionIndexChange,
   onDeleteMission,
-  onPrev,
-  onNext,
 }: TestMissionsStepProps) {
   const handleDeleteMission = (publicId: string) => {
     onDeleteMission(publicId);
@@ -60,18 +54,6 @@ export function TestMissionsStep({
           />
         )
       )}
-
-      <div className="border-t pt-6">
-        {/* 네비게이션 버튼 */}
-        <div className="flex justify-between">
-          <Button variant="outline" onClick={onPrev}>
-            이전
-          </Button>
-          <Button variant="default" onClick={onNext}>
-            다음
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

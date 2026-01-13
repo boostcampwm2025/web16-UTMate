@@ -4,6 +4,7 @@ import type { TestDetail } from '@/features/(test-manage)/types';
 
 import { BackToWorkspaceButton } from './BackToWorkspaceButton';
 import { SaveButton } from './SaveButton';
+import { StepNavigation } from './StepNavigation';
 import { TestFormSidebar, TestFormStep } from './TestFormSidebar';
 import { TestInfoStep } from './TestInfoStep';
 import { TestMissionsStep } from './TestMissionsStep';
@@ -35,7 +36,7 @@ export function TestForm({ initialData }: TestFormProps) {
   } = form;
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col">
       {/* 헤더 */}
       <div className="border-b bg-white px-8 py-4">
         <div className="flex items-center justify-between">
@@ -66,34 +67,37 @@ export function TestForm({ initialData }: TestFormProps) {
         />
 
         {/* 메인 콘텐츠 */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-4xl px-8 py-8">
-            {step === TestFormStep.TEST_INFO && (
-              <TestInfoStep register={register} errors={errors} onNext={handlers.nextStep} />
-            )}
+        <main className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
+            <div className="mx-auto max-w-4xl px-8 py-8">
+              {step === TestFormStep.TEST_INFO && (
+                <TestInfoStep register={register} errors={errors} />
+              )}
 
-            {step === TestFormStep.TEST_MISSIONS && (
-              <TestMissionsStep
-                fields={fields}
-                selectedMissionIndex={selectedMissionIndex}
-                register={register}
-                errors={errors}
-                onSelectedMissionIndexChange={setSelectedMissionIndex}
-                onDeleteMission={handlers.deleteMission}
-                onPrev={handlers.prevStep}
-                onNext={handlers.nextStep}
-              />
-            )}
+              {step === TestFormStep.TEST_MISSIONS && (
+                <TestMissionsStep
+                  fields={fields}
+                  selectedMissionIndex={selectedMissionIndex}
+                  register={register}
+                  errors={errors}
+                  onSelectedMissionIndexChange={setSelectedMissionIndex}
+                  onDeleteMission={handlers.deleteMission}
+                />
+              )}
 
-            {step === TestFormStep.TEST_SDK && (
-              <TestSdkStep
-                testPublicId={initialData.publicId}
-                onPrev={handlers.prevStep}
-                onSave={handlers.save}
-                loading={loading}
-              />
-            )}
+              {step === TestFormStep.TEST_SDK && (
+                <TestSdkStep testPublicId={initialData.publicId} />
+              )}
+            </div>
           </div>
+
+          <StepNavigation
+            currentStep={step}
+            loading={loading}
+            onPrev={handlers.prevStep}
+            onNext={handlers.nextStep}
+            onSave={handlers.save}
+          />
         </main>
       </div>
     </div>

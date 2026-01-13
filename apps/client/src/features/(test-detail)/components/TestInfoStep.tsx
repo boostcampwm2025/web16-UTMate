@@ -1,8 +1,6 @@
 'use client';
 
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
-
-import { Button } from '@/shared/components/ui/button';
 import {
   Field,
   FieldDescription,
@@ -18,10 +16,9 @@ import type { TestFormValues } from '../schemas/testForm';
 interface TestInfoStepProps {
   register: UseFormRegister<TestFormValues>;
   errors: FieldErrors<TestFormValues>;
-  onNext: () => void | Promise<void>;
 }
 
-export function TestInfoStep({ register, errors, onNext }: TestInfoStepProps) {
+export function TestInfoStep({ register, errors }: TestInfoStepProps) {
   return (
     <div className="space-y-8">
       <div>
@@ -68,11 +65,6 @@ export function TestInfoStep({ register, errors, onNext }: TestInfoStepProps) {
           {errors.url && <FieldError>{errors.url.message}</FieldError>}
         </Field>
       </FieldGroup>
-
-      {/* 네비게이션 버튼 */}
-      <div className="flex justify-end border-t pt-6">
-        <Button onClick={onNext}>다음</Button>
-      </div>
     </div>
   );
 }
