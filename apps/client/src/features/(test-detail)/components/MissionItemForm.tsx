@@ -73,7 +73,7 @@ export function MissionItemForm({
           <FieldLabel htmlFor={`mission-description-${field.id}`}>미션 설명 *</FieldLabel>
           <Textarea
             id={`mission-description-${field.id}`}
-            placeholder="당신은 삼성전자 주식을 매일 1만원씩 모으려고 합니다. 주식 모으기 서비스를 찾아 미션을 진행해주세요."
+            placeholder="당신은 삼성전자 주식을 매일 1만원씩 모으려고 합니다. 해당 미션을 진행해주세요."
             {...register(`missions.${missionIndex}.description`)}
             rows={3}
             aria-invalid={!!missionErrors?.description}
