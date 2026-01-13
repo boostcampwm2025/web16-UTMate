@@ -12,12 +12,23 @@ interface MissionStepProps {
   mission: Mission;
   missionNumber: number;
   totalMissions: number;
-  onNext: (completed: boolean, feedback?: string) => void;
+  participantId?: string; // API 연동 시 사용
+  missionResultId?: string; // 현재 미션 결과 ID
+  onMissionResultIdChange?: (id: string) => void; // 미션 결과 ID 업데이트
+  onNext: (completed: boolean, feedback?: string, missionResultId?: string) => void;
 }
 
 type MissionState = 'ready' | 'recording' | 'completed' | 'feedback';
 
-export function MissionStep({ mission, missionNumber, totalMissions, onNext }: MissionStepProps) {
+export function MissionStep({
+  mission,
+  missionNumber,
+  totalMissions,
+  participantId,
+  missionResultId,
+  onMissionResultIdChange,
+  onNext,
+}: MissionStepProps) {
   const [state, setState] = useState<MissionState>('ready');
   const [missionCompleted, setMissionCompleted] = useState<boolean | null>(null);
   const [feedback, setFeedback] = useState('');
@@ -37,13 +48,42 @@ export function MissionStep({ mission, missionNumber, totalMissions, onNext }: M
   //   return () => clearInterval(interval);
   // }, [missionWindow, state]);
 
-  const handleOpenMission = () => {
+  const handleOpenMission = async () => {
+    // API 연동 시 주석 해제
+    // import { startMission } from '../api';
+    //
+    // try {
+    //   if (participantId && onMissionResultIdChange) {
+    //     const { id } = await startMission(mission.publicId, participantId);
+    //     onMissionResultIdChange(id);
+    //   }
+    // } catch (error) {
+    //   console.error('Failed to start mission:', error);
+    //   alert('미션 시작에 실패했습니다.');
+    //   return;
+    // }
+
+    // 현재는 Mock으로 동작
     const newWindow = window.open(mission.missionUrl, '_blank', 'width=1200,height=800');
     setMissionWindow(newWindow);
     setState('recording');
   };
 
-  const handleStopRecording = () => {
+  const handleStopRecording = async () => {
+    // API 연동 시 주석 해제
+    // import { finishMissionRecording } from '../api';
+    //
+    // try {
+    //   if (missionResultId) {
+    //     await finishMissionRecording(missionResultId);
+    //   }
+    // } catch (error) {
+    //   console.error('Failed to finish recording:', error);
+    //   alert('녹화 종료에 실패했습니다.');
+    //   return;
+    // }
+
+    // 현재는 Mock으로 동작
     if (missionWindow && !missionWindow.closed) {
       missionWindow.close();
     }
@@ -57,7 +97,8 @@ export function MissionStep({ mission, missionNumber, totalMissions, onNext }: M
 
   const handleNext = () => {
     if (missionCompleted === null) return;
-    onNext(missionCompleted, feedback || undefined);
+    // missionResultId를 onNext에 전달 (API 연동 시 사용)
+    onNext(missionCompleted, feedback || undefined, missionResultId);
   };
 
   const isStateReached = (targetState: MissionState) => {
