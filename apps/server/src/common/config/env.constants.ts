@@ -2,6 +2,7 @@ export const ENV_KEYS = {
   // Server
   NODE_ENV: 'NODE_ENV',
   SERVER_PORT: 'SERVER_PORT',
+  SDK_DOMAIN: 'SDK_DOMAIN',
 
   // Database
   DATABASE_HOST: 'DATABASE_HOST',

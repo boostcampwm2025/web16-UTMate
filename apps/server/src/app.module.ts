@@ -20,6 +20,7 @@ import { UsersModule } from '#domain/users/users.module';
         // Server
         NODE_ENV: Joi.string().valid('development', 'production').required(),
         SERVER_PORT: Joi.number().default(8080).required(),
+        SDK_DOMAIN: Joi.string().uri().required(),
 
         // Database
         DATABASE_HOST: Joi.string().required(),

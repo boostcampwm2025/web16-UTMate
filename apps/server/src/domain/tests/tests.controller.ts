@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Inject, Param, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Param,
+  Patch,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
@@ -15,7 +26,8 @@ export class TestsController {
   @Get()
   @UseGuards(JwtAuthGuard)
   async getTests(@JwtPayload() payload: JwtPayloadDto) {
-    return this.testsService.getMyTests(payload.userId);
+    const tests = await this.testsService.getMyTests(payload.userId);
+    return tests;
   }
 
   @Get('/:id')
@@ -45,6 +57,13 @@ export class TestsController {
     @Body() updateTestDto: UpdateTestDto,
   ) {
     return await this.testsService.updateTest(payload.userId, publicId, updateTestDto);
+  }
+
+  @Patch('/:id/verify-sdk')
+  @UseGuards(JwtAuthGuard)
+  async verifySdk(@JwtPayload() payload: JwtPayloadDto, @Param('id') publicId: string) {
+    // SDK 검증 로직은 서비스 레이어에서 구현
+    return this.testsService.verifySdkInstallation(payload.userId, publicId);
   }
 
   @Delete('/:id')

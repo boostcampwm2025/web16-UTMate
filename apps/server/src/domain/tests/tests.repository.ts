@@ -33,6 +33,7 @@ export class TestsRepository {
         'tests.title',
         'tests.status',
         'tests.sdkStatus',
+        'tests.url',
         'owner.publicId',
         'owner.username',
         'owner.avatarUrl',
