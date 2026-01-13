@@ -201,16 +201,30 @@ export default function TestParticipatePage() {
   };
 
   // 전체 피드백 제출
-  const handleFeedbackSubmit = (feedback: string) => {
+  const handleFeedbackSubmit = async (feedback: string) => {
+    // API 연동 시 주석 해제
+    // import { completeTestParticipation } from '@/features/(test-participate-new)/api';
+    //
+    // try {
+    //   if (session.participantId) {
+    //     await completeTestParticipation(session.participantId, feedback);
+    //   }
+    // } catch (error) {
+    //   console.error('Failed to complete test:', error);
+    //   alert('테스트 완료 처리에 실패했습니다.');
+    //   return;
+    // }
+
+    // 현재는 Mock으로 동작
     setSession((prev) => ({
       ...prev,
       overallFeedback: feedback,
       currentStep: 'complete',
     }));
 
-    // TODO: API로 전체 세션 데이터 제출
     console.log('세션 완료:', {
       testId,
+      participantId: session.participantId,
       missionResults: session.missionResults,
       overallFeedback: feedback,
     });
