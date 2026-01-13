@@ -132,7 +132,7 @@ export function useTestForm(initialData: TestDetail) {
     } else if (step === TestFormStep.TEST_MISSIONS) {
       isValid = await trigger('missions');
     } else {
-      isValid = true;
+      isValid = await trigger();
     }
 
     if (isValid && step < TestFormStep.TEST_SDK) {
