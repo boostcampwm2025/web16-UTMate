@@ -1,11 +1,11 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
 import { TestDto } from './dto/test.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
-import { Test } from './entities/test.entity';
+import { Test, TestStatus } from './entities/test.entity';
 import { MissionsService } from './missions.service';
 import { TestsRepository } from './tests.repository';
 
@@ -88,6 +88,21 @@ export class TestsService {
       throw new NotFoundException('Test not found');
     }
     await this.testsRepository.remove(test);
+  }
+
+  async updateTestStatus(userId: string, publicId: string, status: TestStatus) {
+    const owner = await this.usersService.getIdByPublicId(userId);
+
+    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    try {
+      test.handleStatusChange(status);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+    await this.testsRepository.save(test);
   }
 
   async verifySdkInstallation(userId: string, publicId: string) {

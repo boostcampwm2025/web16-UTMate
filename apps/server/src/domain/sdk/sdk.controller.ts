@@ -1,4 +1,4 @@
-import { Controller, Headers, Param, Patch, Post, Req } from '@nestjs/common';
+import { Controller, Headers, Param, Post, Req } from '@nestjs/common';
 import type { Request } from 'express';
 
 import { SdkService } from './sdk.service';
@@ -23,7 +23,7 @@ export class SdkController {
     return this.sdkService.saveReplayLog(sessionId, missionId, req);
   }
 
-  @Patch('/tests/:testId/verify-sdk')
+  @Post('/tests/:testId/verify-sdk')
   async verifySdkInstallation(@Param('testId') testId: string) {
     await this.sdkService.verifySdkInstallation(testId);
   }

@@ -96,7 +96,7 @@ async function verifySdkInstallation(testId: string) {
     }
 
     const response = await fetch(`${SERVER_URL}/sdk/tests/${testId}/verify-sdk`, {
-      method: 'PATCH',
+      method: 'POST',
     });
 
     if (!response.ok) {

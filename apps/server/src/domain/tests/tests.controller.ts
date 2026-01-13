@@ -5,7 +5,7 @@ import {
   Get,
   Inject,
   Param,
-  Patch,
+  ParseEnumPipe,
   Post,
   Put,
   UseGuards,
@@ -13,6 +13,7 @@ import {
 
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
+import { TestStatus } from './entities/test.entity';
 import { TestsService } from './tests.service';
 
 import { JwtPayload } from '#domain/auth/decorator/param.decorator';
@@ -59,11 +60,21 @@ export class TestsController {
     return await this.testsService.updateTest(payload.userId, publicId, updateTestDto);
   }
 
-  @Patch('/:id/verify-sdk')
+  @Post('/:id/verify-sdk')
   @UseGuards(JwtAuthGuard)
   async verifySdk(@JwtPayload() payload: JwtPayloadDto, @Param('id') publicId: string) {
     // SDK 검증 로직은 서비스 레이어에서 구현
     return this.testsService.verifySdkInstallation(payload.userId, publicId);
+  }
+
+  @Post('/:id/status')
+  @UseGuards(JwtAuthGuard)
+  async updateTestStatus(
+    @JwtPayload() payload: JwtPayloadDto,
+    @Param('id') publicId: string,
+    @Body('status', new ParseEnumPipe(TestStatus)) status: TestStatus,
+  ) {
+    return await this.testsService.updateTestStatus(payload.userId, publicId, status);
   }
 
   @Delete('/:id')
