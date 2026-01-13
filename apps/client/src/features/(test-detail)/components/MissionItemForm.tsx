@@ -60,7 +60,7 @@ export function MissionItemForm({
           <Input
             type="text"
             id={`mission-name-${field.id}`}
-            placeholder="카페 예약하기"
+            placeholder="하루에 만원씩 주식 모으기"
             {...register(`missions.${missionIndex}.name`)}
             className="h-10"
             aria-invalid={!!missionErrors?.name}
@@ -73,7 +73,7 @@ export function MissionItemForm({
           <FieldLabel htmlFor={`mission-description-${field.id}`}>미션 설명 *</FieldLabel>
           <Textarea
             id={`mission-description-${field.id}`}
-            placeholder="당신은 두바이쫀득쿠키를 구매하려고 합니다. 두바이쫀득쿠키를 판매하는 카페를 찾아 예약을 진행해주세요. "
+            placeholder="당신은 삼성전자 주식을 매일 1만원씩 모으려고 합니다. 주식 모으기 서비스를 찾아 미션을 진행해주세요."
             {...register(`missions.${missionIndex}.description`)}
             rows={3}
             aria-invalid={!!missionErrors?.description}
@@ -89,7 +89,7 @@ export function MissionItemForm({
           <Input
             type="url"
             id={`mission-url-${field.id}`}
-            placeholder="https://www.maps.com/search"
+            placeholder="https://www.stocks.com"
             {...register(`missions.${missionIndex}.missionUrl`)}
             className="h-10"
             aria-invalid={!!missionErrors?.missionUrl}
