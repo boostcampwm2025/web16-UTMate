@@ -67,4 +67,16 @@ export class TestsRepository {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo.remove(test);
   }
+
+  async updateSdkStatus(publicId: string, sdkStatus: boolean, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
+    const result = await repo
+      .createQueryBuilder()
+      .update(Test)
+      .set({ sdkStatus })
+      .where('publicId = :publicId', { publicId })
+      .execute();
+
+    return result.affected || 0;
+  }
 }

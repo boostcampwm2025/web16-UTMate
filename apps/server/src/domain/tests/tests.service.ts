@@ -131,4 +131,11 @@ export class TestsService {
       return false;
     }
   }
+
+  async verifySdkInstallationBySDK(publicId: string) {
+    const affectedRows = await this.testsRepository.updateSdkStatus(publicId, true);
+    if (affectedRows === 0) {
+      throw new NotFoundException('Test not found');
+    }
+  }
 }
