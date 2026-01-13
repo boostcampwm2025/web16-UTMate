@@ -63,6 +63,9 @@ export function TestStartStep({ testInfo, onStart }: TestStartStepProps) {
             <li>• 수집된 데이터는 테스트 분석 목적으로만 사용됩니다.</li>
             <li>• 개인을 식별할 수 있는 정보는 수집되지 않습니다.</li>
             <li>• 언제든지 테스트를 중단할 수 있습니다.</li>
+            <li className="text-orange-600 font-medium">
+              • 테스트 시작 후 이전 단계로 되돌릴 수 없습니다.
+            </li>
           </ul>
         </div>
 
