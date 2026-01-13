@@ -47,8 +47,39 @@ export default function TestParticipatePage() {
   const params = useParams();
   const testId = params.testId as string;
 
-  // TODO: API로 테스트 정보 가져오기
+  // TODO: API로 테스트 정보 가져오기 (현재는 Mock 사용)
   const [testInfo] = useState<TestInfo>(MOCK_TEST);
+
+  // API 연동 시 주석 해제 (not-found.tsx와 TestUnavailable 컴포넌트 활용)
+  // import { notFound } from 'next/navigation';
+  // import { getTestForParticipation } from '@/features/(test-participate-new)/api';
+  // import { TestUnavailable } from '@/features/(test-participate-new)/components/TestUnavailable';
+  //
+  // const [testInfo, setTestInfo] = useState<TestInfo | null>(null);
+  // const [loading, setLoading] = useState(true);
+  //
+  // useEffect(() => {
+  //   async function fetchTest() {
+  //     try {
+  //       const data = await getTestForParticipation(testId);
+  //       if (!data) {
+  //         notFound(); // not-found.tsx로 이동
+  //       }
+  //       setTestInfo(data);
+  //     } catch (error) {
+  //       console.error('Error fetching test:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  //   fetchTest();
+  // }, [testId]);
+  //
+  // if (loading) return <div>Loading...</div>;
+  // if (!testInfo) return null;
+  // if (testInfo.status !== 'ACTIVE') {
+  //   return <TestUnavailable status={testInfo.status} />;
+  // }
 
   // 세션 상태 관리
   const [session, setSession] = useState<TestSession>({
