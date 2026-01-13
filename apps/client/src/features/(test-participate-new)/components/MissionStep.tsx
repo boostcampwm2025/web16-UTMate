@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
@@ -22,6 +22,20 @@ export function MissionStep({ mission, missionNumber, totalMissions, onNext }: M
   const [missionCompleted, setMissionCompleted] = useState<boolean | null>(null);
   const [feedback, setFeedback] = useState('');
   const [missionWindow, setMissionWindow] = useState<Window | null>(null);
+
+  // 창 닫힘 자동 감지 (주석 처리됨 - 필요시 주석 해제)
+  // useEffect(() => {
+  //   if (!missionWindow || state !== 'recording') return;
+  //
+  //   const interval = setInterval(() => {
+  //     if (missionWindow.closed) {
+  //       clearInterval(interval);
+  //       handleStopRecording();
+  //     }
+  //   }, 1000);
+  //
+  //   return () => clearInterval(interval);
+  // }, [missionWindow, state]);
 
   const handleOpenMission = () => {
     const newWindow = window.open(mission.missionUrl, '_blank', 'width=1200,height=800');
@@ -46,6 +60,15 @@ export function MissionStep({ mission, missionNumber, totalMissions, onNext }: M
     onNext(missionCompleted, feedback || undefined);
   };
 
+  const isStateReached = (targetState: MissionState) => {
+    const stateOrder = ['ready', 'recording', 'completed', 'feedback'];
+    return stateOrder.indexOf(state) >= stateOrder.indexOf(targetState);
+  };
+
+  const isStateActive = (targetState: MissionState) => {
+    return state === targetState;
+  };
+
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader>
@@ -63,55 +86,75 @@ export function MissionStep({ mission, missionNumber, totalMissions, onNext }: M
           <p className="text-muted-foreground whitespace-pre-wrap text-sm">{mission.description}</p>
         </div>
 
-        {/* 상태별 UI */}
-        {state === 'ready' && (
-          <Button onClick={handleOpenMission} className="w-full" size="lg">
+        {/* 1. 미션 수행 페이지 열기 */}
+        <div className={!isStateActive('ready') ? 'opacity-50' : ''}>
+          <Button
+            onClick={handleOpenMission}
+            disabled={!isStateActive('ready')}
+            className="w-full"
+            size="lg"
+          >
             미션 수행 페이지 열기 (새 창)
           </Button>
-        )}
+        </div>
 
-        {state === 'recording' && (
-          <div className="space-y-4">
-            <div className="bg-muted rounded-lg p-4">
-              <p className="text-sm">새 창에서 미션을 수행해주세요.</p>
-              <p className="text-muted-foreground text-xs">
-                미션을 완료했다면 아래 버튼을 눌러주세요.
-              </p>
-            </div>
-            <Button onClick={handleStopRecording} variant="destructive" className="w-full" size="lg">
-              녹화 종료
-            </Button>
-          </div>
-        )}
-
-        {state === 'completed' && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="font-semibold">미션 완료 여부</h3>
-              <p className="text-muted-foreground text-sm">미션을 성공적으로 완료하셨나요?</p>
-            </div>
-            <div className="flex gap-4">
+        {/* 2. 녹화 종료 */}
+        {isStateReached('recording') && (
+          <div className={!isStateActive('recording') ? 'opacity-50' : ''}>
+            <div className="space-y-4">
+              <div className="bg-muted rounded-lg p-4">
+                <p className="text-sm">새 창에서 미션을 수행해주세요.</p>
+                <p className="text-muted-foreground text-xs">
+                  미션을 완료했다면 아래 버튼을 눌러주세요.
+                </p>
+              </div>
               <Button
-                onClick={() => handleMissionResult(true)}
-                variant="default"
-                className="flex-1"
+                onClick={handleStopRecording}
+                disabled={!isStateActive('recording')}
+                variant="destructive"
+                className="w-full"
                 size="lg"
               >
-                성공
-              </Button>
-              <Button
-                onClick={() => handleMissionResult(false)}
-                variant="outline"
-                className="flex-1"
-                size="lg"
-              >
-                실패
+                녹화 종료
               </Button>
             </div>
           </div>
         )}
 
-        {state === 'feedback' && (
+        {/* 3. 미션 완료 여부 */}
+        {isStateReached('completed') && (
+          <div className={!isStateActive('completed') ? 'opacity-50' : ''}>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h3 className="font-semibold">미션 완료 여부</h3>
+                <p className="text-muted-foreground text-sm">미션을 성공적으로 완료하셨나요?</p>
+              </div>
+              <div className="flex gap-4">
+                <Button
+                  onClick={() => handleMissionResult(true)}
+                  disabled={!isStateActive('completed')}
+                  variant="default"
+                  className="flex-1"
+                  size="lg"
+                >
+                  성공
+                </Button>
+                <Button
+                  onClick={() => handleMissionResult(false)}
+                  disabled={!isStateActive('completed')}
+                  variant="outline"
+                  className="flex-1"
+                  size="lg"
+                >
+                  실패
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 4. 피드백 */}
+        {isStateReached('feedback') && (
           <div className="space-y-4">
             <div className="bg-muted rounded-lg p-4">
               <p className="text-sm">
