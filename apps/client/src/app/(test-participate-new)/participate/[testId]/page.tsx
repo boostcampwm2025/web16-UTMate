@@ -164,6 +164,7 @@ export default function TestParticipatePage() {
         >
           {session.currentStep === 'mission' && (
             <MissionStep
+              key={testInfo.missions[session.currentMissionIndex].publicId}
               mission={testInfo.missions[session.currentMissionIndex]}
               missionNumber={session.currentMissionIndex + 1}
               totalMissions={testInfo.missions.length}
