@@ -1,85 +1,51 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { notFound, useParams } from 'next/navigation';
 import { useState } from 'react';
 
+import {
+  completeTestParticipation,
+  getTestForParticipation,
+  startTestParticipation,
+  submitMissionResult,
+} from '@/features/(test-participate-new)/api';
 import { CompleteStep } from '@/features/(test-participate-new)/components/CompleteStep';
 import { FeedbackStep } from '@/features/(test-participate-new)/components/FeedbackStep';
 import { MissionStep } from '@/features/(test-participate-new)/components/MissionStep';
 import { TestParticipateLayout } from '@/features/(test-participate-new)/components/TestParticipateLayout';
 import { TestStartStep } from '@/features/(test-participate-new)/components/TestStartStep';
-import type {
-  MissionResult,
-  TestInfo,
-  TestSession,
-  TestStep,
-} from '@/features/(test-participate-new)/types';
-
-// TODO: API로 테스트 데이터 가져오기
-const MOCK_TEST: TestInfo = {
-  publicId: '1',
-  title: '사용성 테스트',
-  description: '제품의 주요 기능을 테스트하고 피드백을 제공해주세요.',
-  status: 'ACTIVE',
-  url: 'https://example.com',
-  sdkStatus: true,
-  missions: [
-    {
-      publicId: 'm1',
-      order: 1,
-      name: '홈페이지 탐색',
-      description: '홈페이지에 접속하여\n주요 기능을 확인해보세요.',
-      missionUrl: 'https://ryurain.info',
-      estimatedDuration: 3,
-    },
-    {
-      publicId: 'm2',
-      order: 2,
-      name: '로그인 기능 테스트',
-      description: '로그인 버튼을 찾아\n클릭해주세요.',
-      missionUrl: 'https://ryurain.info/login',
-      estimatedDuration: 5,
-    },
-  ],
-};
+import { TestUnavailable } from '@/features/(test-participate-new)/components/TestUnavailable';
+import type { MissionResult, TestSession } from '@/features/(test-participate-new)/types';
 
 export default function TestParticipatePage() {
   const params = useParams();
   const testId = params.testId as string;
 
-  // TODO: API로 테스트 정보 가져오기 (현재는 Mock 사용)
-  const [testInfo] = useState<TestInfo>(MOCK_TEST);
+  // React Query로 테스트 정보 가져오기
+  const { data: testInfo, isLoading } = useQuery({
+    queryKey: ['test', testId],
+    queryFn: () => getTestForParticipation(testId),
+  });
 
-  // API 연동 시 주석 해제 (not-found.tsx와 TestUnavailable 컴포넌트 활용)
-  // import { notFound } from 'next/navigation';
-  // import { getTestForParticipation } from '@/features/(test-participate-new)/api';
-  // import { TestUnavailable } from '@/features/(test-participate-new)/components/TestUnavailable';
-  //
-  // const [testInfo, setTestInfo] = useState<TestInfo | null>(null);
-  // const [loading, setLoading] = useState(true);
-  //
-  // useEffect(() => {
-  //   async function fetchTest() {
-  //     try {
-  //       const data = await getTestForParticipation(testId);
-  //       if (!data) {
-  //         notFound(); // not-found.tsx로 이동
-  //       }
-  //       setTestInfo(data);
-  //     } catch (error) {
-  //       console.error('Error fetching test:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
-  //   fetchTest();
-  // }, [testId]);
-  //
-  // if (loading) return <div>Loading...</div>;
-  // if (!testInfo) return null;
-  // if (testInfo.status !== 'ACTIVE') {
-  //   return <TestUnavailable status={testInfo.status} />;
-  // }
+  // 로딩 중
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-muted-foreground">로딩 중...</div>
+      </div>
+    );
+  }
+
+  // 테스트를 찾을 수 없음
+  if (!testInfo) {
+    notFound();
+  }
+
+  // 테스트가 참여 불가능한 상태
+  if (testInfo.status !== 'ACTIVE') {
+    return <TestUnavailable status={testInfo.status} />;
+  }
 
   // 세션 상태 관리
   const [session, setSession] = useState<TestSession>({
@@ -124,110 +90,111 @@ export default function TestParticipatePage() {
     }
   };
 
-  // 시작 버튼 클릭
-  const handleStart = async () => {
-    // API 연동 시 주석 해제
-    // import { startTestParticipation } from '@/features/(test-participate-new)/api';
-    //
-    // try {
-    //   const { participantId } = await startTestParticipation(testId);
-    //   setSession((prev) => ({
-    //     ...prev,
-    //     currentStep: 'mission',
-    //     currentMissionIndex: 0,
-    //     participantId,
-    //   }));
-    // } catch (error) {
-    //   console.error('Failed to start test:', error);
-    //   alert('테스트 시작에 실패했습니다.');
-    // }
+  // 테스트 시작 mutation
+  const startTestMutation = useMutation({
+    mutationFn: () => startTestParticipation(testId),
+    onSuccess: (data) => {
+      setSession((prev) => ({
+        ...prev,
+        currentStep: 'mission',
+        currentMissionIndex: 0,
+        participantId: data.participantId,
+      }));
+    },
+    onError: (error) => {
+      console.error('Failed to start test:', error);
+      alert('테스트 시작에 실패했습니다.');
+    },
+  });
 
-    // 현재는 Mock으로 동작
-    setSession((prev) => ({
-      ...prev,
-      currentStep: 'mission',
-      currentMissionIndex: 0,
-    }));
+  // 시작 버튼 클릭
+  const handleStart = () => {
+    startTestMutation.mutate();
   };
 
-  // 미션 완료 (다음 버튼 클릭 시 MissionStep에서 호출됨)
-  const handleMissionComplete = async (
-    completed: boolean,
-    feedback?: string,
-    missionResultId?: string
-  ) => {
-    // API 연동 시 주석 해제
-    // import { submitMissionResult } from '@/features/(test-participate-new)/api';
-    //
-    // try {
-    //   if (missionResultId) {
-    //     await submitMissionResult(
-    //       missionResultId,
-    //       completed ? 'SUCCESS' : 'FAILED',
-    //       feedback
-    //     );
-    //   }
-    // } catch (error) {
-    //   console.error('Failed to submit mission result:', error);
-    //   alert('미션 결과 제출에 실패했습니다.');
-    //   return;
-    // }
-
-    // 현재는 Mock으로 동작
-    const missionResult: MissionResult = {
-      missionPublicId: testInfo.missions[session.currentMissionIndex].publicId,
+  // 미션 결과 제출 mutation
+  const submitMissionMutation = useMutation({
+    mutationFn: ({
+      missionResultId,
       completed,
       feedback,
-    };
+    }: {
+      missionResultId: string;
+      completed: boolean;
+      feedback?: string;
+    }) => submitMissionResult(missionResultId, completed ? 'SUCCESS' : 'FAILED', feedback),
+    onSuccess: (_, variables) => {
+      const missionResult: MissionResult = {
+        missionPublicId: testInfo.missions[session.currentMissionIndex].publicId,
+        completed: variables.completed,
+        feedback: variables.feedback,
+      };
 
-    setSession((prev) => ({
-      ...prev,
-      missionResults: [...prev.missionResults, missionResult],
-    }));
-
-    // 다음 미션으로 이동 또는 피드백 단계로
-    if (session.currentMissionIndex < testInfo.missions.length - 1) {
       setSession((prev) => ({
         ...prev,
-        currentMissionIndex: prev.currentMissionIndex + 1,
-        currentMissionResultId: undefined, // 새 미션 시작 시 초기화
+        missionResults: [...prev.missionResults, missionResult],
       }));
-    } else {
-      setSession((prev) => ({
-        ...prev,
-        currentStep: 'feedback',
-      }));
+
+      // 다음 미션으로 이동 또는 피드백 단계로
+      if (session.currentMissionIndex < testInfo.missions.length - 1) {
+        setSession((prev) => ({
+          ...prev,
+          currentMissionIndex: prev.currentMissionIndex + 1,
+          currentMissionResultId: undefined,
+        }));
+      } else {
+        setSession((prev) => ({
+          ...prev,
+          currentStep: 'feedback',
+        }));
+      }
+    },
+    onError: (error) => {
+      console.error('Failed to submit mission result:', error);
+      alert('미션 결과 제출에 실패했습니다.');
+    },
+  });
+
+  // 미션 완료 (다음 버튼 클릭 시 MissionStep에서 호출됨)
+  const handleMissionComplete = (completed: boolean, feedback?: string, missionResultId?: string) => {
+    if (!missionResultId) {
+      alert('미션 결과 ID가 없습니다.');
+      return;
     }
+    submitMissionMutation.mutate({ missionResultId, completed, feedback });
   };
 
+  // 테스트 완료 mutation
+  const completeTestMutation = useMutation({
+    mutationFn: (feedback: string) => {
+      if (!session.participantId) {
+        throw new Error('Participant ID가 없습니다.');
+      }
+      return completeTestParticipation(session.participantId, feedback);
+    },
+    onSuccess: (_, feedback) => {
+      setSession((prev) => ({
+        ...prev,
+        overallFeedback: feedback,
+        currentStep: 'complete',
+      }));
+
+      console.log('세션 완료:', {
+        testId,
+        participantId: session.participantId,
+        missionResults: session.missionResults,
+        overallFeedback: feedback,
+      });
+    },
+    onError: (error) => {
+      console.error('Failed to complete test:', error);
+      alert('테스트 완료 처리에 실패했습니다.');
+    },
+  });
+
   // 전체 피드백 제출
-  const handleFeedbackSubmit = async (feedback: string) => {
-    // API 연동 시 주석 해제
-    // import { completeTestParticipation } from '@/features/(test-participate-new)/api';
-    //
-    // try {
-    //   if (session.participantId) {
-    //     await completeTestParticipation(session.participantId, feedback);
-    //   }
-    // } catch (error) {
-    //   console.error('Failed to complete test:', error);
-    //   alert('테스트 완료 처리에 실패했습니다.');
-    //   return;
-    // }
-
-    // 현재는 Mock으로 동작
-    setSession((prev) => ({
-      ...prev,
-      overallFeedback: feedback,
-      currentStep: 'complete',
-    }));
-
-    console.log('세션 완료:', {
-      testId,
-      participantId: session.participantId,
-      missionResults: session.missionResults,
-      overallFeedback: feedback,
-    });
+  const handleFeedbackSubmit = (feedback: string) => {
+    completeTestMutation.mutate(feedback);
   };
 
   return (
