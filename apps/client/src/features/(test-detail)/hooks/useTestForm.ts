@@ -21,6 +21,7 @@ export function useTestForm(initialData: TestDetail) {
   const [selectedMissionIndex, setSelectedMissionIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // react-hook-form 설정
   const form = useForm<TestFormValues>({
@@ -150,10 +151,11 @@ export function useTestForm(initialData: TestDetail) {
   const onSubmit = async (data: TestFormValues) => {
     setLoading(true);
     setSuccess(false);
+    setError(null);
+
+    const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 600));
 
     try {
-      const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 600));
-
       const missionsWithOrder: UpdateTestMission[] = data.missions.map((mission, index) => ({
         publicId: mission.publicId?.startsWith('temp-') ? undefined : mission.publicId,
         order: index,
@@ -163,21 +165,23 @@ export function useTestForm(initialData: TestDetail) {
         estimatedDuration: mission.estimatedDuration,
       }));
 
-      const updatePromise = updateTest(initialData.publicId, {
+      await updateTest(initialData.publicId, {
         title: data.title,
         description: data.description,
         url: data.url,
         missions: missionsWithOrder,
       });
 
-      await Promise.all([updatePromise, minLoadingTime]);
+      await minLoadingTime;
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 2000);
 
       router.push(`/tests/${initialData.publicId}`);
     } catch (err) {
-      console.error('저장 실패:', err);
+      await minLoadingTime;
+      setError(err instanceof Error ? err.message : '저장에 실패했습니다. 다시 시도해주세요.');
+      setTimeout(() => setError(null), 3000);
     } finally {
       setLoading(false);
     }
@@ -269,6 +273,7 @@ export function useTestForm(initialData: TestDetail) {
     setSelectedMissionIndex,
     loading,
     success,
+    error,
 
     // Computed
     displayTestName,

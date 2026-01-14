@@ -25,6 +25,7 @@ export function TestForm({ initialData }: TestFormProps) {
     setSelectedMissionIndex,
     loading,
     success,
+    error,
     displayTestName,
     missionsForSidebar,
     handlers,
@@ -48,7 +49,7 @@ export function TestForm({ initialData }: TestFormProps) {
           </div>
 
           {/* 저장 버튼 */}
-          <SaveButton loading={loading} success={success} onSave={handlers.save} />
+          <SaveButton loading={loading} success={success} error={error} onSave={handlers.save} />
         </div>
       </div>
 
