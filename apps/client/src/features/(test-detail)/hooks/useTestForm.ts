@@ -188,64 +188,6 @@ export function useTestForm(initialData: TestDetail) {
   };
 
   const handleSave = async () => {
-    // 전체 폼 유효성 검사
-    const isValid = await trigger();
-
-    if (!isValid) {
-      const errors = formState.errors;
-
-      // 기본 정보 스텝 에러 확인
-      if (errors.title || errors.description || errors.url) {
-        setStep(TestFormStep.TEST_INFO);
-
-        // 렌더링 후 첫 번째 에러 필드로 포커스
-        setTimeout(() => {
-          if (errors.title) {
-            setFocus('title');
-          } else if (errors.description) {
-            setFocus('description');
-          } else if (errors.url) {
-            setFocus('url');
-          }
-        }, 100);
-        return;
-      }
-
-      // 미션 스텝 에러 확인
-      if (errors.missions && Array.isArray(errors.missions)) {
-        setStep(TestFormStep.TEST_MISSIONS);
-
-        // 에러가 있는 첫 번째 미션 인덱스 찾기
-        const firstErrorMissionIndex = errors.missions.findIndex(
-          (missionError) => missionError !== undefined,
-        );
-
-        if (firstErrorMissionIndex !== -1) {
-          setSelectedMissionIndex(firstErrorMissionIndex);
-
-          // 렌더링 후 해당 미션의 첫 번째 에러 필드로 포커스
-          setTimeout(() => {
-            const missionError = errors.missions?.[firstErrorMissionIndex];
-            if (missionError) {
-              if (missionError.name) {
-                setFocus(`missions.${firstErrorMissionIndex}.name`);
-              } else if (missionError.description) {
-                setFocus(`missions.${firstErrorMissionIndex}.description`);
-              } else if (missionError.missionUrl) {
-                setFocus(`missions.${firstErrorMissionIndex}.missionUrl`);
-              } else if (missionError.estimatedDuration) {
-                setFocus(`missions.${firstErrorMissionIndex}.estimatedDuration`);
-              }
-            }
-          }, 100);
-        }
-        return;
-      }
-
-      return;
-    }
-
-    // 유효하면 저장 진행
     await handleSubmit(onSubmit)();
   };
 
