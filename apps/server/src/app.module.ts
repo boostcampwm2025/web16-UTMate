@@ -8,6 +8,7 @@ import { RedisModule } from '#common/redis/redis.module';
 import { StorageModule } from '#common/storage/storage.module';
 import { AuthModule } from '#domain/auth/auth.module';
 import { MissionResultModule } from '#domain/mission-result/mission-results.module';
+import { ParticipantsModule } from '#domain/participants/participants.module';
 import { SdkModule } from '#domain/sdk/sdk.module';
 import { TestsModule } from '#domain/tests/tests.module';
 import { UsersModule } from '#domain/users/users.module';
@@ -87,6 +88,7 @@ import { UsersModule } from '#domain/users/users.module';
     UsersModule,
     TestsModule,
     MissionResultModule,
+    ParticipantsModule,
     SdkModule,
   ],
 })
