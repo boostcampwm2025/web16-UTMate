@@ -1,10 +1,12 @@
 export class JwtPayloadDto {
-  userId: string;
+  sub: string;
   familyId: string;
+  userId: number;
 
-  constructor(userId: string, familyId: string) {
-    this.userId = userId;
+  constructor(sub: string, familyId: string, userId: number) {
+    this.sub = sub;
     this.familyId = familyId;
+    this.userId = userId;
   }
 }
 

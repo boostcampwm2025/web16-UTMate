@@ -16,8 +16,7 @@ import { UpdateTestDto } from './dto/update-test.dto';
 import { TestStatus } from './entities/test.entity';
 import { TestsService } from './tests.service';
 
-import { JwtPayload } from '#domain/auth/decorator/param.decorator';
-import { JwtPayloadDto } from '#domain/auth/dto/jwt-payload.dto';
+import { UserId } from '#domain/auth/decorator/param.decorator';
 import { JwtAuthGuard } from '#domain/auth/guards/jwt-auth.guard';
 
 @Controller('tests')
@@ -26,60 +25,60 @@ export class TestsController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getTests(@JwtPayload() payload: JwtPayloadDto) {
-    const tests = await this.testsService.getMyTests(payload.userId);
+  async getTests(@UserId() userId: number) {
+    const tests = await this.testsService.getMyTests(userId);
     return tests;
   }
 
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
-  async getTestById(@JwtPayload() payload: JwtPayloadDto, @Param('id') publicId: string) {
-    return this.testsService.getTestById(payload.userId, publicId);
+  async getTestById(@UserId() userId: number, @Param('id') publicId: string) {
+    return this.testsService.getTestById(userId, publicId);
   }
 
   @Get('/:id/sdkStatus')
   @UseGuards(JwtAuthGuard)
-  async getSdkStatus(@JwtPayload() payload: JwtPayloadDto, @Param('id') publicId: string) {
-    return this.testsService.getSdkStatus(payload.userId, publicId);
+  async getSdkStatus(@UserId() userId: number, @Param('id') publicId: string) {
+    return this.testsService.getSdkStatus(userId, publicId);
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async createTest(@JwtPayload() payload: JwtPayloadDto, @Body() body: CreateTestDto) {
-    const testId = await this.testsService.createTest(payload.userId, body.title);
+  async createTest(@UserId() userId: number, @Body() body: CreateTestDto) {
+    const testId = await this.testsService.createTest(userId, body.title);
     return { testId };
   }
 
   @Put('/:id')
   @UseGuards(JwtAuthGuard)
   async updateTest(
-    @JwtPayload() payload: JwtPayloadDto,
+    @UserId() userId: number,
     @Param('id') publicId: string,
     @Body() updateTestDto: UpdateTestDto,
   ) {
-    return await this.testsService.updateTest(payload.userId, publicId, updateTestDto);
+    return await this.testsService.updateTest(userId, publicId, updateTestDto);
   }
 
   @Post('/:id/verify-sdk')
   @UseGuards(JwtAuthGuard)
-  async verifySdk(@JwtPayload() payload: JwtPayloadDto, @Param('id') publicId: string) {
+  async verifySdk(@UserId() userId: number, @Param('id') publicId: string) {
     // SDK 검증 로직은 서비스 레이어에서 구현
-    return this.testsService.verifySdkInstallation(payload.userId, publicId);
+    return this.testsService.verifySdkInstallation(userId, publicId);
   }
 
   @Post('/:id/status')
   @UseGuards(JwtAuthGuard)
   async updateTestStatus(
-    @JwtPayload() payload: JwtPayloadDto,
+    @UserId() userId: number,
     @Param('id') publicId: string,
     @Body('status', new ParseEnumPipe(TestStatus)) status: TestStatus,
   ) {
-    return await this.testsService.updateTestStatus(payload.userId, publicId, status);
+    return await this.testsService.updateTestStatus(userId, publicId, status);
   }
 
   @Delete('/:id')
   @UseGuards(JwtAuthGuard)
-  async deleteTest(@JwtPayload() payload: JwtPayloadDto, @Param('id') publicId: string) {
-    return await this.testsService.deleteTest(payload.userId, publicId);
+  async deleteTest(@UserId() userId: number, @Param('id') publicId: string) {
+    return await this.testsService.deleteTest(userId, publicId);
   }
 }

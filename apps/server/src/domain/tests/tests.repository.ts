@@ -4,8 +4,6 @@ import { EntityManager, Repository } from 'typeorm';
 
 import { Test } from './entities/test.entity';
 
-import { User } from '#domain/users/entities/user.entity';
-
 @Injectable()
 export class TestsRepository {
   constructor(@InjectRepository(Test) private readonly testsRepository: Repository<Test>) {}
@@ -15,16 +13,16 @@ export class TestsRepository {
     return repo.save(test);
   }
 
-  async findByPublicIdAndOwner(publicId: string, owner: User, manager?: EntityManager) {
+  async findByPublicIdAndOwner(publicId: string, ownerId: number, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo
       .createQueryBuilder('tests')
       .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId: owner.id })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
       .getOne();
   }
 
-  async findSummariesByOwner(owner: User, manager?: EntityManager) {
+  async findSummariesByOwner(ownerId: number, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo
       .createQueryBuilder('tests')
@@ -39,27 +37,35 @@ export class TestsRepository {
         'owner.avatarUrl',
       ])
       .leftJoin('tests.owner', 'owner')
-      .where('tests.owner_id = :ownerId', { ownerId: owner.id })
+      .where('tests.owner_id = :ownerId', { ownerId })
       .getMany();
   }
 
-  async findSdkStatusByPublicIdAndOwner(publicId: string, owner: User, manager?: EntityManager) {
+  async findSdkStatusByPublicIdAndOwner(
+    publicId: string,
+    ownerId: number,
+    manager?: EntityManager,
+  ) {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo
       .createQueryBuilder('tests')
       .select(['tests.sdkStatus'])
       .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId: owner.id })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
       .getOne();
   }
 
-  async findWithMissionsByPublicIdAndOwner(publicId: string, owner: User, manager?: EntityManager) {
+  async findWithMissionsByPublicIdAndOwner(
+    publicId: string,
+    ownerId: number,
+    manager?: EntityManager,
+  ) {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo
       .createQueryBuilder('tests')
       .leftJoinAndSelect('tests.missions', 'mission')
       .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId: owner.id })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
       .getOne();
   }
 

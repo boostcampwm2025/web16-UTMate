@@ -91,7 +91,7 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   async logout(@JwtPayload() payload: JwtPayloadDto, @Res() res: Response): Promise<void> {
-    await this.refreshTokenService.deleteRefreshToken(payload.userId, payload.familyId);
+    await this.refreshTokenService.deleteRefreshToken(payload.sub, payload.familyId);
     res.clearCookie('access_token', { path: '/' });
     res.clearCookie('refresh_token', { path: '/api/auth/reissue' });
 

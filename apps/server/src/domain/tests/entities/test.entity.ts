@@ -57,10 +57,11 @@ export class Test {
 
   private constructor() {}
 
-  static createTest(title: string, owner: User): Test {
+  static createTest(title: string, ownerId: number): Test {
     const test = new Test();
     test.title = title;
-    test.owner = owner;
+    test.owner = new User();
+    test.owner.id = ownerId;
     return test;
   }
 

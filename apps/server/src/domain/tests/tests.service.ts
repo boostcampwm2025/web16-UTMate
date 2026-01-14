@@ -22,20 +22,17 @@ export class TestsService {
     @Inject() private readonly configService: ConfigService,
   ) {}
 
-  async createTest(userId: string, title: string) {
-    const owner = await this.usersService.getIdByPublicId(userId);
-    const test = Test.createTest(title, owner);
+  async createTest(ownerId: number, title: string) {
+    const test = Test.createTest(title, ownerId);
     const savedTest = await this.testsRepository.save(test);
     return savedTest.publicId;
   }
 
-  async updateTest(userId: string, publicId: string, updateTestDto: UpdateTestDto) {
-    const owner = await this.usersService.getIdByPublicId(userId);
-
+  async updateTest(ownerId: number, publicId: string, updateTestDto: UpdateTestDto) {
     // 트랜잭션 시작
     await this.dataSource.transaction(async (manager) => {
       // 테스트 업데이트
-      const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner, manager);
+      const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId, manager);
       if (!test) {
         throw new NotFoundException('Test not found');
       }
@@ -51,49 +48,39 @@ export class TestsService {
     });
   }
 
-  async getMyTests(userId: string) {
-    const owner = await this.usersService.getIdByPublicId(userId);
-
-    const test = await this.testsRepository.findSummariesByOwner(owner);
+  async getMyTests(ownerId: number) {
+    const test = await this.testsRepository.findSummariesByOwner(ownerId);
     return TestSummaryDto.fromTestEntities(test);
   }
 
-  async getTestById(userId: string, publicId: string) {
-    const owner = await this.usersService.getIdByPublicId(userId);
-
-    const test = await this.testsRepository.findWithMissionsByPublicIdAndOwner(publicId, owner);
+  async getTestById(ownerId: number, publicId: string) {
+    const test = await this.testsRepository.findWithMissionsByPublicIdAndOwner(publicId, ownerId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
     return TestDto.fromTestEntity(test);
   }
 
-  async getSdkStatus(userId: string, publicId: string) {
-    const owner = await this.usersService.getIdByPublicId(userId);
-
-    const test = await this.testsRepository.findSdkStatusByPublicIdAndOwner(publicId, owner);
+  async getSdkStatus(ownerId: number, publicId: string) {
+    const test = await this.testsRepository.findSdkStatusByPublicIdAndOwner(publicId, ownerId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
     return { sdkStatus: test.sdkStatus };
   }
 
-  async deleteTest(userId: string, publicId: string) {
-    const owner = await this.usersService.getIdByPublicId(userId);
-
+  async deleteTest(ownerId: number, publicId: string) {
     // 테스트 삭제
     // 관련된 미션들은 Test 엔티티의 onDelete: 'CASCADE' 옵션에 의해 자동 삭제됨
-    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner);
+    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
     await this.testsRepository.remove(test);
   }
 
-  async updateTestStatus(userId: string, publicId: string, status: TestStatus) {
-    const owner = await this.usersService.getIdByPublicId(userId);
-
-    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner);
+  async updateTestStatus(ownerId: number, publicId: string, status: TestStatus) {
+    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
@@ -105,10 +92,8 @@ export class TestsService {
     await this.testsRepository.save(test);
   }
 
-  async verifySdkInstallation(userId: string, publicId: string) {
-    const owner = await this.usersService.getIdByPublicId(userId);
-
-    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner);
+  async verifySdkInstallation(ownerId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
