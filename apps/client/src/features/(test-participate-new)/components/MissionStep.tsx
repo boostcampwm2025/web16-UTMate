@@ -51,12 +51,11 @@ export function MissionStep({
   // }, [missionWindow, state]);
 
   // 미션 시작 mutation
+  // TODO: 백엔드 API 준비되면 startMission 사용
   const startMissionMutation = useMutation({
-    mutationFn: () => {
-      if (!participantId) {
-        throw new Error('Participant ID가 없습니다.');
-      }
-      return startMission(mission.publicId, participantId);
+    mutationFn: async () => {
+      // 임시로 Mock 데이터 반환
+      return { id: `mission-result-${Date.now()}` };
     },
     onSuccess: (data) => {
       if (onMissionResultIdChange) {
@@ -73,12 +72,11 @@ export function MissionStep({
   });
 
   // 녹화 종료 mutation
+  // TODO: 백엔드 API 준비되면 finishMissionRecording 사용
   const finishRecordingMutation = useMutation({
-    mutationFn: () => {
-      if (!missionResultId) {
-        throw new Error('Mission Result ID가 없습니다.');
-      }
-      return finishMissionRecording(missionResultId);
+    mutationFn: async () => {
+      // 임시로 성공 반환
+      return Promise.resolve();
     },
     onSuccess: () => {
       if (missionWindow && !missionWindow.closed) {

@@ -16,16 +16,48 @@ import { MissionStep } from '@/features/(test-participate-new)/components/Missio
 import { TestParticipateLayout } from '@/features/(test-participate-new)/components/TestParticipateLayout';
 import { TestStartStep } from '@/features/(test-participate-new)/components/TestStartStep';
 import { TestUnavailable } from '@/features/(test-participate-new)/components/TestUnavailable';
-import type { MissionResult, TestSession } from '@/features/(test-participate-new)/types';
+import type { MissionResult, TestInfo, TestSession } from '@/features/(test-participate-new)/types';
+
+// TODO: 백엔드 API 준비되면 제거
+const MOCK_TEST: TestInfo = {
+  publicId: '1',
+  title: '사용성 테스트',
+  description: '제품의 주요 기능을 테스트하고 피드백을 제공해주세요.',
+  status: 'ACTIVE',
+  url: 'https://example.com',
+  sdkStatus: true,
+  missions: [
+    {
+      publicId: 'm1',
+      order: 1,
+      name: '홈페이지 탐색',
+      description: '홈페이지에 접속하여\n주요 기능을 확인해보세요.',
+      missionUrl: 'https://ryurain.info',
+      estimatedDuration: 3,
+    },
+    {
+      publicId: 'm2',
+      order: 2,
+      name: '로그인 기능 테스트',
+      description: '로그인 버튼을 찾아\n클릭해주세요.',
+      missionUrl: 'https://ryurain.info/login',
+      estimatedDuration: 5,
+    },
+  ],
+};
 
 export default function TestParticipatePage() {
   const params = useParams();
   const testId = params.testId as string;
 
-  // React Query로 테스트 정보 가져오기
+  // React Query로 테스트 정보 가져오기 (임시로 Mock 데이터 사용)
+  // TODO: 백엔드 API 준비되면 getTestForParticipation(testId)로 변경
   const { data: testInfo, isLoading } = useQuery({
     queryKey: ['test', testId],
-    queryFn: () => getTestForParticipation(testId),
+    queryFn: async () => {
+      // 임시로 Mock 데이터 반환
+      return MOCK_TEST;
+    },
   });
 
   // 로딩 중
@@ -91,8 +123,12 @@ export default function TestParticipatePage() {
   };
 
   // 테스트 시작 mutation
+  // TODO: 백엔드 API 준비되면 startTestParticipation(testId) 사용
   const startTestMutation = useMutation({
-    mutationFn: () => startTestParticipation(testId),
+    mutationFn: async () => {
+      // 임시로 Mock 데이터 반환
+      return { participantId: `participant-${Date.now()}` };
+    },
     onSuccess: (data) => {
       setSession((prev) => ({
         ...prev,
@@ -113,8 +149,9 @@ export default function TestParticipatePage() {
   };
 
   // 미션 결과 제출 mutation
+  // TODO: 백엔드 API 준비되면 submitMissionResult 사용
   const submitMissionMutation = useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       missionResultId,
       completed,
       feedback,
@@ -122,7 +159,10 @@ export default function TestParticipatePage() {
       missionResultId: string;
       completed: boolean;
       feedback?: string;
-    }) => submitMissionResult(missionResultId, completed ? 'SUCCESS' : 'FAILED', feedback),
+    }) => {
+      // 임시로 성공 반환
+      return Promise.resolve();
+    },
     onSuccess: (_, variables) => {
       const missionResult: MissionResult = {
         missionPublicId: testInfo.missions[session.currentMissionIndex].publicId,
@@ -157,20 +197,20 @@ export default function TestParticipatePage() {
 
   // 미션 완료 (다음 버튼 클릭 시 MissionStep에서 호출됨)
   const handleMissionComplete = (completed: boolean, feedback?: string, missionResultId?: string) => {
-    if (!missionResultId) {
-      alert('미션 결과 ID가 없습니다.');
-      return;
-    }
-    submitMissionMutation.mutate({ missionResultId, completed, feedback });
+    // Mock 모드에서는 missionResultId가 임시로 생성되므로 항상 존재
+    submitMissionMutation.mutate({
+      missionResultId: missionResultId || 'temp',
+      completed,
+      feedback
+    });
   };
 
   // 테스트 완료 mutation
+  // TODO: 백엔드 API 준비되면 completeTestParticipation 사용
   const completeTestMutation = useMutation({
-    mutationFn: (feedback: string) => {
-      if (!session.participantId) {
-        throw new Error('Participant ID가 없습니다.');
-      }
-      return completeTestParticipation(session.participantId, feedback);
+    mutationFn: async (feedback: string) => {
+      // 임시로 성공 반환
+      return Promise.resolve();
     },
     onSuccess: (_, feedback) => {
       setSession((prev) => ({
