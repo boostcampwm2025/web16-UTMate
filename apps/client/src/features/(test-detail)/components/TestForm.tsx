@@ -1,224 +1,43 @@
 'use client';
 
-import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-
-import type { TestDetail, TestMission } from '@/features/(test-manage)/types';
-import { updateTest } from '@/shared/api/test';
-import { Button } from '@/shared/components/ui/button';
-import type { UpdateTestMission } from '@/shared/api/test';
+import type { TestDetail } from '@/features/(test-manage)/types';
 
 import { BackToWorkspaceButton } from './BackToWorkspaceButton';
+import { SaveButton } from './SaveButton';
+import { StepNavigation } from './StepNavigation';
 import { TestFormSidebar, TestFormStep } from './TestFormSidebar';
 import { TestInfoStep } from './TestInfoStep';
 import { TestMissionsStep } from './TestMissionsStep';
 import { TestSdkStep } from './TestSdkStep';
-import { MAX_MISSIONS } from '../constants';
+import { useTestForm } from '../hooks/useTestForm';
 
 interface TestFormProps {
   initialData: TestDetail;
 }
 
 export function TestForm({ initialData }: TestFormProps) {
-  const router = useRouter();
+  const {
+    form,
+    fields,
+    step,
+    setStep,
+    selectedMissionIndex,
+    setSelectedMissionIndex,
+    loading,
+    success,
+    error,
+    displayTestName,
+    missionsForSidebar,
+    handlers,
+  } = useTestForm(initialData);
 
-  const [test, setTest] = useState<TestDetail>(initialData);
-  const [step, setStep] = useState<TestFormStep>(TestFormStep.TEST_INFO);
-
-  // 폼 상태
-  const [editTitle, setEditTitle] = useState(test.title);
-  const [editDescription, setEditDescription] = useState(test.description);
-  const [editUrl, setEditUrl] = useState(test.url);
-  const [missions, setMissions] = useState<TestMission[]>(test.missions || []);
-  const [selectedMissionIndex, setSelectedMissionIndex] = useState(0);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-
-  const handleTitleChange = (value: string) => {
-    setEditTitle(value);
-    if (error) setError('');
-  };
-
-  const handleDescriptionChange = (value: string) => {
-    setEditDescription(value);
-  };
-
-  const handleUrlChange = (value: string) => {
-    setEditUrl(value);
-  };
-
-  const handleAddMission = () => {
-    // 미션 개수 제한 (최대 5개)
-    if (missions.length >= MAX_MISSIONS) {
-      setError(`미션은 최대 ${MAX_MISSIONS}개까지만 추가할 수 있습니다.`);
-      setTimeout(() => setError(''), 3000);
-      return;
-    }
-
-    const newMission: TestMission = {
-      publicId: `temp-${Date.now()}`, // 임시 ID
-      order: missions.length,
-      name: '',
-      description: '',
-      missionUrl: '',
-      estimatedDuration: 0,
-    };
-    setMissions([...missions, newMission]);
-    // 새로 추가된 미션을 선택
-    setSelectedMissionIndex(missions.length);
-  };
-
-  const handleUpdateMission = (publicId: string, updatedMission: Partial<TestMission>) => {
-    setMissions(
-      missions.map((mission) =>
-        mission.publicId === publicId ? { ...mission, ...updatedMission } : mission,
-      ),
-    );
-  };
-
-  const handleDeleteMission = (publicId: string) => {
-    const deletedIndex = missions.findIndex((mission) => mission.publicId === publicId);
-    setMissions(missions.filter((mission) => mission.publicId !== publicId));
-
-    // 선택된 미션 인덱스 업데이트
-    if (selectedMissionIndex > deletedIndex) {
-      // 삭제된 미션보다 뒤에 있던 미션을 선택했다면 인덱스 감소
-      setSelectedMissionIndex(selectedMissionIndex - 1);
-    } else if (selectedMissionIndex === deletedIndex) {
-      // 선택된 미션을 삭제했다면 이전 미션 선택 (없으면 0)
-      setSelectedMissionIndex(Math.max(0, deletedIndex - 1));
-    }
-  };
-
-  const handleMoveMission = (fromIndex: number, toIndex: number) => {
-    const newMissions = [...missions];
-    const [movedMission] = newMissions.splice(fromIndex, 1);
-    newMissions.splice(toIndex, 0, movedMission);
-    setMissions(newMissions);
-
-    // 선택된 미션 인덱스도 함께 업데이트
-    let newSelectedIndex = selectedMissionIndex;
-
-    if (selectedMissionIndex === fromIndex) {
-      // 선택된 미션 자체가 이동하는 경우
-      newSelectedIndex = toIndex;
-    } else if (fromIndex < toIndex) {
-      // 아래로 이동하는 경우
-      if (selectedMissionIndex > fromIndex && selectedMissionIndex <= toIndex) {
-        // 선택된 미션이 이동 범위 내에 있으면 위로 한 칸 이동
-        newSelectedIndex = selectedMissionIndex - 1;
-      }
-    } else {
-      // 위로 이동하는 경우
-      if (selectedMissionIndex >= toIndex && selectedMissionIndex < fromIndex) {
-        // 선택된 미션이 이동 범위 내에 있으면 아래로 한 칸 이동
-        newSelectedIndex = selectedMissionIndex + 1;
-      }
-    }
-
-    setSelectedMissionIndex(newSelectedIndex);
-  };
-
-  const handleMissionClick = (missionPublicId: string) => {
-    // 미션 인덱스 찾기
-    const missionIndex = missions.findIndex((m) => m.publicId === missionPublicId);
-    if (missionIndex === -1) return;
-
-    // 미션 설정 스텝으로 이동
-    if (step !== TestFormStep.TEST_MISSIONS) {
-      setStep(TestFormStep.TEST_MISSIONS);
-    }
-
-    // 해당 미션 선택
-    setSelectedMissionIndex(missionIndex);
-
-    // 해당 미션으로 스크롤
-    setTimeout(() => {
-      const missionElement = document.getElementById(`mission-${missionPublicId}`);
-      if (missionElement) {
-        missionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
-  };
-
-  const handleNextStep = async () => {
-    // 다음 스텝으로 이동하기 전에 저장
-    await handleSave();
-
-    if (step < TestFormStep.TEST_SDK) {
-      setStep(step + 1);
-    }
-  };
-
-  const handlePrevStep = () => {
-    if (step > TestFormStep.TEST_INFO) {
-      setStep(step - 1);
-    }
-  };
-
-  const handleSave = async () => {
-    // 유효성 검사
-    if (step === TestFormStep.TEST_INFO) {
-      if (!editTitle.trim()) {
-        setError('테스트 이름을 입력해주세요.');
-        return;
-      }
-
-      if (editTitle.length < 2) {
-        setError('테스트 이름은 최소 2자 이상이어야 합니다.');
-        return;
-      }
-    }
-
-    setLoading(true);
-    setError('');
-    setSuccess(false);
-
-    try {
-      // 실제 저장되는 느낌을 주기 위한 의도적인 지연 시작
-      const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 600));
-
-      // missions에 order 업데이트
-      const missionsWithOrder: UpdateTestMission[] = missions.map((mission, index) => ({
-        publicId: mission.publicId.startsWith('temp-') ? undefined : mission.publicId,
-        order: index,
-        name: mission.name,
-        description: mission.description,
-        url: mission.missionUrl,
-        estimatedDuration: mission.estimatedDuration,
-      }));
-
-      // API 함수를 사용하여 테스트 업데이트
-      const updatePromise = updateTest(test.publicId, {
-        title: editTitle,
-        description: editDescription,
-        url: editUrl,
-        missions: missionsWithOrder,
-      });
-
-      // 최소 로딩 시간과 API 호출이 모두 완료될 때까지 대기
-      await Promise.all([updatePromise, minLoadingTime]);
-
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
-
-      router.push(`/tests/${test.publicId}`);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : '저장에 실패했습니다. 다시 시도해주세요.';
-      setError(errorMessage);
-      console.error('저장 실패:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const displayTestName = editTitle ? editTitle : test.title;
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col">
       {/* 헤더 */}
       <div className="border-b bg-white px-8 py-4">
         <div className="flex items-center justify-between">
@@ -230,13 +49,7 @@ export function TestForm({ initialData }: TestFormProps) {
           </div>
 
           {/* 저장 버튼 */}
-          <div className="flex items-center gap-3">
-            {success && <span className="text-sm text-green-600">✓ 저장되었습니다</span>}
-            <Button onClick={handleSave} disabled={loading}>
-              {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
-              저장
-            </Button>
-          </div>
+          <SaveButton loading={loading} success={success} error={error} onSave={handlers.save} />
         </div>
       </div>
 
@@ -245,54 +58,48 @@ export function TestForm({ initialData }: TestFormProps) {
         {/* 사이드바 */}
         <TestFormSidebar
           currentStep={step}
-          missions={missions}
+          missions={missionsForSidebar}
           selectedMissionIndex={selectedMissionIndex}
+          errors={errors}
           onStepChange={setStep}
-          onMissionClick={handleMissionClick}
-          onAddMission={handleAddMission}
-          onDeleteMission={handleDeleteMission}
-          onMoveMission={handleMoveMission}
+          onMissionClick={handlers.missionClick}
+          onAddMission={handlers.addMission}
+          onDeleteMission={handlers.deleteMission}
+          onMoveMission={handlers.moveMission}
         />
 
         {/* 메인 콘텐츠 */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-4xl px-8 py-8">
-            {step === TestFormStep.TEST_INFO && (
-              <TestInfoStep
-                title={editTitle}
-                description={editDescription}
-                url={editUrl}
-                error={error}
-                onTitleChange={handleTitleChange}
-                onDescriptionChange={handleDescriptionChange}
-                onUrlChange={handleUrlChange}
-                onNext={handleNextStep}
-              />
-            )}
+        <main className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
+            <div className="mx-auto max-w-4xl px-8 py-8">
+              {step === TestFormStep.TEST_INFO && (
+                <TestInfoStep register={register} errors={errors} />
+              )}
 
-            {step === TestFormStep.TEST_MISSIONS && (
-              <TestMissionsStep
-                missions={missions}
-                selectedMissionIndex={selectedMissionIndex}
-                onSelectedMissionIndexChange={setSelectedMissionIndex}
-                onAddMission={handleAddMission}
-                onUpdateMission={handleUpdateMission}
-                onDeleteMission={handleDeleteMission}
-                onMoveMission={handleMoveMission}
-                onPrev={handlePrevStep}
-                onNext={handleNextStep}
-              />
-            )}
+              {step === TestFormStep.TEST_MISSIONS && (
+                <TestMissionsStep
+                  fields={fields}
+                  selectedMissionIndex={selectedMissionIndex}
+                  register={register}
+                  errors={errors}
+                  onSelectedMissionIndexChange={setSelectedMissionIndex}
+                  onDeleteMission={handlers.deleteMission}
+                />
+              )}
 
-            {step === TestFormStep.TEST_SDK && (
-              <TestSdkStep
-                testPublicId={test.publicId}
-                onPrev={handlePrevStep}
-                onSave={handleSave}
-                loading={loading}
-              />
-            )}
+              {step === TestFormStep.TEST_SDK && (
+                <TestSdkStep testPublicId={initialData.publicId} />
+              )}
+            </div>
           </div>
+
+          <StepNavigation
+            currentStep={step}
+            loading={loading}
+            onPrev={handlers.prevStep}
+            onNext={handlers.nextStep}
+            onSave={handlers.save}
+          />
         </main>
       </div>
     </div>
