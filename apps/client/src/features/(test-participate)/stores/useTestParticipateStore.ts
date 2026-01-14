@@ -9,6 +9,9 @@ interface TestParticipateState extends TestSession {
   // 현재 미션의 UI 상태 (복원용)
   currentMissionState: MissionState;
 
+  // 이어하기 관련 상태 (persist 안 함)
+  needsResume: boolean;
+
   // Actions
   startTest: (participantId: string) => void;
   setMissionState: (state: MissionState) => void;
@@ -17,6 +20,7 @@ interface TestParticipateState extends TestSession {
   submitFeedback: (feedback: string) => void;
   clearSession: () => void;
   resetToStart: () => void;
+  confirmResume: () => void;
 }
 
 const initialState = {
@@ -33,6 +37,7 @@ export const useTestParticipateStore = create<TestParticipateState>()(
   persist(
     (set, get) => ({
       ...initialState,
+      needsResume: false, // 초기값 (onRehydrateStorage에서 설정)
 
       // 테스트 시작
       startTest: (participantId: string) => {
@@ -41,6 +46,7 @@ export const useTestParticipateStore = create<TestParticipateState>()(
           currentMissionIndex: 0,
           currentMissionState: 'ready',
           participantId,
+          needsResume: false,
         });
       },
 
@@ -90,12 +96,17 @@ export const useTestParticipateStore = create<TestParticipateState>()(
 
       // 세션 초기화 (localStorage도 삭제)
       clearSession: () => {
-        set(initialState);
+        set({ ...initialState, needsResume: false });
       },
 
       // 시작 화면으로 리셋 (데이터는 유지)
       resetToStart: () => {
         set({ currentStep: 'start' });
+      },
+
+      // 이어하기 확인
+      confirmResume: () => {
+        set({ needsResume: false });
       },
     }),
     {
@@ -110,6 +121,20 @@ export const useTestParticipateStore = create<TestParticipateState>()(
         participantId: state.participantId,
         currentMissionResultId: state.currentMissionResultId,
       }),
+      onRehydrateStorage: () => (state) => {
+        // localStorage에서 복원된 후 실행
+        if (state) {
+          // 진행 중인 세션이 있고 아직 완료하지 않았다면 이어하기 필요
+          const hasProgress =
+            state.currentStep !== 'start' &&
+            state.currentStep !== 'complete' &&
+            state.participantId;
+
+          if (hasProgress) {
+            state.needsResume = true;
+          }
+        }
+      },
     }
   )
 );
