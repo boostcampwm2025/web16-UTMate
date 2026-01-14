@@ -1,44 +1,46 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Textarea } from '@/shared/components/ui/textarea';
 
-import { finishMissionRecording, startMission } from '../api';
+import { useTestParticipateStore } from '../stores/useTestParticipateStore';
 import type { Mission } from '../types';
 
 interface MissionStepProps {
   mission: Mission;
   missionNumber: number;
   totalMissions: number;
-  participantId?: string; // API 연동 시 사용
-  missionResultId?: string; // 현재 미션 결과 ID
-  onMissionResultIdChange?: (id: string) => void; // 미션 결과 ID 업데이트
-  onNext: (completed: boolean, feedback?: string, missionResultId?: string) => void;
 }
 
-type MissionState = 'ready' | 'recording' | 'completed' | 'feedback';
+export function MissionStep({ mission, missionNumber, totalMissions }: MissionStepProps) {
+  // Zustand store에서 상태 및 액션 가져오기
+  const currentMissionState = useTestParticipateStore((state) => state.currentMissionState);
+  const participantId = useTestParticipateStore((state) => state.participantId);
+  const missionResultId = useTestParticipateStore((state) => state.currentMissionResultId);
+  const setMissionState = useTestParticipateStore((state) => state.setMissionState);
+  const setMissionResultId = useTestParticipateStore((state) => state.setMissionResultId);
+  const completeMission = useTestParticipateStore((state) => state.completeMission);
 
-export function MissionStep({
-  mission,
-  missionNumber,
-  totalMissions,
-  participantId,
-  missionResultId,
-  onMissionResultIdChange,
-  onNext,
-}: MissionStepProps) {
-  const [state, setState] = useState<MissionState>('ready');
+  // 로컬 상태
   const [missionCompleted, setMissionCompleted] = useState<boolean | null>(null);
   const [feedback, setFeedback] = useState('');
   const [missionWindow, setMissionWindow] = useState<Window | null>(null);
 
+  // 컴포넌트 마운트 시 store의 상태로 동기화
+  useEffect(() => {
+    // 다음 미션으로 넘어갈 때 로컬 상태 초기화
+    setMissionCompleted(null);
+    setFeedback('');
+    setMissionWindow(null);
+  }, [mission.publicId]); // 미션이 변경될 때마다 초기화
+
   // TODO: 창 닫힘 자동 감지 기능 활성화 (필요시 주석 해제)
   // useEffect(() => {
-  //   if (!missionWindow || state !== 'recording') return;
+  //   if (!missionWindow || currentMissionState !== 'recording') return;
   //
   //   const interval = setInterval(() => {
   //     if (missionWindow.closed) {
@@ -48,7 +50,7 @@ export function MissionStep({
   //   }, 1000);
   //
   //   return () => clearInterval(interval);
-  // }, [missionWindow, state]);
+  // }, [missionWindow, currentMissionState]);
 
   // 미션 시작 mutation
   // TODO: 백엔드 API 준비되면 startMission 사용
@@ -58,12 +60,10 @@ export function MissionStep({
       return { id: `mission-result-${Date.now()}` };
     },
     onSuccess: (data) => {
-      if (onMissionResultIdChange) {
-        onMissionResultIdChange(data.id);
-      }
+      setMissionResultId(data.id);
       const newWindow = window.open(mission.missionUrl, '_blank', 'width=1200,height=800');
       setMissionWindow(newWindow);
-      setState('recording');
+      setMissionState('recording');
     },
     onError: (error) => {
       console.error('Failed to start mission:', error);
@@ -82,7 +82,7 @@ export function MissionStep({
       if (missionWindow && !missionWindow.closed) {
         missionWindow.close();
       }
-      setState('completed');
+      setMissionState('completed');
     },
     onError: (error) => {
       console.error('Failed to finish recording:', error);
@@ -105,22 +105,29 @@ export function MissionStep({
 
   const handleMissionResult = (completed: boolean) => {
     setMissionCompleted(completed);
-    setState('feedback');
+    setMissionState('feedback');
   };
 
   const handleNext = () => {
     if (missionCompleted === null) return;
-    // missionResultId를 onNext에 전달 (API 연동 시 사용)
-    onNext(missionCompleted, feedback || undefined, missionResultId);
+
+    // Store에 미션 결과 저장 및 다음 미션으로 이동
+    completeMission({
+      missionPublicId: mission.publicId,
+      completed: missionCompleted,
+      feedback: feedback || undefined,
+    });
   };
 
-  const isStateReached = (targetState: MissionState) => {
+  const isStateReached = (targetState: typeof currentMissionState) => {
     const stateOrder = ['ready', 'recording', 'completed', 'feedback'];
-    return stateOrder.indexOf(state) >= stateOrder.indexOf(targetState);
+    return (
+      stateOrder.indexOf(currentMissionState) >= stateOrder.indexOf(targetState)
+    );
   };
 
-  const isStateActive = (targetState: MissionState) => {
-    return state === targetState;
+  const isStateActive = (targetState: typeof currentMissionState) => {
+    return currentMissionState === targetState;
   };
 
   return (
