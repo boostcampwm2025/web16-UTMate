@@ -47,7 +47,7 @@ import { UsersModule } from '#domain/users/users.module';
         JWT_REFRESH_SECRET: Joi.string().required(),
         JWT_REFRESH_EXPIRES_IN: Joi.number().default(604800),
 
-        // AWS S3
+        // S3
         S3_ACCESS_KEY_ID: Joi.string().required(),
         S3_SECRET_ACCESS_KEY: Joi.string().required(),
         S3_REGION: Joi.string().required(),
