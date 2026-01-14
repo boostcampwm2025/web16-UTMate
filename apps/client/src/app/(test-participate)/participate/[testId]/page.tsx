@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { notFound, useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   completeTestParticipation,
@@ -80,13 +80,48 @@ export default function TestParticipatePage() {
   //   return <TestUnavailable status={testInfo.status} />;
   // }
 
-  // 세션 상태 관리
-  const [session, setSession] = useState<TestSession>({
-    currentStep: 'start',
-    currentMissionIndex: 0,
-    missionResults: [],
-    overallFeedback: undefined,
-  });
+  // 세션 상태 관리 (localStorage에서 복원)
+  const getStorageKey = () => `test-session-${testId}`;
+
+  const loadSessionFromStorage = (): TestSession => {
+    if (typeof window === 'undefined') {
+      return {
+        currentStep: 'start',
+        currentMissionIndex: 0,
+        missionResults: [],
+        overallFeedback: undefined,
+      };
+    }
+
+    try {
+      const saved = localStorage.getItem(getStorageKey());
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error('Failed to load session from localStorage:', error);
+    }
+
+    return {
+      currentStep: 'start',
+      currentMissionIndex: 0,
+      missionResults: [],
+      overallFeedback: undefined,
+    };
+  };
+
+  const [session, setSession] = useState<TestSession>(loadSessionFromStorage);
+
+  // 세션이 변경될 때마다 localStorage에 저장
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(getStorageKey(), JSON.stringify(session));
+      } catch (error) {
+        console.error('Failed to save session to localStorage:', error);
+      }
+    }
+  }, [session, testId]);
 
   // 현재 단계에 따른 프로그레스 계산
   const getCurrentStepNumber = (): number => {
