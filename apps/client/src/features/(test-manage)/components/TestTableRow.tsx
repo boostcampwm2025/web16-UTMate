@@ -38,7 +38,7 @@ export function TestTableRow({ test }: TestTableRowProps) {
         <TestStatusBadge status={test.status} />
       </td>
       <td className="px-6 py-4">
-        <IntegrationIcon url={test.url} />
+        <IntegrationIcon url={test.url} testId={test.publicId} />
       </td>
       <td className="px-6 py-4">
         <span className="text-sm text-gray-900">-</span>

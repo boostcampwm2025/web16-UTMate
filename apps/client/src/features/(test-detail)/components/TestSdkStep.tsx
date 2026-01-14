@@ -1,18 +1,15 @@
 'use client';
 
-import { Copy, Loader2 } from 'lucide-react';
+import { Copy } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/shared/components/ui/button';
 
 interface TestSdkStepProps {
   testPublicId: string;
-  onPrev: () => void;
-  onSave: () => Promise<void>;
-  loading: boolean;
 }
 
-export function TestSdkStep({ testPublicId, onPrev, onSave, loading }: TestSdkStepProps) {
+export function TestSdkStep({ testPublicId }: TestSdkStepProps) {
   const [copied, setCopied] = useState(false);
 
   const sdkCode = `<script src="https://cdn.utmate.com/sdk.js"></script>
@@ -79,17 +76,6 @@ export function TestSdkStep({ testPublicId, onPrev, onSave, loading }: TestSdkSt
             확인
           </Button>
         </div>
-      </div>
-
-      {/* 네비게이션 버튼 */}
-      <div className="flex justify-between border-t pt-6">
-        <Button variant="outline" onClick={onPrev}>
-          이전
-        </Button>
-        <Button onClick={onSave} disabled={loading}>
-          {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
-          저장하기
-        </Button>
       </div>
     </div>
   );
