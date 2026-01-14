@@ -9,14 +9,14 @@ import {
   getTestForParticipation,
   startTestParticipation,
   submitMissionResult,
-} from '@/features/(test-participate-new)/api';
-import { CompleteStep } from '@/features/(test-participate-new)/components/CompleteStep';
-import { FeedbackStep } from '@/features/(test-participate-new)/components/FeedbackStep';
-import { MissionStep } from '@/features/(test-participate-new)/components/MissionStep';
-import { TestParticipateLayout } from '@/features/(test-participate-new)/components/TestParticipateLayout';
-import { TestStartStep } from '@/features/(test-participate-new)/components/TestStartStep';
-import { TestUnavailable } from '@/features/(test-participate-new)/components/TestUnavailable';
-import type { MissionResult, TestInfo, TestSession } from '@/features/(test-participate-new)/types';
+} from '@/features/(test-participate)/api';
+import { CompleteStep } from '@/features/(test-participate)/components/CompleteStep';
+import { FeedbackStep } from '@/features/(test-participate)/components/FeedbackStep';
+import { MissionStep } from '@/features/(test-participate)/components/MissionStep';
+import { TestParticipateLayout } from '@/features/(test-participate)/components/TestParticipateLayout';
+import { TestStartStep } from '@/features/(test-participate)/components/TestStartStep';
+import { TestUnavailable } from '@/features/(test-participate)/components/TestUnavailable';
+import type { MissionResult, TestInfo, TestSession } from '@/features/(test-participate)/types';
 
 // TODO: 백엔드 API 준비되면 제거
 const MOCK_TEST: TestInfo = {
