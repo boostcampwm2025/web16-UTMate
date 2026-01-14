@@ -4,15 +4,15 @@ import { CreateMissionResultDto } from './dtos/create-mission-result.dto';
 import { MissionResultDto, SimpleMissionResultDto } from './dtos/mission-result.dto';
 import { UpdateMissionResultDto } from './dtos/update-mission-result.dto';
 import { MissionResult } from './entities/mission-result.entity';
-import { MissionResultRepository } from './mission-result.repository';
+import { MissionResultsRepository } from './mission-results.repository';
 
 import { S3StorageService } from '#common/storage/s3-storage.service';
 import { StorageService } from '#common/storage/storage.service';
 
 @Injectable()
-export class MissionResultService {
+export class MissionResultsService {
   constructor(
-    private readonly missionResultRepository: MissionResultRepository,
+    private readonly missionResultsRepository: MissionResultsRepository,
     private readonly storageService: StorageService,
     private readonly s3StorageService: S3StorageService,
   ) {}
@@ -26,7 +26,7 @@ export class MissionResultService {
   async createMissionResult(dto: CreateMissionResultDto) {
     // missionId 유효성 검사 등 추가 로직 필요
     const missionResult = MissionResult.start(dto.participantId, dto.missionId);
-    const savedMissionResult = await this.missionResultRepository.save(missionResult);
+    const savedMissionResult = await this.missionResultsRepository.save(missionResult);
     return MissionResultDto.fromEntity(savedMissionResult);
   }
 
@@ -38,7 +38,7 @@ export class MissionResultService {
    */
   async updateMissionResult(missionResultId: number, dto: UpdateMissionResultDto) {
     // 미션 결과 조회
-    const missionResult = await this.missionResultRepository.findById(missionResultId);
+    const missionResult = await this.missionResultsRepository.findById(missionResultId);
     if (!missionResult) {
       throw new NotFoundException('미션 결과를 찾을 수 없습니다.');
     }
@@ -61,7 +61,7 @@ export class MissionResultService {
       // TODO 로그 스트림을 분석 모듈에 보내 분석 후 분석 결과를 업데이드하는 로직 구현
 
       // 변경된 미션 결과 저장
-      await this.missionResultRepository.save(missionResult);
+      await this.missionResultsRepository.save(missionResult);
       return MissionResultDto.fromEntity(missionResult);
     } catch (error) {
       // 에러 발생 시 S3에 업로드한 로그 파일 삭제
@@ -78,7 +78,7 @@ export class MissionResultService {
    * @returns MissionResultDto
    */
   async getMissionResult(missionResultId: number) {
-    const findMissionResult = await this.missionResultRepository.findById(missionResultId);
+    const findMissionResult = await this.missionResultsRepository.findById(missionResultId);
     if (!findMissionResult) {
       throw new NotFoundException('미션 결과를 찾을 수 없습니다.');
     }
@@ -94,7 +94,7 @@ export class MissionResultService {
    * @returns
    */
   async getMissionResults(missionId: string) {
-    const missionResults = await this.missionResultRepository.findAll(missionId);
+    const missionResults = await this.missionResultsRepository.findAll(missionId);
     return SimpleMissionResultDto.fromEntities(missionResults);
   }
 

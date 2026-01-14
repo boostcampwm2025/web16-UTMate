@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { MissionResult } from './entities/mission-result.entity';
 
 @Injectable()
-export class MissionResultRepository {
+export class MissionResultsRepository {
   private currentId = 1;
   private missionResults: Map<number, MissionResult>;
   constructor() {
