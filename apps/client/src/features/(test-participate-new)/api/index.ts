@@ -1,6 +1,6 @@
 import type { TestInfo } from '../types';
 
-import { API_BASE_URL } from '@/shared/constants/api';
+import { CLIENT_BASE_URL as API_BASE_URL } from '@/shared/constants/api';
 
 // 테스트 정보 조회
 export async function getTestForParticipation(testId: string): Promise<TestInfo | null> {
