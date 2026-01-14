@@ -1,13 +1,15 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
 import { TestDto } from './dto/test.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
-import { Test } from './entities/test.entity';
+import { Test, TestStatus } from './entities/test.entity';
 import { MissionsService } from './missions.service';
 import { TestsRepository } from './tests.repository';
 
+import { ENV_KEYS } from '#common/config/env.constants';
 import { UsersService } from '#domain/users/users.service';
 
 @Injectable()
@@ -17,6 +19,7 @@ export class TestsService {
     @Inject() private readonly usersService: UsersService,
     @Inject() private readonly missionsService: MissionsService,
     @Inject() private readonly dataSource: DataSource,
+    @Inject() private readonly configService: ConfigService,
   ) {}
 
   async createTest(userId: string, title: string) {
@@ -65,6 +68,16 @@ export class TestsService {
     return TestDto.fromTestEntity(test);
   }
 
+  async getSdkStatus(userId: string, publicId: string) {
+    const owner = await this.usersService.getIdByPublicId(userId);
+
+    const test = await this.testsRepository.findSdkStatusByPublicIdAndOwner(publicId, owner);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return { sdkStatus: test.sdkStatus };
+  }
+
   async deleteTest(userId: string, publicId: string) {
     const owner = await this.usersService.getIdByPublicId(userId);
 
@@ -75,5 +88,69 @@ export class TestsService {
       throw new NotFoundException('Test not found');
     }
     await this.testsRepository.remove(test);
+  }
+
+  async updateTestStatus(userId: string, publicId: string, status: TestStatus) {
+    const owner = await this.usersService.getIdByPublicId(userId);
+
+    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    try {
+      test.handleStatusChange(status);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+    await this.testsRepository.save(test);
+  }
+
+  async verifySdkInstallation(userId: string, publicId: string) {
+    const owner = await this.usersService.getIdByPublicId(userId);
+
+    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, owner);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+
+    // SDK 설치 여부 검증 로직
+    const isSdkInstalled = await this.verifySdkInstallationLogic(test.url); // 실제 검증 로직으로 대체 필요
+    test.sdkStatus = isSdkInstalled;
+    await this.testsRepository.save(test);
+
+    return { sdkStatus: test.sdkStatus };
+  }
+
+  private async verifySdkInstallationLogic(destination: string): Promise<boolean> {
+    try {
+      const response = await fetch(destination);
+      if (!response.ok) {
+        return false;
+      }
+
+      const html = await response.text();
+
+      // <script> 태그에서만 src 속성 찾기
+      // <script src="..." 패턴만 매칭
+      const scriptTagPattern = /<script\s+[^>]*src=["']([^"']*)/gi;
+      const matches = html.match(scriptTagPattern);
+
+      if (!matches) {
+        return false;
+      }
+
+      // SDK URL 확인
+      const sdkDomain = this.configService.get(ENV_KEYS.SDK_DOMAIN); // SDK 도메인 패턴
+      return matches.some((match) => match.toLowerCase().includes(sdkDomain));
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async verifySdkInstallationBySDK(publicId: string) {
+    const affectedRows = await this.testsRepository.updateSdkStatus(publicId, true);
+    if (affectedRows === 0) {
+      throw new NotFoundException('Test not found');
+    }
   }
 }

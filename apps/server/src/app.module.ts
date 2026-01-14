@@ -20,6 +20,7 @@ import { UsersModule } from '#domain/users/users.module';
         // Server
         NODE_ENV: Joi.string().valid('development', 'production').required(),
         SERVER_PORT: Joi.number().default(8080).required(),
+        SDK_DOMAIN: Joi.string().uri().required(),
 
         // Database
         DATABASE_HOST: Joi.string().required(),
@@ -45,6 +46,13 @@ import { UsersModule } from '#domain/users/users.module';
         JWT_ACCESS_EXPIRES_IN: Joi.number().default(900),
         JWT_REFRESH_SECRET: Joi.string().required(),
         JWT_REFRESH_EXPIRES_IN: Joi.number().default(604800),
+
+        // S3
+        S3_ACCESS_KEY_ID: Joi.string().required(),
+        S3_SECRET_ACCESS_KEY: Joi.string().required(),
+        S3_REGION: Joi.string().required(),
+        S3_BUCKET_NAME: Joi.string().required(),
+        S3_ENDPOINT: Joi.string().uri().optional(),
       }),
       validationOptions: {
         abortEarly: false,

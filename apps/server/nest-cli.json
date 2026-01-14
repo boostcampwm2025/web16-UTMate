@@ -10,7 +10,7 @@
         "options": {
           "classValidatorShim": true,
           "introspectComments": true,
-          "dtoNameSuffix": ".dto.ts",
+          "dtoFileNameSuffix": ".dto.ts",
           "controllerFileNameSuffix": ".controller.ts",
           "searchOnStartup": true
         }

@@ -2,8 +2,6 @@ import { PickType } from '@nestjs/mapped-types';
 
 import { MissionResult, MissionResultStatus } from '../entities/mission-result.entity';
 
-import { S3_URL } from '#common/storage/const';
-
 export class MissionResultDto {
   id: number;
   participantId: string;
@@ -17,7 +15,7 @@ export class MissionResultDto {
   // TODO 추가적으로 로그 분석하여 저장할 필드 정의
   logUrl?: string;
 
-  static fromEntity(missionResult: MissionResult) {
+  static fromEntity(missionResult: MissionResult, presignedUrl?: string) {
     const dto = new MissionResultDto();
     dto.id = missionResult.id;
     dto.participantId = missionResult.participantId;
@@ -28,7 +26,9 @@ export class MissionResultDto {
     dto.createdAt = missionResult.createdAt;
     dto.updatedAt = missionResult.updatedAt;
 
-    dto.logUrl = S3_URL + '/' + missionResult.logUrl;
+    if (presignedUrl) {
+      dto.logUrl = presignedUrl;
+    }
     return dto;
   }
 }
