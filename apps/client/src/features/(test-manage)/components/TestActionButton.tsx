@@ -42,7 +42,7 @@ export function TestActionButton({ testId }: TestActionButtonProps) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="text-gray-400 transition-colors hover:text-gray-600"
+          className="rounded-full text-gray-400 transition-colors hover:text-gray-600"
           disabled={isDeleting}
         >
           <MoreVertical className="h-5 w-5" />
