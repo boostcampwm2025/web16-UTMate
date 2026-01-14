@@ -60,25 +60,6 @@ export default function TestParticipatePage() {
     },
   });
 
-  // TODO: Hook 순서 문제 해결 필요 - 조건부 return을 모든 Hook 선언 이후로 이동
-  // // 로딩 중
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex min-h-screen items-center justify-center bg-gray-50">
-  //       <div className="text-muted-foreground">로딩 중...</div>
-  //     </div>
-  //   );
-  // }
-
-  // // 테스트를 찾을 수 없음
-  // if (!testInfo) {
-  //   notFound();
-  // }
-
-  // // 테스트가 참여 불가능한 상태
-  // if (testInfo.status !== 'ACTIVE') {
-  //   return <TestUnavailable status={testInfo.status} />;
-  // }
 
   // 세션 상태 관리 (localStorage에서 복원)
   const getStorageKey = () => `test-session-${testId}`;
