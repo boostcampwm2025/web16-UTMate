@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { getParticipantProgress } from '../api';
 import type { TestSession } from '../types';
 
 interface UseTestSessionOptions {
@@ -7,7 +8,7 @@ interface UseTestSessionOptions {
 }
 
 /**
- * 테스트 세션 상태를 관리하고 localStorage에 저장/복원하는 커스텀 훅
+ * 테스트 세션 상태를 관리하고 localStorage 및 백엔드에서 저장/복원하는 커스텀 훅
  */
 export function useTestSession({ testId }: UseTestSessionOptions) {
   const getStorageKey = () => `test-session-${testId}`;
@@ -40,6 +41,31 @@ export function useTestSession({ testId }: UseTestSessionOptions) {
   };
 
   const [session, setSession] = useState<TestSession>(loadSessionFromStorage);
+  const [isSessionRestored, setIsSessionRestored] = useState(false);
+
+  // 초기 로드 시 백엔드에서 세션 복원 시도
+  useEffect(() => {
+    const restoreSessionFromBackend = async () => {
+      const localSession = loadSessionFromStorage();
+
+      // localStorage에 participantId가 있으면 백엔드에서 최신 상태 가져오기
+      if (localSession.participantId) {
+        try {
+          // TODO: 백엔드 API 준비되면 주석 해제
+          // const backendSession = await getParticipantProgress(localSession.participantId);
+          // if (backendSession) {
+          //   setSession(backendSession);
+          // }
+        } catch (error) {
+          console.error('Failed to restore session from backend:', error);
+        }
+      }
+
+      setIsSessionRestored(true);
+    };
+
+    restoreSessionFromBackend();
+  }, [testId]);
 
   // 세션이 변경될 때마다 localStorage에 저장
   useEffect(() => {
@@ -73,5 +99,6 @@ export function useTestSession({ testId }: UseTestSessionOptions) {
     session,
     setSession,
     clearSession,
+    isSessionRestored,
   };
 }

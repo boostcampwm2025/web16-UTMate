@@ -1,15 +1,16 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 import { CompleteStep } from '@/features/(test-participate)/components/CompleteStep';
 import { FeedbackStep } from '@/features/(test-participate)/components/FeedbackStep';
 import { MissionStep } from '@/features/(test-participate)/components/MissionStep';
 import { TestParticipateLayout } from '@/features/(test-participate)/components/TestParticipateLayout';
 import { TestStartStep } from '@/features/(test-participate)/components/TestStartStep';
-import type { MissionResult, TestInfo, TestSession } from '@/features/(test-participate)/types';
+import { useTestParticipation } from '@/features/(test-participate)/hooks/useTestParticipation';
+import { useTestSession } from '@/features/(test-participate)/hooks/useTestSession';
+import type { TestInfo } from '@/features/(test-participate)/types';
 
 // TODO: 백엔드 API 준비되면 제거
 const MOCK_TEST: TestInfo = {
@@ -45,7 +46,7 @@ export default function TestParticipatePage() {
 
   // React Query로 테스트 정보 가져오기 (임시로 Mock 데이터 사용)
   // TODO: 백엔드 API 준비되면 getTestForParticipation(testId)로 변경
-  const { data: testInfo, isLoading } = useQuery({
+  const { data: testInfo } = useQuery({
     queryKey: ['test', testId],
     queryFn: async () => {
       // 임시로 Mock 데이터 반환
@@ -53,49 +54,15 @@ export default function TestParticipatePage() {
     },
   });
 
+  // 커스텀 훅: 세션 상태 관리 (localStorage + 백엔드 복원)
+  const { session, setSession, isSessionRestored } = useTestSession({ testId });
 
-  // 세션 상태 관리 (localStorage에서 복원)
-  const getStorageKey = () => `test-session-${testId}`;
-
-  const loadSessionFromStorage = (): TestSession => {
-    if (typeof window === 'undefined') {
-      return {
-        currentStep: 'start',
-        currentMissionIndex: 0,
-        missionResults: [],
-        overallFeedback: undefined,
-      };
-    }
-
-    try {
-      const saved = localStorage.getItem(getStorageKey());
-      if (saved) {
-        return JSON.parse(saved);
-      }
-    } catch (error) {
-      console.error('Failed to load session from localStorage:', error);
-    }
-
-    return {
-      currentStep: 'start',
-      currentMissionIndex: 0,
-      missionResults: [],
-      overallFeedback: undefined,
-    };
-  };
-
-  const [session, setSession] = useState<TestSession>(loadSessionFromStorage);
-
-  // 세션이 변경될 때마다 localStorage에 저장
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem(getStorageKey(), JSON.stringify(session));
-      } catch (error) {
-        console.error('Failed to save session to localStorage:', error);
-      }
-    }
-  }, [session, testId]);
+  // 커스텀 훅: 테스트 참여 관련 mutation 로직
+  const { handleStart, handleMissionComplete, handleFeedbackSubmit } = useTestParticipation({
+    testInfo,
+    session,
+    setSession,
+  });
 
   // 현재 단계에 따른 프로그레스 계산
   const getCurrentStepNumber = (): number => {
@@ -135,125 +102,8 @@ export default function TestParticipatePage() {
     }
   };
 
-  // 테스트 시작 mutation
-  // TODO: 백엔드 API 준비되면 startTestParticipation(testId) 사용
-  const startTestMutation = useMutation({
-    mutationFn: async () => {
-      // 임시로 Mock 데이터 반환
-      return { participantId: `participant-${Date.now()}` };
-    },
-    onSuccess: (data) => {
-      setSession((prev) => ({
-        ...prev,
-        currentStep: 'mission',
-        currentMissionIndex: 0,
-        participantId: data.participantId,
-      }));
-    },
-    onError: (error) => {
-      console.error('Failed to start test:', error);
-      alert('테스트 시작에 실패했습니다.');
-    },
-  });
-
-  // 시작 버튼 클릭
-  const handleStart = () => {
-    startTestMutation.mutate();
-  };
-
-  // 미션 결과 제출 mutation
-  // TODO: 백엔드 API 준비되면 submitMissionResult 사용
-  const submitMissionMutation = useMutation({
-    mutationFn: async ({
-      missionResultId,
-      completed,
-      feedback,
-    }: {
-      missionResultId: string;
-      completed: boolean;
-      feedback?: string;
-    }) => {
-      // 임시로 성공 반환
-      return Promise.resolve();
-    },
-    onSuccess: (_, variables) => {
-      if (!testInfo) return;
-
-      const missionResult: MissionResult = {
-        missionPublicId: testInfo.missions[session.currentMissionIndex].publicId,
-        completed: variables.completed,
-        feedback: variables.feedback,
-      };
-
-      setSession((prev) => ({
-        ...prev,
-        missionResults: [...prev.missionResults, missionResult],
-      }));
-
-      // 다음 미션으로 이동 또는 피드백 단계로
-      if (session.currentMissionIndex < testInfo.missions.length - 1) {
-        setSession((prev) => ({
-          ...prev,
-          currentMissionIndex: prev.currentMissionIndex + 1,
-          currentMissionResultId: undefined,
-        }));
-      } else {
-        setSession((prev) => ({
-          ...prev,
-          currentStep: 'feedback',
-        }));
-      }
-    },
-    onError: (error) => {
-      console.error('Failed to submit mission result:', error);
-      alert('미션 결과 제출에 실패했습니다.');
-    },
-  });
-
-  // 미션 완료 (다음 버튼 클릭 시 MissionStep에서 호출됨)
-  const handleMissionComplete = (completed: boolean, feedback?: string, missionResultId?: string) => {
-    // Mock 모드에서는 missionResultId가 임시로 생성되므로 항상 존재
-    submitMissionMutation.mutate({
-      missionResultId: missionResultId || 'temp',
-      completed,
-      feedback
-    });
-  };
-
-  // 테스트 완료 mutation
-  // TODO: 백엔드 API 준비되면 completeTestParticipation 사용
-  const completeTestMutation = useMutation({
-    mutationFn: async (feedback: string) => {
-      // 임시로 성공 반환
-      return Promise.resolve();
-    },
-    onSuccess: (_, feedback) => {
-      setSession((prev) => ({
-        ...prev,
-        overallFeedback: feedback,
-        currentStep: 'complete',
-      }));
-
-      console.log('세션 완료:', {
-        testId,
-        participantId: session.participantId,
-        missionResults: session.missionResults,
-        overallFeedback: feedback,
-      });
-    },
-    onError: (error) => {
-      console.error('Failed to complete test:', error);
-      alert('테스트 완료 처리에 실패했습니다.');
-    },
-  });
-
-  // 전체 피드백 제출
-  const handleFeedbackSubmit = (feedback: string) => {
-    completeTestMutation.mutate(feedback);
-  };
-
-  // testInfo가 없으면 로딩 화면 표시
-  if (!testInfo) {
+  // testInfo가 없거나 세션이 복원되지 않았으면 로딩 화면 표시
+  if (!testInfo || !isSessionRestored) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-muted-foreground">로딩 중...</div>
