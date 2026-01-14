@@ -1,21 +1,14 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { notFound, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import {
-  completeTestParticipation,
-  getTestForParticipation,
-  startTestParticipation,
-  submitMissionResult,
-} from '@/features/(test-participate)/api';
 import { CompleteStep } from '@/features/(test-participate)/components/CompleteStep';
 import { FeedbackStep } from '@/features/(test-participate)/components/FeedbackStep';
 import { MissionStep } from '@/features/(test-participate)/components/MissionStep';
 import { TestParticipateLayout } from '@/features/(test-participate)/components/TestParticipateLayout';
 import { TestStartStep } from '@/features/(test-participate)/components/TestStartStep';
-import { TestUnavailable } from '@/features/(test-participate)/components/TestUnavailable';
 import type { MissionResult, TestInfo, TestSession } from '@/features/(test-participate)/types';
 
 // TODO: 백엔드 API 준비되면 제거
