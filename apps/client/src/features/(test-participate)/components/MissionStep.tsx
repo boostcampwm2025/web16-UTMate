@@ -91,6 +91,11 @@ export function MissionStep({
   });
 
   const handleOpenMission = () => {
+    // 이미 창이 열려있고 닫히지 않았다면 포커스만 주기
+    if (missionWindow && !missionWindow.closed) {
+      missionWindow.focus();
+      return;
+    }
     startMissionMutation.mutate();
   };
 
