@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { MoreVertical, Trash2 } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -20,6 +21,7 @@ interface TestActionButtonProps {
 export function TestActionButton({ testId }: TestActionButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const handleDelete = async () => {
     if (!confirm('정말로 이 테스트를 삭제하시겠습니까?')) {
@@ -37,6 +39,10 @@ export function TestActionButton({ testId }: TestActionButtonProps) {
     }
   };
 
+  const handleUpdate = () => {
+    router.push(`/tests/${testId}?mode=edit`);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -49,8 +55,15 @@ export function TestActionButton({ testId }: TestActionButtonProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-          <Trash2 className="mr-2 h-4 w-4" />
+        <DropdownMenuItem onClick={handleUpdate} className="cursor-pointer text-base">
+          수정
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="cursor-pointer text-base"
+        >
           삭제
         </DropdownMenuItem>
       </DropdownMenuContent>
