@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { CompleteStep } from '@/features/(test-participate)/components/CompleteStep';
 import { FeedbackStep } from '@/features/(test-participate)/components/FeedbackStep';
 import { MissionStep } from '@/features/(test-participate)/components/MissionStep';
+import { ResumeTestStep } from '@/features/(test-participate)/components/ResumeTestStep';
 import { TestParticipateLayout } from '@/features/(test-participate)/components/TestParticipateLayout';
 import { TestStartStep } from '@/features/(test-participate)/components/TestStartStep';
 import { useTestParticipateStore } from '@/features/(test-participate)/stores/useTestParticipateStore';
@@ -56,6 +57,7 @@ export default function TestParticipatePage() {
   // Zustand store에서 상태 및 액션 가져오기
   const currentStep = useTestParticipateStore((state) => state.currentStep);
   const currentMissionIndex = useTestParticipateStore((state) => state.currentMissionIndex);
+  const needsResume = useTestParticipateStore((state) => state.needsResume);
   const startTest = useTestParticipateStore((state) => state.startTest);
   const submitFeedback = useTestParticipateStore((state) => state.submitFeedback);
 
@@ -148,8 +150,13 @@ export default function TestParticipatePage() {
 
   return (
     <>
-      {/* 시작 단계는 프로그레스 바 없이 */}
-      {currentStep === 'start' ? (
+      {/* 이어하기 안내 */}
+      {needsResume ? (
+        <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
+          <ResumeTestStep testInfo={testInfo} />
+        </div>
+      ) : /* 시작 단계는 프로그레스 바 없이 */
+      currentStep === 'start' ? (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
           <TestStartStep testInfo={testInfo} onStart={handleStart} />
         </div>
