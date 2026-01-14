@@ -5,7 +5,7 @@ import { type Test, TestStatus } from '@/features/(test-manage)/types';
 
 import { TestStatusBadge } from './TestStatusBadge';
 import { IntegrationIcon } from './IntegrationIcon';
-import { UserAvatar } from './UserAvatar';
+
 import { TestActionButton } from './TestActionButton';
 
 interface TestTableRowProps {
@@ -42,11 +42,6 @@ export function TestTableRow({ test }: TestTableRowProps) {
       </td>
       <td className="px-6 py-4">
         <span className="text-sm text-gray-900">-</span>
-      </td>
-      <td className="px-6 py-4">
-        <div className="flex items-center gap-2">
-          <UserAvatar name={test.owner.username} imageUrl={test.owner.avatarUrl} />
-        </div>
       </td>
       <td className="px-6 py-4" onClick={handleActionClick}>
         <TestActionButton testId={test.publicId} />

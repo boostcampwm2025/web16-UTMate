@@ -10,12 +10,11 @@ export function TestTable({ tests }: TestTableProps) {
     <div className="overflow-hidden rounded-lg border border-gray-200">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
-          <tr className="text-sm font-semibold text-gray-500 uppercase tracking-wider text-left">
+          <tr className="text-left text-sm font-semibold tracking-wider text-gray-500 uppercase">
             <th className="px-6 py-3">테스트 이름</th>
             <th className="px-6 py-3">상태</th>
             <th className="px-6 py-3">통합</th>
             <th className="px-6 py-3">참가자</th>
-            <th className="px-6 py-3">생성자</th>
             <th className="px-6 py-3">작업</th>
           </tr>
         </thead>
