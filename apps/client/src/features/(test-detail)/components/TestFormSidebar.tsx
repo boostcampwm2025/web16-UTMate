@@ -99,7 +99,7 @@ export function TestFormSidebar({
                     isInvalid && isActive && 'bg-destructive/10 text-destructive',
                   )}
                 >
-                  {isInvalid ? <AlertCircle className="size-6" /> : item.icon}
+                  {item.icon}
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3
