@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { type Test, TestStatus } from '@/features/(test-manage)/types';
 
 import { TestStatusBadge } from './TestStatusBadge';
-import { IntegrationIcon } from './IntegrationIcon';
+import { IntegrationButton } from './IntegrationButton';
 
 import { TestActionButton } from './TestActionButton';
 
@@ -31,19 +31,19 @@ export function TestTableRow({ test }: TestTableRowProps) {
 
   return (
     <tr onClick={handleRowClick} className="cursor-pointer transition-colors hover:bg-gray-50">
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 text-left">
         <div className="font-medium text-gray-900">{test.title}</div>
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 text-center">
         <TestStatusBadge status={test.status} />
       </td>
-      <td className="px-6 py-4">
-        <IntegrationIcon url={test.url} testId={test.publicId} />
+      <td className="px-6 py-4 text-center">
+        <IntegrationButton url={test.url} testId={test.publicId} />
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 text-center">
         <span className="text-sm text-gray-900">-</span>
       </td>
-      <td className="px-6 py-4" onClick={handleActionClick}>
+      <td className="px-6 py-4 text-center" onClick={handleActionClick}>
         <TestActionButton testId={test.publicId} />
       </td>
     </tr>
