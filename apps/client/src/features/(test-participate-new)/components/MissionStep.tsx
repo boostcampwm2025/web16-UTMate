@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Textarea } from '@/shared/components/ui/textarea';
 
+import { finishMissionRecording, startMission } from '../api';
 import type { Mission } from '../types';
 
 interface MissionStepProps {
@@ -41,53 +43,61 @@ export function MissionStep({
   //   const interval = setInterval(() => {
   //     if (missionWindow.closed) {
   //       clearInterval(interval);
-  //       handleStopRecording();
+  //       finishRecordingMutation.mutate();
   //     }
   //   }, 1000);
   //
   //   return () => clearInterval(interval);
   // }, [missionWindow, state]);
 
-  const handleOpenMission = async () => {
-    // API 연동 시 주석 해제
-    // import { startMission } from '../api';
-    //
-    // try {
-    //   if (participantId && onMissionResultIdChange) {
-    //     const { id } = await startMission(mission.publicId, participantId);
-    //     onMissionResultIdChange(id);
-    //   }
-    // } catch (error) {
-    //   console.error('Failed to start mission:', error);
-    //   alert('미션 시작에 실패했습니다.');
-    //   return;
-    // }
+  // 미션 시작 mutation
+  const startMissionMutation = useMutation({
+    mutationFn: () => {
+      if (!participantId) {
+        throw new Error('Participant ID가 없습니다.');
+      }
+      return startMission(mission.publicId, participantId);
+    },
+    onSuccess: (data) => {
+      if (onMissionResultIdChange) {
+        onMissionResultIdChange(data.id);
+      }
+      const newWindow = window.open(mission.missionUrl, '_blank', 'width=1200,height=800');
+      setMissionWindow(newWindow);
+      setState('recording');
+    },
+    onError: (error) => {
+      console.error('Failed to start mission:', error);
+      alert('미션 시작에 실패했습니다.');
+    },
+  });
 
-    // 현재는 Mock으로 동작
-    const newWindow = window.open(mission.missionUrl, '_blank', 'width=1200,height=800');
-    setMissionWindow(newWindow);
-    setState('recording');
+  // 녹화 종료 mutation
+  const finishRecordingMutation = useMutation({
+    mutationFn: () => {
+      if (!missionResultId) {
+        throw new Error('Mission Result ID가 없습니다.');
+      }
+      return finishMissionRecording(missionResultId);
+    },
+    onSuccess: () => {
+      if (missionWindow && !missionWindow.closed) {
+        missionWindow.close();
+      }
+      setState('completed');
+    },
+    onError: (error) => {
+      console.error('Failed to finish recording:', error);
+      alert('녹화 종료에 실패했습니다.');
+    },
+  });
+
+  const handleOpenMission = () => {
+    startMissionMutation.mutate();
   };
 
-  const handleStopRecording = async () => {
-    // API 연동 시 주석 해제
-    // import { finishMissionRecording } from '../api';
-    //
-    // try {
-    //   if (missionResultId) {
-    //     await finishMissionRecording(missionResultId);
-    //   }
-    // } catch (error) {
-    //   console.error('Failed to finish recording:', error);
-    //   alert('녹화 종료에 실패했습니다.');
-    //   return;
-    // }
-
-    // 현재는 Mock으로 동작
-    if (missionWindow && !missionWindow.closed) {
-      missionWindow.close();
-    }
-    setState('completed');
+  const handleStopRecording = () => {
+    finishRecordingMutation.mutate();
   };
 
   const handleMissionResult = (completed: boolean) => {
