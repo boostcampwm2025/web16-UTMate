@@ -119,7 +119,7 @@ export function MissionStep({
   };
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full max-w-3xl">
       <CardHeader>
         <div className="space-y-2">
           <p className="text-muted-foreground text-sm">
