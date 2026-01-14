@@ -45,7 +45,7 @@ export function TestTableRow({ test }: TestTableRowProps) {
         <span className="cursor-pointer text-sm text-gray-900">-</span>
       </td>
       <td className="px-6 py-4 text-center" onClick={handleActionClick}>
-        <TestActionButton testId={test.publicId} />
+        <TestActionButton testId={test.publicId} testStatus={test.status} />
       </td>
     </tr>
   );
