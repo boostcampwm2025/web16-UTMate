@@ -7,7 +7,7 @@ export class MissionResultDto {
   participantId: string;
   missionId: string;
   status: MissionResultStatus;
-  duration: number;
+  duration?: number;
   feedback?: string;
   createdAt: Date;
   updatedAt: Date;

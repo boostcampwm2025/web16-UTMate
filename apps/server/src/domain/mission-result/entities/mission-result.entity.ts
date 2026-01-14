@@ -1,3 +1,6 @@
+import { nanoid } from 'nanoid';
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
 export enum MissionResultStatus {
   PENDING = 'PENDING',
   COMPLETED = 'COMPLETED',
@@ -5,20 +8,43 @@ export enum MissionResultStatus {
   SKIPPED = 'SKIPPED',
 }
 
+@Entity('mission_results')
 export class MissionResult {
+  @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ unique: true, name: 'public_id', length: 21 })
+  publicId: string;
+
+  @Column({ name: 'participant_id' })
   participantId: string;
+
+  @Column({ name: 'mission_id' })
   missionId: string;
 
+  @Column({ type: 'enum', enum: MissionResultStatus, default: MissionResultStatus.PENDING })
   status: MissionResultStatus;
-  duration: number;
-  feedback: string | undefined;
 
+  @Column({ type: 'int', nullable: true })
+  duration?: number;
+
+  @Column({ type: 'text', nullable: true })
+  feedback?: string;
+
+  @Column({ name: 'created_at', type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
+
+  @Column({
+    name: 'updated_at',
+    type: 'datetime',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
   // TODO 추가적으로 로그 분석하여 저장할 필드 정의
-  logUrl?: string;
+  @Column({ nullable: true })
+  filename?: string;
 
   private constructor(participantId: string, missionId: string) {
     this.participantId = participantId;
@@ -53,7 +79,14 @@ export class MissionResult {
     this.updatedAt = new Date();
   }
 
-  uploadedLogFile(url: string) {
-    this.logUrl = url;
+  recordUploadedFile(filename: string) {
+    this.filename = filename;
+  }
+
+  @BeforeInsert()
+  generatePublicId() {
+    if (!this.publicId) {
+      this.publicId = nanoid();
+    }
   }
 }

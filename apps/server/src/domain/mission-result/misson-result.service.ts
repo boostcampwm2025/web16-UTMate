@@ -56,7 +56,7 @@ export class MissionResultService {
       this.applyStatus(missionResult, dto);
 
       // 업로드된 로그 파일 URL 저장
-      missionResult.uploadedLogFile(compressedFileName);
+      missionResult.recordUploadedFile(compressedFileName);
 
       // TODO 로그 스트림을 분석 모듈에 보내 분석 후 분석 결과를 업데이드하는 로직 구현
 
@@ -82,8 +82,8 @@ export class MissionResultService {
     if (!findMissionResult) {
       throw new NotFoundException('미션 결과를 찾을 수 없습니다.');
     }
-    const presignedUrl = findMissionResult.logUrl
-      ? await this.s3StorageService.getPresignedUrl(findMissionResult.logUrl)
+    const presignedUrl = findMissionResult.filename
+      ? await this.s3StorageService.getPresignedUrl(findMissionResult.filename)
       : undefined;
     return MissionResultDto.fromEntity(findMissionResult, presignedUrl);
   }
