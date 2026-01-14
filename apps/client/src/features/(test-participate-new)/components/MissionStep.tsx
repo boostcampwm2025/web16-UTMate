@@ -36,7 +36,7 @@ export function MissionStep({
   const [feedback, setFeedback] = useState('');
   const [missionWindow, setMissionWindow] = useState<Window | null>(null);
 
-  // 창 닫힘 자동 감지 (주석 처리됨 - 필요시 주석 해제)
+  // TODO: 창 닫힘 자동 감지 기능 활성화 (필요시 주석 해제)
   // useEffect(() => {
   //   if (!missionWindow || state !== 'recording') return;
   //

@@ -146,6 +146,7 @@ export default function ProfilePage() {
             </Avatar>
             <div className="space-y-1">
               <h3 className="text-2xl font-semibold">{user.username}</h3>
+              {/* TODO: 백엔드에서 이메일 정보 제공 시 user.email로 변경 */}
               <p className="text-muted-foreground text-sm">email: {'나중에 고칠 예정'}</p>
             </div>
           </div>
@@ -159,6 +160,7 @@ export default function ProfilePage() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="publicId">이메일</Label>
+              {/* TODO: 백엔드에서 이메일 정보 제공 시 user.email로 변경 */}
               <Input id="publicId" value={'나중에 고칠 예정'} disabled />
             </div>
           </div>
