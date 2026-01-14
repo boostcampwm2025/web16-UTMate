@@ -80,4 +80,12 @@ export class TestsRepository {
 
     return result.affected || 0;
   }
+
+  async findIdByPublicId(publicId: string) {
+    return await this.testsRepository
+      .createQueryBuilder('tests')
+      .select(['tests.id'])
+      .where('tests.publicId = :publicId', { publicId })
+      .getOne();
+  }
 }

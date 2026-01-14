@@ -10,13 +10,11 @@ import { MissionsService } from './missions.service';
 import { TestsRepository } from './tests.repository';
 
 import { ENV_KEYS } from '#common/config/env.constants';
-import { UsersService } from '#domain/users/users.service';
 
 @Injectable()
 export class TestsService {
   constructor(
     @Inject() private readonly testsRepository: TestsRepository,
-    @Inject() private readonly usersService: UsersService,
     @Inject() private readonly missionsService: MissionsService,
     @Inject() private readonly dataSource: DataSource,
     @Inject() private readonly configService: ConfigService,
@@ -143,5 +141,13 @@ export class TestsService {
     if (affectedRows === 0) {
       throw new NotFoundException('Test not found');
     }
+  }
+
+  async findIdByPublicId(testId: string) {
+    const tests = await this.testsRepository.findIdByPublicId(testId);
+    if (!tests) {
+      throw new NotFoundException('Test not found');
+    }
+    return tests.id;
   }
 }
