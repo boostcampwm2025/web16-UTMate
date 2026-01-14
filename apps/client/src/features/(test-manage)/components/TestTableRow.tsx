@@ -40,8 +40,9 @@ export function TestTableRow({ test }: TestTableRowProps) {
       <td className="px-6 py-4 text-center">
         <IntegrationButton url={test.url} testId={test.publicId} />
       </td>
+      {/* TODO: 테스트 참여자 수 표시 */}
       <td className="px-6 py-4 text-center">
-        <span className="text-sm text-gray-900">-</span>
+        <span className="cursor-pointer text-sm text-gray-900">-</span>
       </td>
       <td className="px-6 py-4 text-center" onClick={handleActionClick}>
         <TestActionButton testId={test.publicId} />
