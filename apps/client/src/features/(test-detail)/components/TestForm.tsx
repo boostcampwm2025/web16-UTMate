@@ -59,6 +59,7 @@ export function TestForm({ initialData }: TestFormProps) {
           currentStep={step}
           missions={missionsForSidebar}
           selectedMissionIndex={selectedMissionIndex}
+          errors={errors}
           onStepChange={setStep}
           onMissionClick={handlers.missionClick}
           onAddMission={handlers.addMission}

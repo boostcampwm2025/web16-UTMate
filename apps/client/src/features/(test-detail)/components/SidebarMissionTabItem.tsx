@@ -7,6 +7,7 @@ interface SidebarMissionTabItemProps {
   mission: TestMission;
   index: number;
   isActive: boolean;
+  isInvalid?: boolean;
   totalMissions: number;
   onMissionClick: (missionPublicId: string) => void;
   onMoveMission: (fromIndex: number, toIndex: number) => void;
@@ -16,6 +17,7 @@ export function SidebarMissionTabItem({
   mission,
   index,
   isActive,
+  isInvalid,
   totalMissions,
   onMissionClick,
   onMoveMission,
@@ -45,14 +47,16 @@ export function SidebarMissionTabItem({
       className={cn(
         'flex min-h-10 w-full items-center gap-2 rounded-md border px-2 py-2 text-gray-600 transition-colors hover:bg-gray-100',
         isActive && 'border-gray-300 bg-gray-200 hover:bg-gray-200',
+        isInvalid && 'border-destructive',
       )}
     >
       <button
         onClick={handleMissionClick}
-        className="flex-1 cursor-pointer text-left font-medium wrap-break-word"
+        className="flex flex-1 cursor-pointer items-center gap-2 text-left font-medium wrap-break-word"
       >
         {displayName}
       </button>
+
       {isActive && (
         <div className="flex gap-0.5">
           <Button
