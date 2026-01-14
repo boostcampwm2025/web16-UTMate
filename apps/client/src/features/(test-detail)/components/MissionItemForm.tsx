@@ -1,4 +1,3 @@
-import { Trash2 } from 'lucide-react';
 import type { UseFormRegister, FieldErrors, FieldArrayWithId } from 'react-hook-form';
 
 import { Button } from '@/shared/components/ui/button';
@@ -13,6 +12,7 @@ import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
 
 import type { TestFormValues } from '../schemas/testForm';
+import { MissionItemDeleteButton } from './MissionItemDeleteButton';
 
 interface MissionItemFormProps {
   field: FieldArrayWithId<TestFormValues, 'missions', 'id'>;
@@ -43,15 +43,10 @@ export function MissionItemForm({
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold text-gray-700">미션 {missionIndex + 1}</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleDeleteMission}
-          className="group text-red-600 hover:bg-red-50 hover:text-red-700"
-        >
-          <Trash2 className="size-4" />
-          <span className="ml-1 hidden group-hover:inline">삭제</span>
-        </Button>
+        <MissionItemDeleteButton
+          publicId={field.publicId || ''}
+          onDeleteMission={handleDeleteMission}
+        />
       </div>
 
       <FieldGroup>
