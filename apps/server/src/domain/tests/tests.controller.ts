@@ -18,6 +18,7 @@ import { TestsService } from './tests.service';
 
 import { UserId } from '#domain/auth/decorator/param.decorator';
 import { JwtAuthGuard } from '#domain/auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '#domain/auth/guards/optional-jwt-auth.guard';
 
 @Controller('tests')
 export class TestsController {
@@ -31,8 +32,8 @@ export class TestsController {
   }
 
   @Get('/:id')
-  @UseGuards(JwtAuthGuard)
-  async getTestById(@UserId() userId: number, @Param('id') publicId: string) {
+  @UseGuards(OptionalJwtAuthGuard)
+  async getTestById(@UserId() userId: number | undefined, @Param('id') publicId: string) {
     return this.testsService.getTestById(userId, publicId);
   }
 

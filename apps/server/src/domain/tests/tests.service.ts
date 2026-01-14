@@ -53,12 +53,18 @@ export class TestsService {
     return TestSummaryDto.fromTestEntities(test);
   }
 
-  async getTestById(ownerId: number, publicId: string) {
-    const test = await this.testsRepository.findWithMissionsByPublicIdAndOwner(publicId, ownerId);
+  async getTestById(ownerId: number | undefined, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
-    return TestDto.fromTestEntity(test);
+
+    if (test.status === TestStatus.PUBLISHED) return TestDto.fromTestEntity(test);
+
+    if (test.ownerId === ownerId) {
+      return TestDto.fromTestEntity(test);
+    }
+    throw new NotFoundException('Test not found');
   }
 
   async getSdkStatus(ownerId: number, publicId: string) {
