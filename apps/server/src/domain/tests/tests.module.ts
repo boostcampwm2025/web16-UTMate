@@ -15,5 +15,6 @@ import { UsersModule } from '#domain/users/users.module';
   imports: [TypeOrmModule.forFeature([Test, Mission]), UsersModule],
   controllers: [TestsController],
   providers: [TestsService, TestsRepository, MissionsService, MissionRepository],
+  exports: [TestsService],
 })
 export class TestsModule {}
