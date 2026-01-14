@@ -1,17 +1,9 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 
 export function CompleteStep() {
-  const router = useRouter();
-
-  const handleGoBack = () => {
-    router.push('/');
-  };
-
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader>
@@ -31,9 +23,11 @@ export function CompleteStep() {
         </div>
 
         {/* 돌아가기 버튼 */}
-        <Button onClick={handleGoBack} className="w-full" size="lg">
-          홈으로 돌아가기
-        </Button>
+        <Link href="/">
+          <Button className="w-full" size="lg">
+            홈으로 돌아가기
+          </Button>
+        </Link>
       </CardContent>
     </Card>
   );
