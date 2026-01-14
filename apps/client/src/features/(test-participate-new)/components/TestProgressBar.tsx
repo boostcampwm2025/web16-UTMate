@@ -12,16 +12,18 @@ export function TestProgressBar({ currentStep, totalSteps, description }: TestPr
   const percentage = Math.round((currentStep / totalSteps) * 100);
 
   return (
-    <div className="w-full space-y-3 border-b bg-white px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <p className="text-sm font-medium">
-            {currentStep} / {totalSteps} ({percentage}%)
-          </p>
-          {description && <p className="text-muted-foreground text-xs">{description}</p>}
+    <div className="w-full border-b bg-white px-6 py-4">
+      <div className="mx-auto w-full max-w-4xl space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-sm font-medium">
+              {currentStep} / {totalSteps} ({percentage}%)
+            </p>
+            {description && <p className="text-muted-foreground text-xs">{description}</p>}
+          </div>
         </div>
+        <Progress value={percentage} className="h-2" />
       </div>
-      <Progress value={percentage} className="h-2" />
     </div>
   );
 }

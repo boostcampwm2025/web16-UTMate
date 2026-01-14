@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 
 export function CompleteStep() {
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full max-w-3xl">
       <CardHeader>
         <CardTitle className="text-center text-2xl">참여해주셔서 감사합니다!</CardTitle>
       </CardHeader>

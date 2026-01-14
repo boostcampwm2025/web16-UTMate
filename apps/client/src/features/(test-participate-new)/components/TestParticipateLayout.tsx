@@ -24,7 +24,7 @@ export function TestParticipateLayout({
         totalSteps={totalSteps}
         description={stepDescription}
       />
-      <main className="flex flex-1 items-center justify-center p-6">{children}</main>
+      <main className="flex flex-1 items-start justify-center px-6 pt-8">{children}</main>
     </div>
   );
 }

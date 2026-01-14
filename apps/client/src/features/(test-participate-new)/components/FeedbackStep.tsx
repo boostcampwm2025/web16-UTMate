@@ -18,7 +18,7 @@ export function FeedbackStep({ onSubmit }: FeedbackStepProps) {
   };
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full max-w-3xl">
       <CardHeader>
         <CardTitle className="text-2xl">테스트 완료</CardTitle>
       </CardHeader>

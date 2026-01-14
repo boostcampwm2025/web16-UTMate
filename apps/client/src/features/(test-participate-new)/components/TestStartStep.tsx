@@ -32,7 +32,7 @@ export function TestStartStep({ testInfo, onStart }: TestStartStepProps) {
   );
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full max-w-3xl">
       <CardHeader>
         <CardTitle className="text-2xl">{testInfo.title}</CardTitle>
       </CardHeader>
