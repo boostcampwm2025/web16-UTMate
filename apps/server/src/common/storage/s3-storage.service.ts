@@ -1,38 +1,65 @@
-import fs from 'fs';
-import path from 'path';
-import { Readable } from 'stream';
+import { promisify } from 'util';
 import zlib from 'zlib';
 
-import { Injectable } from '@nestjs/common';
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+import { S3_CLIENT } from './const';
+
+import { ENV_KEYS } from '#common/config/env.constants';
 
 @Injectable()
 export class S3StorageService {
-  private readonly uploadDir = path.join(process.cwd(), 's3');
-  constructor() {}
+  private readonly bucketName: string;
+  private readonly gzip = promisify(zlib.gzip);
 
-  async uploadToS3(fileName: string, content: Readable): Promise<void> {
-    // S3 업로드 로직 구현 AWS SDK 사용하여 NCP Object Storage에 업로드
-    // mvp 단계에서는 fs 기반 스토리지 사용
-    const filePath = path.join(this.uploadDir, fileName);
-    const dir = path.dirname(filePath);
+  constructor(
+    @Inject(S3_CLIENT) private readonly s3Client: S3Client,
+    @Inject() private readonly configService: ConfigService,
+  ) {
+    this.bucketName = this.configService.get<string>(ENV_KEYS.S3_BUCKET_NAME)!;
+  }
 
-    await fs.promises.mkdir(dir, { recursive: true });
+  async uploadToS3(fileName: string, content: Buffer): Promise<string> {
+    const compressed = await this.gzip(content);
+    const compressedFileName = fileName + '.gz';
 
-    // 압축
-    const gzip = zlib.createGzip();
-    const compressedStream = content.pipe(gzip);
-
-    const writeStream = fs.createWriteStream(filePath, { flags: 'a' });
-    compressedStream.pipe(writeStream);
-
-    await new Promise<void>((resolve, reject) => {
-      writeStream.on('finish', () => resolve());
-      writeStream.on('error', (error) => reject(error));
+    // S3에 업로드
+    const command = new PutObjectCommand({
+      Bucket: this.bucketName,
+      Key: compressedFileName,
+      Body: compressed,
+      ContentType: 'application/x-jsonlines',
+      ContentEncoding: 'gzip',
     });
+
+    await this.s3Client.send(command);
+
+    return compressedFileName;
+  }
+
+  async getPresignedUrl(fileName: string, expiresIn: number = 3600): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucketName,
+      Key: fileName,
+    });
+
+    return await getSignedUrl(this.s3Client, command, { expiresIn });
   }
 
   async deleteFromS3(fileName: string): Promise<void> {
-    const filePath = path.join(this.uploadDir, fileName);
-    await fs.promises.unlink(filePath);
+    const command = new DeleteObjectCommand({
+      Bucket: this.bucketName,
+      Key: fileName,
+    });
+
+    await this.s3Client.send(command);
   }
 }
