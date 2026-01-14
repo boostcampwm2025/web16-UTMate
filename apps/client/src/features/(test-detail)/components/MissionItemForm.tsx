@@ -1,6 +1,5 @@
 import type { UseFormRegister, FieldErrors, FieldArrayWithId } from 'react-hook-form';
 
-import { Button } from '@/shared/components/ui/button';
 import {
   Field,
   FieldDescription,
