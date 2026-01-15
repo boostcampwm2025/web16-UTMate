@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 import { type Test, TestStatus } from '@/features/(test-manage)/types';
 
 import { TestStatusBadge } from './TestStatusBadge';
-import { IntegrationIcon } from './IntegrationIcon';
-import { UserAvatar } from './UserAvatar';
+import { IntegrationButton } from './IntegrationButton';
+
 import { TestActionButton } from './TestActionButton';
 
 interface TestTableRowProps {
@@ -20,7 +20,7 @@ export function TestTableRow({ test }: TestTableRowProps) {
       router.push(`/tests/${test.publicId}?mode=edit`);
       return;
     } else {
-      router.push(`/dashboard/${test.publicId}`);
+      router.push(`/tests/${test.publicId}/result`);
     }
   };
 
@@ -31,25 +31,21 @@ export function TestTableRow({ test }: TestTableRowProps) {
 
   return (
     <tr onClick={handleRowClick} className="cursor-pointer transition-colors hover:bg-gray-50">
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 text-left">
         <div className="font-medium text-gray-900">{test.title}</div>
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 text-center">
         <TestStatusBadge status={test.status} />
       </td>
-      <td className="px-6 py-4">
-        <IntegrationIcon url={test.url} />
+      <td className="px-6 py-4 text-center">
+        <IntegrationButton url={test.url} testId={test.publicId} />
       </td>
-      <td className="px-6 py-4">
-        <span className="text-sm text-gray-900">-</span>
+      {/* TODO: 테스트 참여자 수 표시 */}
+      <td className="px-6 py-4 text-center">
+        <span className="cursor-pointer text-sm text-gray-900">-</span>
       </td>
-      <td className="px-6 py-4">
-        <div className="flex items-center gap-2">
-          <UserAvatar name={test.owner.username} imageUrl={test.owner.avatarUrl} />
-        </div>
-      </td>
-      <td className="px-6 py-4" onClick={handleActionClick}>
-        <TestActionButton testId={test.publicId} />
+      <td className="px-6 py-4 text-center" onClick={handleActionClick}>
+        <TestActionButton testId={test.publicId} testStatus={test.status} />
       </td>
     </tr>
   );

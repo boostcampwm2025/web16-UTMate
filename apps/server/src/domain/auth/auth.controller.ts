@@ -36,7 +36,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: this.config.get<number>(ENV_KEYS.JWT_ACCESS_EXPIRES_IN)! * 1000,
+      maxAge: this.config.get<number>(ENV_KEYS.JWT_REFRESH_EXPIRES_IN)! * 1000,
     });
 
     res.cookie('refresh_token', token.refreshToken, {
@@ -67,15 +67,15 @@ export class AuthController {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        maxAge: this.config.get<number>(ENV_KEYS.JWT_ACCESS_EXPIRES_IN)!,
+        maxAge: this.config.get<number>(ENV_KEYS.JWT_REFRESH_EXPIRES_IN)! * 1000,
       });
 
       res.cookie('refresh_token', token.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        path: '/api/auth/reissue',
-        maxAge: this.config.get<number>(ENV_KEYS.JWT_REFRESH_EXPIRES_IN)!,
+        path: '/',
+        maxAge: this.config.get<number>(ENV_KEYS.JWT_REFRESH_EXPIRES_IN)! * 1000,
       });
 
       res.sendStatus(200);
@@ -91,6 +91,7 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   async logout(@JwtPayload() payload: JwtPayloadDto, @Res() res: Response): Promise<void> {
+    await this.refreshTokenService.deleteRefreshToken(payload.sub, payload.familyId);
     res.clearCookie('access_token', { path: '/' });
     res.clearCookie('refresh_token', { path: '/api/auth/reissue' });
 

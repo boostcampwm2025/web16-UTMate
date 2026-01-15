@@ -111,7 +111,7 @@ body {
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
+  --color-sidebar: var(--background);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
@@ -130,13 +130,24 @@ body {
   }
 }
 
+/* 둥실둥실 떠다니는 애니메이션 */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
 /* Sidebar collapsed 상태에서 텍스트 완전히 숨기기 */
 @layer components {
-  [data-collapsible="icon"] [data-sidebar="menu-button"] > span:not([class*="sr-only"]) {
+  [data-collapsible='icon'] [data-sidebar='menu-button'] > span:not([class*='sr-only']) {
     display: none;
   }
 
-  [data-collapsible="icon"] [data-sidebar="menu-button"] > span[class*="ml-auto"] {
+  [data-collapsible='icon'] [data-sidebar='menu-button'] > span[class*='ml-auto'] {
     display: none;
   }
 }

@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
@@ -30,6 +31,16 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('api');
+
+  // Swagger 설정
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('UTMate API')
+    .setDescription('UTMate API Documentation')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(config.get<number>('SERVER_PORT')!);
 }

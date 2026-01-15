@@ -4,10 +4,14 @@ import * as zlib from 'zlib';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { StorageService } from '#common/storage/storage.service';
+import { TestsService } from '#domain/tests/tests.service';
 
 @Injectable()
 export class SdkService {
-  constructor(private readonly storageService: StorageService) {}
+  constructor(
+    private readonly storageService: StorageService,
+    private readonly testsService: TestsService,
+  ) {}
 
   async saveReplayLog(sessionId: string, missionId: string, stream: Readable) {
     if (!sessionId || !missionId) {
@@ -22,5 +26,9 @@ export class SdkService {
 
     // 스트림을 그대로 StorageService에 전달
     await this.storageService.save(filename, decompressedStream);
+  }
+
+  async verifySdkInstallation(testId: string) {
+    await this.testsService.verifySdkInstallationBySDK(testId);
   }
 }
