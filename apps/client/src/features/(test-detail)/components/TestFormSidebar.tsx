@@ -1,13 +1,11 @@
 'use client';
 
-import { FileText, ListTodo, Code, AlertCircle } from 'lucide-react';
-import type { FieldErrors } from 'react-hook-form';
+import { FileText, ListTodo, Code } from 'lucide-react';
 
 import type { TestMission } from '@/features/(test-manage)/types';
 import { cn } from '@/shared/utils';
 
 import { SidebarMissionTab } from './SidebarMissionTab';
-import type { TestFormValues } from '../schemas/testForm';
 
 export enum TestFormStep {
   TEST_INFO = 1,
@@ -47,7 +45,6 @@ interface TestFormSidebarProps {
   currentStep: TestFormStep;
   missions: TestMission[];
   selectedMissionIndex: number;
-  errors: FieldErrors<TestFormValues>;
   onStepChange: (step: TestFormStep) => void;
   onMissionClick: (missionPublicId: string) => void;
   onAddMission: () => void;
@@ -59,10 +56,10 @@ export function TestFormSidebar({
   currentStep,
   missions,
   selectedMissionIndex,
-  errors,
   onStepChange,
   onMissionClick,
   onAddMission,
+  onDeleteMission,
   onMoveMission,
 }: TestFormSidebarProps) {
   return (
@@ -72,14 +69,6 @@ export function TestFormSidebar({
           const isActive = currentStep === item.step;
           const isMissionStep = item.step === TestFormStep.TEST_MISSIONS;
 
-          // 유효성 검사 결과 확인
-          let isInvalid = false;
-          if (item.step === TestFormStep.TEST_INFO) {
-            isInvalid = !!(errors.title || errors.description || errors.url);
-          } else if (item.step === TestFormStep.TEST_MISSIONS) {
-            isInvalid = !!errors.missions;
-          }
-
           const handleStepChange = () => {
             onStepChange(item.step);
           };
@@ -88,15 +77,13 @@ export function TestFormSidebar({
             <div key={item.step}>
               <button
                 onClick={handleStepChange}
-                className="group flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-gray-100"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-gray-100"
               >
                 <div
                   className={cn(
                     'flex size-12 shrink-0 items-center justify-center rounded-full',
                     isActive && 'bg-primary text-white',
                     !isActive && 'bg-gray-200 text-gray-600',
-                    isInvalid && !isActive && 'bg-destructive/10 text-destructive',
-                    isInvalid && isActive && 'bg-destructive/10 text-destructive',
                   )}
                 >
                   {item.icon}
@@ -105,18 +92,13 @@ export function TestFormSidebar({
                   <h3
                     className={cn(
                       'text-lg font-bold',
-                      isActive && !isInvalid && 'text-blue-900',
-                      !isActive && !isInvalid && 'text-gray-700',
-                      isInvalid && 'text-destructive',
+                      isActive && 'text-blue-900',
+                      !isActive && 'text-gray-700',
                     )}
                   >
                     {item.title}
                   </h3>
-                  <p
-                    className={cn('truncate text-sm', isInvalid ? 'text-red-400' : 'text-gray-500')}
-                  >
-                    {isInvalid ? '필수 입력 사항을 입력해주세요' : item.description}
-                  </p>
+                  <p className="truncate text-sm text-gray-500">{item.description}</p>
                 </div>
               </button>
 
@@ -125,7 +107,6 @@ export function TestFormSidebar({
                 <SidebarMissionTab
                   missions={missions}
                   selectedMissionIndex={selectedMissionIndex}
-                  errors={errors.missions}
                   onMissionClick={onMissionClick}
                   onAddMission={onAddMission}
                   onMoveMission={onMoveMission}

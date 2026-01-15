@@ -15,8 +15,3 @@ export const JwtPayload = createParamDecorator((data, ctx) => {
 export const RtPayload = createParamDecorator((data, ctx) => {
   return ctx.switchToHttp().getRequest().user as RtPayloadDto;
 });
-
-export const UserId = createParamDecorator((data, ctx): string | undefined => {
-  const requset = ctx.switchToHttp().getRequest();
-  return requset.user?.userId;
-});

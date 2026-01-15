@@ -3,13 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-github2';
 
-import { GITHUB } from '../const';
-
 import { ENV_KEYS } from '#common/config/env.constants';
 import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
 
 @Injectable()
-export class GithubStrategy extends PassportStrategy(Strategy, GITHUB) {
+export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
   constructor(private readonly config: ConfigService) {
     super({
       clientID: config.get<string>(ENV_KEYS.GITHUB_CLIENT_ID)!,

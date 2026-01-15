@@ -4,10 +4,9 @@ import { SdkController } from './sdk.controller';
 import { SdkService } from './sdk.service';
 
 import { StorageModule } from '#common/storage/storage.module';
-import { TestsModule } from '#domain/tests/tests.module';
 
 @Module({
-  imports: [StorageModule, TestsModule],
+  imports: [StorageModule],
   controllers: [SdkController],
   providers: [SdkService],
 })

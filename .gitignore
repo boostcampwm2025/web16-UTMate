@@ -4,7 +4,3 @@ node_modules
 
 .env*
 !.env.example
-
-.pnpm-store
-
-api-collection

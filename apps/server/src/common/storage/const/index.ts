@@ -1,1 +1,1 @@
-export const S3_CLIENT = Symbol('S3_CLIENT');
+export const S3_URL = 'http://localhost:3000/storage/s3';

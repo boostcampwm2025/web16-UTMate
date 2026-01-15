@@ -1,22 +1,22 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import fs from 'fs';
+import path from 'path';
 
-import { S3StorageService } from './s3-storage.service';
+import { Controller, Get, Param, Res, StreamableFile } from '@nestjs/common';
+import type { Response } from 'express';
 
-/**
- * @description 스토리지 관련 테스트 컨트롤러 (실제 서비스용 아님)
- */
 @Controller('/storage')
 export class StorageController {
-  constructor(@Inject() private storageService: S3StorageService) {}
+  private readonly uploadDir = path.join(process.cwd(), 's3');
 
-  @Get('/file/*testFile')
-  async getTestFile(@Param('testFile') testFile: string[]) {
-    const filePath = testFile.join('/');
-    return await this.storageService.getPresignedUrl(filePath);
-  }
-
-  @Post('/file')
-  async uploadFile(@Body() body: { content: string; filename: string }) {
-    return await this.storageService.uploadToS3(body.filename, Buffer.from(body.content));
+  // S3 흉내용 엔드포인트
+  @Get('/s3/*key')
+  getFile(@Param('key') key: string[], @Res({ passthrough: true }) res: Response) {
+    res.set({
+      'Content-Type': 'application/gzip',
+      'Content-Encoding': 'gzip',
+    });
+    const filePath = path.join(this.uploadDir, ...key);
+    const fileStream = fs.createReadStream(filePath);
+    return new StreamableFile(fileStream);
   }
 }

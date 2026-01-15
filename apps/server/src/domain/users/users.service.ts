@@ -39,12 +39,12 @@ export class UsersService {
   }
 
   /**
-   * JWT 검증 후 받은 id 기반으로 사용자 요약 정보를 반환합니다.
-   * @param id 토큰을 파싱하여 나온 id
+   * 토큰 파싱 후 나온 publicId를 기반으로 사용자 요약 정보를 반환합니다.
+   * @param publicId 토큰을 파싱하여 나온 publicId
    * @returns UserSummaryDto - 사용자 요약 정보
    */
-  async getUserSummary(id: number) {
-    const user = await this.usersRepository.findSummary(id);
+  async getUserSummary(publicId: string) {
+    const user = await this.usersRepository.findSummaryByPublicId(publicId);
     if (!user) {
       throw new BadRequestException('User not found');
     }
@@ -52,11 +52,11 @@ export class UsersService {
   }
 
   /**
-   * JWT 검증 후 받은 id를 기반으로 사용자를 삭제합니다.
-   * @param id 토큰을 파싱하여 나온 id
+   * 토큰 파싱 후 나온 publicId를 기반으로 사용자를 삭제합니다.
+   * @param publicId 토큰을 파싱하여 나온 publicId
    */
-  async deleteUser(id: number) {
-    this.usersRepository.delete(id);
+  async deleteUser(publicId: string) {
+    this.usersRepository.deleteByPublicId(publicId);
   }
 
   /**

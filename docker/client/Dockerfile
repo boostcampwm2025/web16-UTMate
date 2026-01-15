@@ -7,8 +7,6 @@ WORKDIR /app
 # 빌드 시점 환경변수 선언
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_SDK_URL
-ARG NEXT_PUBLIC_GA_ID
-ARG NEXT_PUBLIC_SDK_DOMAIN
 
 # 필수 메타 파일만 먼저 복사해 의존성 캐시 활용
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./

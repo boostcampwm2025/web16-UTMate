@@ -17,9 +17,6 @@ export class TestSummaryDto {
   @IsBoolean()
   sdkStatus: boolean;
 
-  @IsString()
-  url: string;
-
   @IsObject()
   owner: UserSummaryDto;
 
@@ -31,7 +28,6 @@ export class TestSummaryDto {
     dto.title = test.title;
     dto.status = test.status;
     dto.sdkStatus = test.sdkStatus;
-    dto.url = test.url;
     dto.owner = UserSummaryDto.fromUserEntity(test.owner);
     return dto;
   }

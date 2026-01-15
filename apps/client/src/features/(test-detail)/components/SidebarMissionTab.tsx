@@ -1,16 +1,13 @@
 import { Plus } from 'lucide-react';
-import type { FieldErrors } from 'react-hook-form';
 
 import type { TestMission } from '@/features/(test-manage)/types';
 import { Button } from '@/shared/components/ui/button';
 
 import { SidebarMissionTabItem } from './SidebarMissionTabItem';
-import type { TestFormValues } from '../schemas/testForm';
 
 interface SidebarMissionTabProps {
   missions: TestMission[];
   selectedMissionIndex: number;
-  errors?: FieldErrors<TestFormValues>['missions'];
   onMissionClick: (missionPublicId: string) => void;
   onAddMission: () => void;
   onMoveMission: (fromIndex: number, toIndex: number) => void;
@@ -19,7 +16,6 @@ interface SidebarMissionTabProps {
 export function SidebarMissionTab({
   missions,
   selectedMissionIndex,
-  errors,
   onMissionClick,
   onAddMission,
   onMoveMission,
@@ -40,7 +36,6 @@ export function SidebarMissionTab({
             mission={mission}
             index={index}
             isActive={selectedMissionIndex === index}
-            isInvalid={!!errors?.[index]}
             totalMissions={missions.length}
             onMissionClick={onMissionClick}
             onMoveMission={onMoveMission}

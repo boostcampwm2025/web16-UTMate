@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
-import { GoogleAnalytics } from '@next/third-parties/google';
 
 import { QueryClientProviders } from '@/shared/providers/QueryClientProvider';
 import { MSWProvider } from '@/shared/providers/MswProvider';
-import { WebVitalsCollector } from '@/shared/components/WebVitalsCollector';
-import { ConfirmDialogProvider } from '@/shared/providers/ConfirmDialogProvider';
 
 import '@/styles/globals.css';
 
@@ -19,8 +16,8 @@ if (
 }
 
 export const metadata: Metadata = {
-  title: 'UTMate',
-  description: '당신을 위한 사용성 테스트 솔루션',
+  title: 'UT MVP',
+  description: 'User Testing MVP',
 };
 
 export default function RootLayout({
@@ -34,12 +31,6 @@ export default function RootLayout({
         <MSWProvider>
           <QueryClientProviders>{children}</QueryClientProviders>
         </MSWProvider>
-
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID as string} />
-        )}
-        {process.env.NEXT_PUBLIC_GA_ID && <WebVitalsCollector />}
-        <ConfirmDialogProvider />
       </body>
     </html>
   );

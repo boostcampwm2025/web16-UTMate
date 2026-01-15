@@ -29,8 +29,4 @@ export class MissionRepository {
     const ids = missions.map((mission) => mission.id);
     return repo.delete(ids);
   }
-
-  findByPublicId(publicId: string) {
-    return this.missionRepository.findOneBy({ publicId });
-  }
 }
