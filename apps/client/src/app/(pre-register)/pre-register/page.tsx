@@ -23,15 +23,17 @@ export default function PreRegisterPage() {
     <div className="relative h-screen w-full overflow-hidden bg-black">
       {/* 배경 */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* 그라데이션 배경 */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-[#0a1628] to-[#0d2847]" />
+        {/* 그라데이션 배경*/}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-[#1a0a28] to-[#0d2847]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[#8884fd]/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-[#8884fd]/10 to-transparent" />
 
         {/* 파티클 배경 */}
         <Particles
           particleColors={['#ffffff', '#88ccff', '#aaddff']}
-          particleCount={300}
+          particleCount={400}
           particleSpread={15}
-          speed={0.05}
+          speed={0.1}
           particleBaseSize={80}
           moveParticlesOnHover={true}
           alphaParticles={true}
@@ -77,8 +79,10 @@ export default function PreRegisterPage() {
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
           }`}
         >
-          <h1 className="mb-4 text-5xl font-bold tracking-wider text-white md:text-7xl">
-            <span className="text-primary">UT</span>Mate
+          <h1 className="mb-4 text-7xl font-bold tracking-wider text-white">
+            <span className="from-primary to-primary/70 bg-linear-to-r bg-clip-text text-transparent">
+              UTMate
+            </span>
           </h1>
           <p className="text-2xl text-white/80 md:text-4xl">
             세상에서 가장 쉬운 사용성 테스트가 온다
