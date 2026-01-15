@@ -21,7 +21,7 @@ export default function MissionResultDetailPage() {
   const participantsId = params.participantsId as string;
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 
-  // TODO: API 연동 필요 - GET /api/missionresults/:participantsId
+  // TODO: API 연동 필요 - GET /api/missionresults/:missionresultId (participantsId를 missionresultId로 전달)
   const missionResultData = {
     testId: testId,
     testTitle: '사용성 테스트 예제',
