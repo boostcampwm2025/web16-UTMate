@@ -15,6 +15,7 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { getCurrentUser, logout } from '@/features/(auth)/apis';
 import type { User } from '@/features/(auth)/types';
+import { Logo } from '@/shared/components/Logo';
 
 /**
  * GlobalNavigationBar - 로그인 후 상단 네비게이션 바
@@ -72,11 +73,8 @@ export function GlobalNavigationBar() {
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="flex h-16 items-center justify-between gap-4 px-4 lg:px-6">
         {/* 로고/서비스명 */}
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
-            <span className="text-primary-foreground text-sm font-bold">UT</span>
-          </div>
-          <span className="hidden text-lg font-bold sm:inline-block">UTMate</span>
+        <Link href="/workspace" className="flex items-center gap-2">
+          <Logo size="lg" />
         </Link>
 
         {/* 사용자 프로필 드롭다운 */}

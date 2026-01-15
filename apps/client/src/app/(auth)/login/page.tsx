@@ -1,5 +1,6 @@
 import { LoginForm } from '@/features/(auth)/components/LoginForm';
 import { UTMateCarousel } from '@/features/(auth)/components/UTMateCarousel';
+import { Logo } from '@/shared/components/Logo';
 
 export default function LoginPage() {
   return (
@@ -10,14 +11,8 @@ export default function LoginPage() {
           <div className="mx-auto w-full max-w-md space-y-8">
             {/* 로고/헤더 */}
             <div className="text-center lg:text-left">
-              <div className="mb-4 inline-flex items-center justify-center lg:justify-start">
-                {/* TODO : UTMate 로고 이미지 */}
-              </div>
               <h1 className="text-3xl font-bold tracking-tight">
-                <span className="bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                  UTMate
-                </span>{' '}
-                로그인
+                <Logo size="lg" /> 로그인
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
                 GitHub 계정으로 간편하게 시작하세요

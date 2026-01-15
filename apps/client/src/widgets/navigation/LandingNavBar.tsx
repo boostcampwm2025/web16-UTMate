@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/shared/components/ui/button';
+import { Logo } from '@/shared/components/Logo';
 
 /**
  * LandingNavBar - 랜딩 페이지 전용 네비게이션 바
@@ -17,10 +18,7 @@ export function LandingNavBar() {
       <div className="flex h-16 items-center justify-between px-4 lg:px-6">
         {/* 로고/서비스명 */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
-            <span className="text-primary-foreground text-sm font-bold">UT</span>
-          </div>
-          <span className="text-lg font-bold">UTMate</span>
+          <Logo size="lg" />
         </Link>
 
         {/* 로그인 버튼 */}
