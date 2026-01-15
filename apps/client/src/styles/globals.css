@@ -130,6 +130,17 @@ body {
   }
 }
 
+/* 둥실둥실 떠다니는 애니메이션 */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
 /* Sidebar collapsed 상태에서 텍스트 완전히 숨기기 */
 @layer components {
   [data-collapsible='icon'] [data-sidebar='menu-button'] > span:not([class*='sr-only']) {

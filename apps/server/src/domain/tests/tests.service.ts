@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, NotFoundException } from '@nes
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
-import { TestDto } from './dto/test.dto';
+import { TestDto, TestWithProgressDto } from './dto/test.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
@@ -10,14 +10,14 @@ import { MissionsService } from './missions.service';
 import { TestsRepository } from './tests.repository';
 
 import { ENV_KEYS } from '#common/config/env.constants';
-import { UsersService } from '#domain/users/users.service';
+import { ParticipantsService } from '#domain/participants/participants.service';
 
 @Injectable()
 export class TestsService {
   constructor(
     @Inject() private readonly testsRepository: TestsRepository,
-    @Inject() private readonly usersService: UsersService,
     @Inject() private readonly missionsService: MissionsService,
+    @Inject() private readonly participantsService: ParticipantsService,
     @Inject() private readonly dataSource: DataSource,
     @Inject() private readonly configService: ConfigService,
   ) {}
@@ -53,12 +53,18 @@ export class TestsService {
     return TestSummaryDto.fromTestEntities(test);
   }
 
-  async getTestById(ownerId: number, publicId: string) {
-    const test = await this.testsRepository.findWithMissionsByPublicIdAndOwner(publicId, ownerId);
+  async getTestById(ownerId: number | undefined, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
-    return TestDto.fromTestEntity(test);
+
+    if (test.status === TestStatus.PUBLISHED) return TestDto.fromTestEntity(test);
+
+    if (test.ownerId === ownerId) {
+      return TestDto.fromTestEntity(test);
+    }
+    throw new NotFoundException('Test not found');
   }
 
   async getSdkStatus(ownerId: number, publicId: string) {
@@ -137,5 +143,34 @@ export class TestsService {
     if (affectedRows === 0) {
       throw new NotFoundException('Test not found');
     }
+  }
+
+  async findIdByPublicId(testId: string) {
+    const tests = await this.testsRepository.findIdByPublicId(testId);
+    if (!tests) {
+      throw new NotFoundException('Test not found');
+    }
+    return tests.id;
+  }
+
+  async createParticipant(userId: number | undefined, publicId: string) {
+    const test = await this.testsRepository.findIdByPublicId(publicId);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    if (test.status !== TestStatus.PUBLISHED) {
+      throw new BadRequestException('Test is not published');
+    }
+    return this.participantsService.createParticipant(userId, test.id);
+  }
+
+  async getTestWithParticipantInfo(publicId: string, participantId: string) {
+    const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    const participantMissionProgress =
+      await this.participantsService.getparticipantMissionProgress(participantId);
+    return TestWithProgressDto.fromTestEntityWithProgress(test, participantMissionProgress);
   }
 }
