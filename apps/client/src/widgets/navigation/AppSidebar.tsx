@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarTrigger,
+  useSidebar,
 } from '@/shared/components/ui/sidebar';
 
 /**
@@ -72,6 +73,8 @@ const navItems: NavItem[] = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { state } = useSidebar();
+  const isCollapsed = state === 'collapsed';
 
   return (
     <Sidebar collapsible="icon" className="bg-background">
@@ -138,7 +141,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              tooltip="사이드바 열기/닫기"
+              tooltip={isCollapsed ? '열기' : '닫기'}
               asChild
               className="border-input hover:bg-accent hover:text-accent-foreground h-8 w-8 justify-center border bg-transparent"
             >
