@@ -62,11 +62,6 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
-
-        {/* 오른쪽: UTMate Carousel */}
-        <div className="from-primary/5 via-background to-secondary/5 hidden bg-linear-to-br lg:block">
-          <UTMateCarousel />
-        </div>
       </div>
 
       <UTMateCarousel />
