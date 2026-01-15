@@ -16,6 +16,7 @@ export class ParticipantsService {
   async createParticipant(userId: number | undefined, createParticipantDto: CreateParticipantDto) {
     const testId = await this.testsService.findIdByPublicId(createParticipantDto.testId);
     const participant = Participant.create(userId, testId);
-    return this.participantsRepository.save(participant);
+    const savedParticipant = await this.participantsRepository.save(participant);
+    return savedParticipant.publicId;
   }
 }
