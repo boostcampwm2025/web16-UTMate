@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 
-import { MissionProgressDto } from './dto/mission-progress.dto';
+import { MissionProgressDto, MissionProgressDtoV2 } from './dto/mission-progress.dto';
 import { Participant } from './entities/participant.entity';
 import { ParticipantStatus } from './enums';
 import { ParticipantsRepository } from './participants.repository';
@@ -36,5 +36,17 @@ export class ParticipantsService {
     }
 
     return MissionProgressDto.fromMissionResults(participant.missionResults);
+  }
+
+  async getMissionProgress(publicId: string) {
+    const participant =
+      await this.participantsRepository.findByPublicIdWithMissionResultsAndMission(publicId);
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
+    }
+    if (participant.status === ParticipantStatus.COMPLETED) {
+      throw new BadRequestException('참가자는 이미 테스트를 완료한 상태입니다.');
+    }
+    return MissionProgressDtoV2.fromMissionResults(participant.missionResults);
   }
 }

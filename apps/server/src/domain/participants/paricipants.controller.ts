@@ -1,4 +1,4 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, Param } from '@nestjs/common';
 
 import { ParticipantsService } from './participants.service';
 
@@ -6,8 +6,8 @@ import { ParticipantsService } from './participants.service';
 export class ParticipantsController {
   constructor(@Inject() private readonly participantsService: ParticipantsService) {}
 
-  @Get()
-  async getParticipants() {
-    //TODO 이어하기를 위한 정보 반환
+  @Get('/:id')
+  async getMissionProgress(@Param('id') publicId: string) {
+    return this.participantsService.getMissionProgress(publicId);
   }
 }

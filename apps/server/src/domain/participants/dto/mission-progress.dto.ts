@@ -24,3 +24,27 @@ export class MissionProgressDto {
     return dto;
   }
 }
+
+export class MissionProgressDtoV2 {
+  finishedMissionCount: number = 0;
+  isPendingMissionExist: boolean = false;
+  pendingMissionId?: string;
+
+  constructor() {}
+
+  static fromMissionResults(missionResults: MissionResult[]) {
+    const dto = new MissionProgressDtoV2();
+    dto.finishedMissionCount = missionResults.filter(
+      (result) =>
+        result.status === MissionResultStatus.SUCCESS ||
+        result.status === MissionResultStatus.FAILED,
+    ).length;
+    missionResults.forEach((result) => {
+      if (result.status === MissionResultStatus.PENDING) {
+        dto.isPendingMissionExist = true;
+        dto.pendingMissionId = result.mission.publicId;
+      }
+    });
+    return dto;
+  }
+}

@@ -22,10 +22,18 @@ export class ParticipantsRepository {
       .getOne();
   }
 
-  findByPublicIdWithMissionResults(publicId: string) {
+  async findByPublicIdWithMissionResults(publicId: string) {
     return this.participantsRepository
       .createQueryBuilder('participant')
       .leftJoinAndSelect('participant.missionResults', 'missionResults')
+      .where('participant.publicId = :publicId', { publicId })
+      .getOne();
+  }
+  async findByPublicIdWithMissionResultsAndMission(publicId: string) {
+    return this.participantsRepository
+      .createQueryBuilder('participant')
+      .leftJoinAndSelect('participant.missionResults', 'missionResults')
+      .leftJoinAndSelect('missionResults.mission', 'mission')
       .where('participant.publicId = :publicId', { publicId })
       .getOne();
   }
