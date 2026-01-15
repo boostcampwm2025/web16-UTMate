@@ -17,12 +17,13 @@ interface EventLog {
 
 export default function MissionResultDetailPage() {
   const params = useParams();
-  const missionResultId = params.missionResultId as string;
+  const testId = params.id as string;
+  const participantsId = params.participantsId as string;
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 
-  // TODO: API 연동 필요 - GET /api/missionresults/:missionResultId
+  // TODO: API 연동 필요 - GET /api/missionresults/:participantsId
   const missionResultData = {
-    testId: 1,
+    testId: testId,
     testTitle: '사용성 테스트 예제',
     missionId: 1,
     missionTitle: '로그인하기',
@@ -119,7 +120,7 @@ export default function MissionResultDetailPage() {
       <header className="border-b bg-white px-6 py-4">
         <div className="flex items-center gap-3">
           <Button variant="outline" size="icon" asChild>
-            <Link href={`/tests/${missionResultData.testId}/result`}>
+            <Link href={`/tests/${testId}/result`}>
               <ArrowLeft />
             </Link>
           </Button>

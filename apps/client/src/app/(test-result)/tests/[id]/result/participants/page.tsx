@@ -103,8 +103,8 @@ export default function ParticipantsResultsPage() {
     }
   };
 
-  const handleMissionClick = (missionResultId: number) => {
-    window.location.href = `/missionresults/${missionResultId}`;
+  const handleMissionClick = (participantsId: number) => {
+    window.location.href = `/tests/${testId}/result/mission-result/${participantsId}`;
   };
 
   return (

@@ -145,8 +145,8 @@ export default function MissionResultsPage() {
                         key={log.id}
                         className="cursor-pointer border-b transition-colors hover:bg-gray-50"
                         onClick={() => {
-                          // TODO: missionResultId를 실제 API 응답에서 가져와야 함
-                          window.location.href = `/missionresults/${log.id}`;
+                          // TODO: participantsId를 실제 API 응답에서 가져와야 함
+                          window.location.href = `/tests/${testId}/result/mission-result/${log.id}`;
                         }}
                       >
                         <td className="px-4 py-3 text-sm">{log.userId}</td>
