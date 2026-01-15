@@ -27,7 +27,7 @@ export async function getTestForParticipation(testId: string): Promise<TestInfo 
 
 // 1. 테스트 시작 (시작 버튼 클릭)
 export async function startTestParticipation(testId: string): Promise<{ participantId: string }> {
-  const response = await fetch(`${API_BASE_URL}/participants`, {
+  const response = await fetch(`${API_BASE_URL}/tests/${testId}/participants`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -36,7 +36,10 @@ export async function startTestParticipation(testId: string): Promise<{ particip
     body: JSON.stringify({ testId }),
   });
 
+  console.log('startTestParticipation response', response);
+
   if (!response.ok) {
+    console.log(response.ok);
     throw new Error('Failed to start test participation');
   }
 
@@ -51,7 +54,7 @@ export async function startTestParticipation(testId: string): Promise<{ particip
 // 2. 미션 시작 (미션 수행 페이지 열기)
 export async function startMission(
   missionId: string,
-  participantId: string
+  participantId: string,
 ): Promise<{ id: string }> {
   const response = await fetch(`${API_BASE_URL}/missionResult`, {
     method: 'POST',
@@ -94,7 +97,7 @@ export async function finishMissionRecording(missionResultId: string): Promise<v
 export async function submitMissionResult(
   missionResultId: string,
   status: 'SUCCESS' | 'FAILED',
-  feedback?: string
+  feedback?: string,
 ): Promise<void> {
   const body: { status: string; feedback?: string } = { status };
   if (feedback) {
@@ -118,7 +121,7 @@ export async function submitMissionResult(
 // 5. 테스트 완료 (제출하기 버튼 클릭)
 export async function completeTestParticipation(
   participantId: string,
-  overallFeedback: string
+  overallFeedback: string,
 ): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/participants/${participantId}`, {
     method: 'PATCH',
@@ -142,9 +145,7 @@ export async function completeTestParticipation(
 
 // 6. 세션 복원 (페이지 새로고침 시 진행 상황 조회)
 // TODO: 백엔드 API 준비 필요 - GET /participants/:participantId/progress
-export async function getParticipantProgress(
-  participantId: string
-): Promise<TestSession | null> {
+export async function getParticipantProgress(participantId: string): Promise<TestSession | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/participants/${participantId}/progress`, {
       credentials: 'include',

@@ -47,25 +47,7 @@ export default function LoginPage() {
                 에 동의하는 것으로 간주됩니다.
               </p>
             </div>
-
-            {/* 푸터 텍스트 */}
-            <p className="text-muted-foreground text-center text-xs lg:text-left">
-              로그인하면{' '}
-              <a href="#" className="text-primary hover:underline">
-                서비스 약관
-              </a>
-              과{' '}
-              <a href="#" className="text-primary hover:underline">
-                개인정보 처리방침
-              </a>
-              에 동의하는 것으로 간주됩니다.
-            </p>
           </div>
-        </div>
-
-        {/* 오른쪽: UTMate Carousel */}
-        <div className="from-primary/5 via-background to-secondary/5 hidden bg-linear-to-br lg:block">
-          <UTMateCarousel />
         </div>
       </div>
 

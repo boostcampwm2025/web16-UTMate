@@ -88,4 +88,8 @@ export class TestsRepository {
       .where('tests.publicId = :publicId', { publicId })
       .getOne();
   }
+
+  async findByPublicId(publicId: string) {
+    return this.testsRepository.findOneBy({ publicId });
+  }
 }

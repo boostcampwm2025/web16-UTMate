@@ -94,7 +94,7 @@ export class TestsController {
 
   @Post('/:id/participants')
   @UseGuards(OptionalJwtAuthGuard)
-  async getParticipants(@UserId() userId: number | undefined, @Param('id') publicId: string) {
+  async createParticipant(@UserId() userId: number | undefined, @Param('id') publicId: string) {
     return this.testsService.createParticipant(userId, publicId);
   }
 }

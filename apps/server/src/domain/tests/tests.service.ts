@@ -154,7 +154,7 @@ export class TestsService {
   }
 
   async createParticipant(userId: number | undefined, publicId: string) {
-    const test = await this.testsRepository.findIdByPublicId(publicId);
+    const test = await this.testsRepository.findByPublicId(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
