@@ -44,6 +44,7 @@ export const useConfirmStore = create<ConfirmState>((set) => ({
         confirmText: options?.confirmText ?? '확인',
         isAlert: options?.isAlert ?? false,
         onConfirm: () => {
+          set({ isOpen: false });
           resolve(true);
         },
         onCancel: () => {
