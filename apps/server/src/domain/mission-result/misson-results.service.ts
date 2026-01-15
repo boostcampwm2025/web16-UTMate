@@ -27,7 +27,12 @@ export class MissionResultsService {
    * @returns publicId
    */
   async createMissionResult(missionId: number, participantId: number) {
-    // missionId 유효성 검사 등 추가 로직 필요
+    const existsPendingMission =
+      await this.missionResultsRepository.existsPendingMissionByParticipantId(participantId);
+    if (existsPendingMission) {
+      throw new BadRequestException('이미 진행 중인 미션이 존재합니다. 완료 후 다시 시도해주세요.');
+    }
+
     const missionResult = MissionResult.start(missionId, participantId);
     const savedMissionResult = await this.missionResultsRepository.save(missionResult);
     return { missionResultId: savedMissionResult.publicId };

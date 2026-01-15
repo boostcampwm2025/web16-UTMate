@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { MissionResult } from './entities/mission-result.entity';
+import { MissionResult, MissionResultStatus } from './entities/mission-result.entity';
 
 @Injectable()
 export class MissionResultsRepository {
@@ -19,5 +19,20 @@ export class MissionResultsRepository {
       .createQueryBuilder('missionResult')
       .where('missionResult.publicId = :publicId', { publicId })
       .getOne();
+  }
+
+  async findByParticipantId(participantId: number) {
+    return this.repository
+      .createQueryBuilder('missionResult')
+      .where('missionResult.participant_id = :participantId', { participantId })
+      .getMany();
+  }
+
+  async existsPendingMissionByParticipantId(participantId: number) {
+    return await this.repository
+      .createQueryBuilder('missionResult')
+      .where('missionResult.participant_id = :participantId', { participantId })
+      .andWhere('missionResult.status = :status', { status: MissionResultStatus.PENDING })
+      .getExists();
   }
 }
