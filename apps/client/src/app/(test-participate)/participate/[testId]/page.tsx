@@ -11,6 +11,8 @@ import { TestParticipateLayout } from '@/features/(test-participate)/components/
 import { TestStartStep } from '@/features/(test-participate)/components/TestStartStep';
 import { useTestParticipateStore } from '@/features/(test-participate)/stores/useTestParticipateStore';
 import type { TestInfo } from '@/features/(test-participate)/types';
+import { CLIENT_BASE_URL } from '@/shared/constants/api';
+import { getTestForParticipation, startTestParticipation } from '@/features/(test-participate)/api';
 
 // TODO: 백엔드 API 준비되면 제거
 const MOCK_TEST: TestInfo = {
@@ -49,8 +51,7 @@ export default function TestParticipatePage() {
   const { data: testInfo } = useQuery({
     queryKey: ['test', testId],
     queryFn: async () => {
-      // 임시로 Mock 데이터 반환
-      return MOCK_TEST;
+      return getTestForParticipation(testId);
     },
   });
 
@@ -65,8 +66,7 @@ export default function TestParticipatePage() {
   // TODO: 백엔드 API 준비되면 startTestParticipation(testId) 사용
   const startTestMutation = useMutation({
     mutationFn: async () => {
-      // 임시로 Mock 데이터 반환
-      return { participantId: `participant-${Date.now()}` };
+      return await startTestParticipation(testId);
     },
     onSuccess: (data) => {
       startTest(data.participantId);
