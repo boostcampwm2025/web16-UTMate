@@ -88,7 +88,10 @@ export function TestForm({ initialData }: TestFormProps) {
               )}
 
               {step === TestFormStep.TEST_SDK && (
-                <TestSdkStep testPublicId={initialData.publicId} />
+                <TestSdkStep
+                  testId={initialData.publicId}
+                  initialSdkStatus={initialData.sdkStatus}
+                />
               )}
             </div>
           </div>

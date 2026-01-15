@@ -4,6 +4,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import { QueryClientProviders } from '@/shared/providers/QueryClientProvider';
 import { MSWProvider } from '@/shared/providers/MswProvider';
 import { WebVitalsCollector } from '@/shared/components/WebVitalsCollector';
+import { ConfirmDialogProvider } from '@/shared/providers/ConfirmDialogProvider';
 
 import '@/styles/globals.css';
 
@@ -35,6 +36,7 @@ export default function RootLayout({
         </MSWProvider>
         <WebVitalsCollector />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID as string} />
+        <ConfirmDialogProvider />
       </body>
     </html>
   );
