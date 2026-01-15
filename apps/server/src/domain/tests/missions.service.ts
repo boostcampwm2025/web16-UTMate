@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
 import { UpdateMissionDto } from './dto/update-mission.dto';
@@ -6,9 +6,16 @@ import { Mission } from './entities/mission.entity';
 import { Test } from './entities/test.entity';
 import { MissionRepository } from './missions.repository';
 
+import { MissionResultsService } from '#domain/mission-result/misson-results.service';
+import { ParticipantsService } from '#domain/participants/participants.service';
+
 @Injectable()
 export class MissionsService {
-  constructor(@Inject() private readonly missionRepository: MissionRepository) {}
+  constructor(
+    @Inject() private readonly missionRepository: MissionRepository,
+    @Inject() private readonly participantsService: ParticipantsService,
+    @Inject() private readonly missionResultsService: MissionResultsService,
+  ) {}
 
   async updateMissions(test: Test, updateMissionDtos: UpdateMissionDto[], manager?: EntityManager) {
     const missions = await this.missionRepository.findAllByTest(test, manager);
@@ -34,5 +41,14 @@ export class MissionsService {
     if (saveMissions.length > 0) await this.missionRepository.saveAll(saveMissions, manager);
     // 참조되지 않는 미션 삭제
     if (deleteMissions.length > 0) await this.missionRepository.deleteAll(deleteMissions, manager);
+  }
+
+  async createMissionResult(publicId: string, participantId: string) {
+    const mission = await this.missionRepository.findByPublicId(publicId);
+    if (!mission) {
+      throw new BadRequestException('Mission not found');
+    }
+    const participantPkId = await this.participantsService.findIdByPublicId(participantId);
+    return this.missionResultsService.createMissionResult(mission.id, participantPkId);
   }
 }

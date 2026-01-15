@@ -15,21 +15,21 @@ export class TokenService {
 
   /**
    * Access Token, Refresh Token 쌍을 생성합니다.
-   * @param publicId payload 내 sub로 사용됩니다.
+   * @param sub payload 내 sub로 사용됩니다.
    * @param familyId payload 내 familyId로 사용됩니다.
    * @returns TokenDto
    */
-  async generateTokenPair(publicId: string, familyId: string): Promise<TokenDto> {
+  async generateTokenPair(sub: string, familyId: string): Promise<TokenDto> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
-        { sub: publicId, familyId },
+        { sub, familyId },
         {
           secret: this.config.get<string>(ENV_KEYS.JWT_ACCESS_SECRET)!,
           expiresIn: this.config.get<number>(ENV_KEYS.JWT_ACCESS_EXPIRES_IN)!,
         },
       ),
       this.jwtService.signAsync(
-        { sub: publicId, familyId },
+        { sub, familyId },
         {
           secret: this.config.get<string>(ENV_KEYS.JWT_REFRESH_SECRET)!,
           expiresIn: this.config.get<number>(ENV_KEYS.JWT_REFRESH_EXPIRES_IN)!,

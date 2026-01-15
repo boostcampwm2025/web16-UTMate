@@ -24,6 +24,18 @@ services:
     volumes:
       - redis_data:/data
 
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      # nginx 설정 파일 매핑
+      - ./dev/nginx.conf:/etc/nginx/nginx.conf:ro
+      #sdk 빌드 결과 폴더 매핑
+      - ./apps/sdk/dist:/usr/share/nginx/html/sdk
+
 volumes:
   mysql_data:
   redis_data:

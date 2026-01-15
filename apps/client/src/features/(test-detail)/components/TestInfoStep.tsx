@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/shared/components/ui/button';
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import {
   Field,
   FieldDescription,
@@ -11,39 +11,14 @@ import {
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
 
+import type { TestFormValues } from '../schemas/testForm';
+
 interface TestInfoStepProps {
-  title: string;
-  description: string;
-  url: string;
-  error: string;
-  onTitleChange: (value: string) => void;
-  onDescriptionChange: (value: string) => void;
-  onUrlChange: (value: string) => void;
-  onNext: () => void | Promise<void>;
+  register: UseFormRegister<TestFormValues>;
+  errors: FieldErrors<TestFormValues>;
 }
 
-export function TestInfoStep({
-  title,
-  description,
-  url,
-  error,
-  onTitleChange,
-  onDescriptionChange,
-  onUrlChange,
-  onNext,
-}: TestInfoStepProps) {
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onTitleChange(e.target.value);
-  };
-
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onDescriptionChange(e.target.value);
-  };
-
-  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUrlChange(e.target.value);
-  };
-
+export function TestInfoStep({ register, errors }: TestInfoStepProps) {
   return (
     <div className="space-y-8">
       <div>
@@ -52,52 +27,44 @@ export function TestInfoStep({
       </div>
 
       <FieldGroup>
-        <Field data-invalid={!!error}>
+        <Field data-invalid={!!errors.title}>
           <FieldLabel htmlFor="test-title">테스트 이름 *</FieldLabel>
           <Input
             id="test-title"
             placeholder="예: 주식모으기 서비스 테스트"
-            value={title}
-            onChange={handleTitleChange}
-            aria-invalid={!!error}
+            {...register('title')}
+            aria-invalid={!!errors.title}
             autoComplete="off"
           />
           <FieldDescription>테스트를 식별할 수 있는 이름을 입력해주세요.</FieldDescription>
-          {error && <FieldError>{error}</FieldError>}
+          {errors.title && <FieldError>{errors.title.message}</FieldError>}
         </Field>
 
-        <Field>
+        <Field data-invalid={!!errors.description}>
           <FieldLabel htmlFor="test-description">테스트 설명</FieldLabel>
           <Textarea
             id="test-description"
             placeholder="테스트에 대한 설명을 입력해주세요."
-            value={description}
-            onChange={handleDescriptionChange}
+            {...register('description')}
             rows={3}
           />
           <FieldDescription>테스트의 목적과 내용을 간단히 설명해주세요.</FieldDescription>
+          {errors.description && <FieldError>{errors.description.message}</FieldError>}
         </Field>
 
-        <Field>
+        <Field data-invalid={!!errors.url}>
           <FieldLabel htmlFor="test-url">서비스 URL *</FieldLabel>
           <Input
             id="test-url"
             placeholder="https://www.utmate.me"
-            value={url}
-            onChange={handleUrlChange}
+            {...register('url')}
             autoComplete="off"
-            required
+            aria-invalid={!!errors.url}
           />
-          <FieldDescription>
-            테스트할 서비스의 URL을 입력해주세요.
-          </FieldDescription>
+          <FieldDescription>테스트할 서비스의 URL을 입력해주세요.</FieldDescription>
+          {errors.url && <FieldError>{errors.url.message}</FieldError>}
         </Field>
       </FieldGroup>
-
-      {/* 네비게이션 버튼 */}
-      <div className="flex justify-end border-t pt-6">
-        <Button onClick={() => void onNext()}>다음</Button>
-      </div>
     </div>
   );
 }
