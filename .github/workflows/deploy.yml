@@ -27,6 +27,8 @@ jobs:
             dockerfile: docker/client/Dockerfile
             build-args: |
               NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+              NEXT_PUBLIC_SDK_DOMAIN=${{ vars.NEXT_PUBLIC_SDK_DOMAIN }}
+              NEXT_PUBLIC_GA_ID=${{ vars.NEXT_PUBLIC_GA_ID }}
 
     steps:
       - name: Checkout code
