@@ -13,4 +13,12 @@ export class ParticipantsRepository {
   async save(participant: Participant) {
     return this.participantsRepository.save(participant);
   }
+
+  async findByPublicId(ParticipantId: string) {
+    return this.participantsRepository
+      .createQueryBuilder('participant')
+      .select('participant.id')
+      .where('participant.publicId = :publicId', { publicId: ParticipantId })
+      .getOne();
+  }
 }

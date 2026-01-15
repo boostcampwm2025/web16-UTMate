@@ -1,7 +1,5 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 
-import { CreateMissionResultDto } from './dtos/create-mission-result.dto';
-import { MissionResultDto } from './dtos/mission-result.dto';
 import { UpdateMissionResultDto } from './dtos/update-mission-result.dto';
 import { MissionResultsService } from './misson-results.service';
 
@@ -9,28 +7,21 @@ import { MissionResultsService } from './misson-results.service';
 export class MissionResultsController {
   constructor(private readonly missionResultsService: MissionResultsService) {}
 
-  @Get()
-  async getMissionResults(@Query('mission-id') missionId: string) {
-    return await this.missionResultsService.getMissionResults(missionId);
+  @Get('/:id')
+  async getMissionResult(@Param('id') _publicId: string) {
+    // todo 대시 보드용 미션 결과 상세 조회
   }
 
-  @Get('/:missionResultId')
-  async getMissionResult(@Param('missionResultId', ParseIntPipe) missionResultId: number) {
-    return await this.missionResultsService.getMissionResult(missionResultId);
+  @Post('/:id/record')
+  async createMissionResultRecord(@Param('id') publicId: string) {
+    return this.missionResultsService.createMissionResultRecord(publicId);
   }
 
-  @Post()
-  async createMissionResult(
-    @Body() createMissionResultDto: CreateMissionResultDto,
-  ): Promise<MissionResultDto> {
-    return await this.missionResultsService.createMissionResult(createMissionResultDto);
-  }
-
-  @Patch('/:missionResultId')
+  @Patch('/:id')
   async completeMissionResult(
-    @Param('missionResultId', ParseIntPipe) missionResultId: number,
+    @Param('id') publicId: string,
     @Body() updateMissionResultDto: UpdateMissionResultDto,
   ) {
-    return this.missionResultsService.updateMissionResult(missionResultId, updateMissionResultDto);
+    return this.missionResultsService.updateMissionResult(publicId, updateMissionResultDto);
   }
 }

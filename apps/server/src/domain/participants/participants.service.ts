@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { Participant } from './entities/participant.entity';
 import { ParticipantsRepository } from './participants.repository';
@@ -11,5 +11,13 @@ export class ParticipantsService {
     const participant = Participant.create(userId, testId);
     const savedParticipant = await this.participantsRepository.save(participant);
     return { participantId: savedParticipant.publicId };
+  }
+
+  async findIdByPublicId(ParticipantId: string) {
+    const participant = await this.participantsRepository.findByPublicId(ParticipantId);
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
+    }
+    return participant.id;
   }
 }

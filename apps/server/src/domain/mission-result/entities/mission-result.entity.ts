@@ -1,11 +1,20 @@
 import { nanoid } from 'nanoid';
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+
+import { Participant } from '#domain/participants/entities/participant.entity';
+import { Mission } from '#domain/tests/entities/mission.entity';
 
 export enum MissionResultStatus {
   PENDING = 'PENDING',
-  COMPLETED = 'COMPLETED',
+  SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
-  SKIPPED = 'SKIPPED',
 }
 
 @Entity('mission_results')
@@ -16,11 +25,19 @@ export class MissionResult {
   @Column({ unique: true, name: 'public_id', length: 21 })
   publicId: string;
 
-  @Column({ name: 'participant_id' })
-  participantId: string;
+  @ManyToOne(() => Mission, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'mission_id' })
+  mission: Mission;
 
   @Column({ name: 'mission_id' })
-  missionId: string;
+  missionId: number;
+
+  @ManyToOne(() => Participant, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'participant_id' })
+  participant: Participant;
+
+  @Column({ name: 'participant_id' })
+  participantId: number;
 
   @Column({ type: 'enum', enum: MissionResultStatus, default: MissionResultStatus.PENDING })
   status: MissionResultStatus;
@@ -46,41 +63,28 @@ export class MissionResult {
   @Column({ nullable: true })
   filename?: string;
 
-  private constructor(participantId: string, missionId: string) {
-    this.participantId = participantId;
+  private constructor(missionId: number, participantId: number) {
     this.missionId = missionId;
+    this.participantId = participantId;
     this.status = MissionResultStatus.PENDING;
     this.duration = 0;
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
 
-  static start(participantId: string, missionId: string): MissionResult {
-    return new MissionResult(participantId, missionId);
-  }
-
-  complete(feedback?: string) {
-    this.status = MissionResultStatus.COMPLETED;
-    this.duration = Date.now() - this.createdAt.getTime();
-    this.feedback = feedback;
-    this.updatedAt = new Date();
-  }
-
-  fail(feedback?: string) {
-    this.status = MissionResultStatus.FAILED;
-    this.duration = Date.now() - this.createdAt.getTime();
-    this.feedback = feedback;
-    this.updatedAt = new Date();
-  }
-
-  skip() {
-    this.status = MissionResultStatus.SKIPPED;
-    this.duration = Date.now() - this.createdAt.getTime();
-    this.updatedAt = new Date();
+  static start(missionId: number, participantId: number): MissionResult {
+    return new MissionResult(missionId, participantId);
   }
 
   recordUploadedFile(filename: string) {
     this.filename = filename;
+  }
+
+  complete(status: MissionResultStatus, feedback?: string) {
+    this.status = status;
+    if (feedback) {
+      this.feedback = feedback;
+    }
   }
 
   @BeforeInsert()
