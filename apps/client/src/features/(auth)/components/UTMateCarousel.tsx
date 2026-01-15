@@ -28,8 +28,8 @@ const slides = [
     image: '/images/voice.png',
   },
   {
-    title: '데이터로 보여주세요',
-    description: '사용자의 행동 패턴을 분석하여 서비스의 개선점을 찾아내세요.',
+    title: '데이터로 말하세요',
+    description: '로그, 세션 리플레이로 정량적으로 데이터를 분석하세요.',
     image: '/images/developer.png',
   },
 ];
