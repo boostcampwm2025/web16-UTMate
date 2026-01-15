@@ -1,4 +1,4 @@
-import type { TestInfo } from '../types';
+import type { TestInfo, TestSession } from '../types';
 
 import { CLIENT_BASE_URL as API_BASE_URL } from '@/shared/constants/api';
 
@@ -138,4 +138,53 @@ export async function completeTestParticipation(
 
   // 로컬스토리지에서 participantId 제거
   localStorage.removeItem('participantId');
+}
+
+// 6. 세션 복원 (페이지 새로고침 시 진행 상황 조회)
+// TODO: 백엔드 API 준비 필요 - GET /participants/:participantId/progress
+export async function getParticipantProgress(
+  participantId: string
+): Promise<TestSession | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/participants/${participantId}/progress`, {
+      credentials: 'include',
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      throw new Error('Failed to fetch participant progress');
+    }
+
+    const data = await response.json();
+
+    // 백엔드 응답을 TestSession 형태로 변환
+    // 예상 응답 형태:
+    // {
+    //   participantId: string;
+    //   status: 'in_progress' | 'complete';
+    //   currentMissionIndex: number;
+    //   missionResults: [{ missionPublicId, completed, feedback }];
+    //   overallFeedback?: string;
+    // }
+    const session: TestSession = {
+      currentStep:
+        data.status === 'complete'
+          ? 'complete'
+          : data.currentMissionIndex === -1
+            ? 'feedback'
+            : 'mission',
+      currentMissionIndex: Math.max(0, data.currentMissionIndex),
+      missionResults: data.missionResults || [],
+      overallFeedback: data.overallFeedback,
+      participantId: data.participantId,
+    };
+
+    return session;
+  } catch (error) {
+    console.error('Error fetching participant progress:', error);
+    return null;
+  }
 }
