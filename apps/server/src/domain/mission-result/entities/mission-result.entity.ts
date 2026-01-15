@@ -1,92 +1,59 @@
-import { nanoid } from 'nanoid';
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+export enum MissionResultStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  SKIPPED = 'SKIPPED',
+}
 
-import { MissionResultStatus } from '../enums';
-
-import { Participant } from '#domain/participants/entities/participant.entity';
-import { Mission } from '#domain/tests/entities/mission.entity';
-
-@Entity('mission_results')
 export class MissionResult {
-  @PrimaryGeneratedColumn()
   id: number;
+  participantId: string;
+  missionId: string;
 
-  @Column({ unique: true, name: 'public_id', length: 21 })
-  publicId: string;
-
-  @ManyToOne(() => Mission, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'mission_id' })
-  mission: Mission;
-
-  @Column({ name: 'mission_id' })
-  missionId: number;
-
-  @ManyToOne(() => Participant, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'participant_id' })
-  participant: Participant;
-
-  @Column({ name: 'participant_id' })
-  participantId: number;
-
-  @Column({ type: 'enum', enum: MissionResultStatus, default: MissionResultStatus.PENDING })
   status: MissionResultStatus;
+  duration: number;
+  feedback: string | undefined;
 
-  @Column({ type: 'int', nullable: true })
-  duration?: number;
-
-  @Column({ type: 'text', nullable: true })
-  feedback?: string;
-
-  @Column({ name: 'created_at', type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
-
-  @Column({
-    name: 'updated_at',
-    type: 'datetime',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
   updatedAt: Date;
 
   // TODO 추가적으로 로그 분석하여 저장할 필드 정의
-  @Column({ nullable: true })
-  filename?: string;
+  logUrl?: string;
 
-  private constructor(missionId: number, participantId: number) {
-    this.missionId = missionId;
+  private constructor(participantId: string, missionId: string) {
     this.participantId = participantId;
+    this.missionId = missionId;
     this.status = MissionResultStatus.PENDING;
     this.duration = 0;
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
 
-  static start(missionId: number, participantId: number): MissionResult {
-    return new MissionResult(missionId, participantId);
+  static start(participantId: string, missionId: string): MissionResult {
+    return new MissionResult(participantId, missionId);
   }
 
-  recordUploadedFile(filename: string) {
-    this.filename = filename;
+  complete(feedback?: string) {
+    this.status = MissionResultStatus.COMPLETED;
+    this.duration = Date.now() - this.createdAt.getTime();
+    this.feedback = feedback;
+    this.updatedAt = new Date();
   }
 
-  complete(status: MissionResultStatus, feedback?: string) {
-    this.status = status;
-    if (feedback) {
-      this.feedback = feedback;
-    }
+  fail(feedback?: string) {
+    this.status = MissionResultStatus.FAILED;
+    this.duration = Date.now() - this.createdAt.getTime();
+    this.feedback = feedback;
+    this.updatedAt = new Date();
   }
 
-  @BeforeInsert()
-  generatePublicId() {
-    if (!this.publicId) {
-      this.publicId = nanoid();
-    }
+  skip() {
+    this.status = MissionResultStatus.SKIPPED;
+    this.duration = Date.now() - this.createdAt.getTime();
+    this.updatedAt = new Date();
+  }
+
+  uploadedLogFile(url: string) {
+    this.logUrl = url;
   }
 }

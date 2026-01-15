@@ -31,9 +31,6 @@ export class Test {
   @JoinColumn({ name: 'owner_id' })
   owner: User;
 
-  @Column({ name: 'owner_id' })
-  ownerId: number;
-
   @Column()
   title: string;
 
@@ -60,10 +57,10 @@ export class Test {
 
   private constructor() {}
 
-  static createTest(title: string, ownerId: number): Test {
+  static createTest(title: string, owner: User): Test {
     const test = new Test();
     test.title = title;
-    test.ownerId = ownerId;
+    test.owner = owner;
     return test;
   }
 
@@ -71,40 +68,6 @@ export class Test {
     this.title = title;
     this.description = description;
     this.url = url;
-  }
-
-  handleStatusChange(status: TestStatus) {
-    switch (status) {
-      case TestStatus.DRAFT:
-        this.draft();
-        break;
-      case TestStatus.PUBLISHED:
-        this.publish();
-        break;
-      case TestStatus.ARCHIVED:
-        this.archive();
-        break;
-      default:
-        throw new Error('Invalid status');
-    }
-  }
-
-  private draft() {
-    this.status = TestStatus.DRAFT;
-  }
-
-  private publish() {
-    if (this.sdkStatus === false) {
-      throw new Error('SDK 연결이 확인되지 않아 테스트를 게시할 수 없습니다.');
-    }
-    this.status = TestStatus.PUBLISHED;
-  }
-
-  private archive() {
-    if (this.status === TestStatus.DRAFT) {
-      throw new Error('Draft 상태의 테스트는 Archive 할 수 없습니다.');
-    }
-    this.status = TestStatus.ARCHIVED;
   }
 
   @BeforeInsert()

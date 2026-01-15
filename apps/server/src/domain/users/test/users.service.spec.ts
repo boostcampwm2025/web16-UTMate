@@ -107,7 +107,7 @@ describe('UserService', () => {
 
       const result = await service.getUserSummary('user-123');
 
-      expect(repository.findSummary).toHaveBeenCalledWith('user-123');
+      expect(repository.findSummaryByPublicId).toHaveBeenCalledWith('user-123');
       expect(result).toBeInstanceOf(UserSummaryDto);
       expect(result.publicId).toBe('user-123');
       expect(result.username).toBe('testuser');
@@ -126,7 +126,7 @@ describe('UserService', () => {
     it('레포지토리의 deleteByPublicId를 호출해야 한다', async () => {
       await service.deleteUser('user-123');
 
-      expect(repository.delete).toHaveBeenCalledWith('user-123');
+      expect(repository.deleteByPublicId).toHaveBeenCalledWith('user-123');
     });
   });
 });

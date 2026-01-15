@@ -2,7 +2,7 @@ import { record } from '@rrweb/record';
 import type { eventWithTime } from '@rrweb/types';
 import pako from 'pako';
 
-import { EVENT_SEND_INTERVAL, SERVER_URL } from './constants';
+import { EVENT_SEND_INTERVAL, EVENT_SEND_URL } from './constants';
 
 interface IIds {
   sessionId: string;
@@ -45,7 +45,7 @@ async function sendEventsToServer(ids: IIds, events: eventWithTime[], isUnload =
   const jsonl = events.map((e) => JSON.stringify(e)).join('\n') + '\n';
   const compressed = pako.gzip(jsonl);
 
-  const response = await fetch(`${SERVER_URL}/sdk/replay_logs`, {
+  const response = await fetch(EVENT_SEND_URL, {
     method: 'POST',
     // fetch의 keepalive 옵션은 http keep-alive와 다른 개념임에 유의
     keepalive: isUnload,
@@ -85,41 +85,8 @@ async function flushEvents(ids: IIds, eventQueue: eventWithTime[], isUnload = fa
   }
 }
 
-/** SDK 설치 검증 요청 처리
- * @param testId 테스트 식별자
- */
-async function verifySdkInstallation(testId: string) {
-  try {
-    if (!testId) {
-      alert('유효하지 않은 테스트 ID입니다. 창을 닫고 다시 시도해주세요.');
-      return;
-    }
-
-    const response = await fetch(`${SERVER_URL}/sdk/tests/${testId}/verify-sdk`, {
-      method: 'POST',
-    });
-
-    if (!response.ok) {
-      throw new Error('SDK 설치 확인에 실패했습니다.');
-    }
-
-    alert('SDK 정상 작동이 확인되었습니다. 창을 닫아주세요.');
-  } catch (error) {
-    alert('SDK 설치 확인 중 오류가 발생했습니다. 창을 닫고 다시 시도해주세요.');
-  }
-}
-
 // 즉시 실행 함수로 SDK 초기화
-(async () => {
-  const searchParams = new URLSearchParams(window.location.search);
-  const verifySdkInstallationParam = searchParams.get('utm-sdk-verify');
-
-  // sdk-verify 파라미터가 있으면 SDK 설치 검증 모드로 동작
-  if (verifySdkInstallationParam === 'true') {
-    await verifySdkInstallation(searchParams.get('test-id')!);
-    return;
-  }
-
+(() => {
   // URL 혹은 세션 스토리지에 session_id, mission_id가 없으면 종료
   const ids = getIdsFromUrl();
   if (!ids) {
@@ -145,4 +112,4 @@ async function verifySdkInstallation(testId: string) {
       await flushEvents(ids, eventQueue, true);
     }
   });
-})().catch(() => {});
+})();

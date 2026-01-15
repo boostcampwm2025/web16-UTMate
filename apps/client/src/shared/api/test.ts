@@ -1,7 +1,7 @@
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import type { ApiErrorResponse } from '@/shared/types/api';
 import type { TestDetail } from '@/features/(test-manage)/types';
-import { ApiError } from '@/shared/constants/api';
+
 export interface UpdateTestMission {
   publicId?: string;
   order: number;
@@ -32,17 +32,4 @@ export const updateTest = async (publicId: string, data: UpdateTestParams): Prom
     const error = (await response.json()) as ApiErrorResponse;
     throw new Error(error.message || '테스트를 업데이트하는데 실패했습니다.');
   }
-};
-
-export const verifySdkInstallation = async (testId: string): Promise<{ sdkStatus: boolean }> => {
-  const response = await fetch(`${CLIENT_BASE_URL}/tests/${testId}/verify-sdk`, {
-    method: 'POST',
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    const error = (await response.json()) as ApiErrorResponse;
-    throw new ApiError(error.message || 'SDK 연동 확인에 실패했습니다.', error.statusCode);
-  }
-  return response.json();
 };

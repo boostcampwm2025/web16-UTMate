@@ -13,7 +13,7 @@ export default function TestManageLayout({ children }: { children: React.ReactNo
         <AppSidebar />
         <div className="flex flex-1 flex-col">
           <GlobalNavigationBar />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 p-6">{children}</main>
         </div>
       </div>
     </SidebarProvider>

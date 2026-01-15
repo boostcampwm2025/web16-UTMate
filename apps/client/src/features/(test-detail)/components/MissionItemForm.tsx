@@ -1,116 +1,122 @@
-import type { UseFormRegister, FieldErrors, FieldArrayWithId } from 'react-hook-form';
+import { Trash2 } from 'lucide-react';
 
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/shared/components/ui/field';
+import type { TestMission } from '@/features/(test-manage)/types';
+import { Button } from '@/shared/components/ui/button';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
 
-import type { TestFormValues } from '../schemas/testForm';
-import { MissionItemDeleteButton } from './MissionItemDeleteButton';
-
 interface MissionItemFormProps {
-  field: FieldArrayWithId<TestFormValues, 'missions', 'id'>;
+  mission: TestMission;
   missionIndex: number;
-  register: UseFormRegister<TestFormValues>;
-  errors: FieldErrors<TestFormValues>;
+  onUpdateMission: (publicId: string, mission: Partial<TestMission>) => void;
   onDeleteMission: (publicId: string) => void;
 }
 
 export function MissionItemForm({
-  field,
+  mission,
   missionIndex,
-  register,
-  errors,
+  onUpdateMission,
   onDeleteMission,
 }: MissionItemFormProps) {
   const handleDeleteMission = () => {
-    onDeleteMission(field.publicId || '');
+    onDeleteMission(mission.publicId);
   };
 
-  const missionErrors = errors.missions?.[missionIndex];
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onUpdateMission(mission.publicId, { name: e.target.value });
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onUpdateMission(mission.publicId, { description: e.target.value });
+  };
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onUpdateMission(mission.publicId, { missionUrl: e.target.value });
+  };
+
+  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    onUpdateMission(mission.publicId, {
+      estimatedDuration: value || 0,
+    });
+  };
 
   return (
     <div
-      key={field.id}
-      id={`mission-${field.publicId}`}
+      key={mission.publicId}
+      id={`mission-${mission.publicId}`}
       className="rounded-lg border bg-white p-6 transition-all"
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold text-gray-700">미션 {missionIndex + 1}</h3>
-        <MissionItemDeleteButton
-          publicId={field.publicId || ''}
-          onDeleteMission={handleDeleteMission}
-        />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleDeleteMission}
+          className="group text-red-600 hover:bg-red-50 hover:text-red-700"
+        >
+          <Trash2 className="size-4" />
+          <span className="ml-1 hidden group-hover:inline">삭제</span>
+        </Button>
       </div>
 
       <FieldGroup>
-        <Field data-invalid={!!missionErrors?.name}>
-          <FieldLabel htmlFor={`mission-name-${field.id}`}>미션 이름 *</FieldLabel>
+        <Field>
+          <FieldLabel htmlFor={`mission-name-${mission.publicId}`}>미션 이름 *</FieldLabel>
           <Input
             type="text"
-            id={`mission-name-${field.id}`}
-            placeholder="하루에 만원씩 주식 모으기"
-            {...register(`missions.${missionIndex}.name`)}
+            id={`mission-name-${mission.publicId}`}
+            placeholder="카페 예약하기"
+            value={mission.name}
+            onChange={handleNameChange}
             className="h-10"
-            aria-invalid={!!missionErrors?.name}
+            required
           />
           <FieldDescription>미션의 이름을 입력해주세요.</FieldDescription>
-          {missionErrors?.name && <FieldError>{missionErrors.name.message}</FieldError>}
         </Field>
 
-        <Field data-invalid={!!missionErrors?.description}>
-          <FieldLabel htmlFor={`mission-description-${field.id}`}>미션 설명 *</FieldLabel>
+        <Field>
+          <FieldLabel htmlFor={`mission-description-${mission.publicId}`}>미션 설명 *</FieldLabel>
           <Textarea
-            id={`mission-description-${field.id}`}
-            placeholder="당신은 삼성전자 주식을 매일 1만원씩 모으려고 합니다. 해당 미션을 진행해주세요."
-            {...register(`missions.${missionIndex}.description`)}
+            id={`mission-description-${mission.publicId}`}
+            placeholder="당신은 두바이쫀득쿠키를 구매하려고 합니다. 두바이쫀득쿠키를 판매하는 카페를 찾아 예약을 진행해주세요. "
+            value={mission.description}
+            onChange={handleDescriptionChange}
             rows={3}
-            aria-invalid={!!missionErrors?.description}
           />
           <FieldDescription>미션에 대한 자세한 설명을 입력해주세요.</FieldDescription>
-          {missionErrors?.description && (
-            <FieldError>{missionErrors.description.message}</FieldError>
-          )}
         </Field>
 
-        <Field data-invalid={!!missionErrors?.missionUrl}>
-          <FieldLabel htmlFor={`mission-url-${field.id}`}>대상 URL *</FieldLabel>
+        <Field>
+          <FieldLabel htmlFor={`mission-url-${mission.publicId}`}>대상 URL *</FieldLabel>
           <Input
             type="url"
-            id={`mission-url-${field.id}`}
-            placeholder="https://www.stocks.com"
-            {...register(`missions.${missionIndex}.missionUrl`)}
+            id={`mission-url-${mission.publicId}`}
+            placeholder="https://maps.com/search"
+            value={mission.missionUrl}
+            onChange={handleUrlChange}
             className="h-10"
-            aria-invalid={!!missionErrors?.missionUrl}
+            required
           />
           <FieldDescription>테스트 참여자가 미션을 시작할 URL을 입력해주세요.</FieldDescription>
-          {missionErrors?.missionUrl && <FieldError>{missionErrors.missionUrl.message}</FieldError>}
         </Field>
 
-        <Field data-invalid={!!missionErrors?.estimatedDuration}>
-          <FieldLabel htmlFor={`mission-duration-${field.id}`}>예상 소요시간 *</FieldLabel>
+        <Field>
+          <FieldLabel htmlFor={`mission-duration-${mission.publicId}`}>예상 소요시간 *</FieldLabel>
           <div className="flex items-center gap-2">
             <Input
               type="number"
-              id={`mission-duration-${field.id}`}
+              id={`mission-duration-${mission.publicId}`}
               min="1"
-              {...register(`missions.${missionIndex}.estimatedDuration`, {
-                valueAsNumber: true,
-              })}
+              value={mission.estimatedDuration || ''}
+              onChange={handleDurationChange}
               className="h-10 w-24"
-              aria-invalid={!!missionErrors?.estimatedDuration}
+              required
             />
             <span className="text-sm text-gray-600">분</span>
           </div>
           <FieldDescription>미션에 소요되는 예상 시간을 입력해주세요.</FieldDescription>
-          {missionErrors?.estimatedDuration && (
-            <FieldError>{missionErrors.estimatedDuration.message}</FieldError>
-          )}
         </Field>
       </FieldGroup>
     </div>

@@ -1,4 +1,4 @@
-import { Controller, Headers, Param, Post, Req } from '@nestjs/common';
+import { Controller, Headers, Post, Req } from '@nestjs/common';
 import type { Request } from 'express';
 
 import { SdkService } from './sdk.service';
@@ -21,10 +21,5 @@ export class SdkController {
     const sessionId = headerSessionId || cookieSessionId;
     const missionId = headerMissionId || cookieMissionId;
     return this.sdkService.saveReplayLog(sessionId, missionId, req);
-  }
-
-  @Post('/tests/:testId/verify-sdk')
-  async verifySdkInstallation(@Param('testId') testId: string) {
-    await this.sdkService.verifySdkInstallation(testId);
   }
 }

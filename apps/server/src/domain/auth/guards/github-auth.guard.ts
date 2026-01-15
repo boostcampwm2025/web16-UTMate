@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
-import { GITHUB } from '../const';
-
 @Injectable()
-export class GithubAuthGuard extends AuthGuard(GITHUB) {}
+export class GithubAuthGuard extends AuthGuard('github') {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    return (await super.canActivate(context)) as boolean;
+  }
+}

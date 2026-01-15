@@ -1,5 +1,0 @@
-export enum AuthErrorCode {
-  EXPIRED = 'TOKEN_EXPIRED',
-  INVALID = 'TOKEN_INVALID',
-  MISSING = 'TOKEN_MISSING',
-}
