@@ -6,7 +6,8 @@ import {
 } from '@nestjs/common';
 
 import { UpdateMissionResultDto } from './dtos/update-mission-result.dto';
-import { MissionResult, MissionResultStatus } from './entities/mission-result.entity';
+import { MissionResult } from './entities/mission-result.entity';
+import { MissionResultStatus } from './enums';
 import { MissionResultsRepository } from './mission-results.repository';
 
 import { S3StorageService } from '#common/storage/s3-storage.service';

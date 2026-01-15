@@ -8,14 +8,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { MissionResultStatus } from '../enums';
+
 import { Participant } from '#domain/participants/entities/participant.entity';
 import { Mission } from '#domain/tests/entities/mission.entity';
-
-export enum MissionResultStatus {
-  PENDING = 'PENDING',
-  SUCCESS = 'SUCCESS',
-  FAILED = 'FAILED',
-}
 
 @Entity('mission_results')
 export class MissionResult {

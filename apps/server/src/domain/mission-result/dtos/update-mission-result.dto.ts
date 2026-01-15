@@ -1,6 +1,6 @@
 import { IsEnum, IsIn, IsString } from 'class-validator';
 
-import { MissionResultStatus } from '../entities/mission-result.entity';
+import { MissionResultStatus } from '../enums';
 
 export class UpdateMissionResultDto {
   @IsIn([MissionResultStatus.SUCCESS, MissionResultStatus.FAILED])

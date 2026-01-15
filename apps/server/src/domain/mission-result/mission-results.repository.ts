@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { MissionResult, MissionResultStatus } from './entities/mission-result.entity';
+import { MissionResult } from './entities/mission-result.entity';
+import { MissionResultStatus } from './enums';
 
 @Injectable()
 export class MissionResultsRepository {
