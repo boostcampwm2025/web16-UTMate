@@ -1,7 +1,40 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/shared/components/ui/carousel';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from '@/shared/components/ui/carousel';
+import { cn } from '@/shared/utils';
+
+/* TODO : 이미지 확정 시 누끼 제대로 따기 & webp로 변환 */
+const slides = [
+  {
+    title: '모험을 떠나세요',
+    description: '서비스를 개선하기 위한 첫 걸음을 내딛으세요.',
+    image: '/images/astronaut.png',
+  },
+  {
+    title: '마법처럼 시작하세요',
+    description: '복잡한 설정 없이 간편하게 시작하세요.',
+    image: '/images/wizard.png',
+  },
+  {
+    title: '사용자의 소리를 들으세요',
+    description: '사용자의 소리를 들어 서비스의 개선점을 찾아내세요.',
+    image: '/images/voice.png',
+  },
+  {
+    title: '데이터로 보여주세요',
+    description: '사용자의 행동 패턴을 분석하여 서비스의 개선점을 찾아내세요.',
+    image: '/images/developer.png',
+  },
+];
+
+const CAROUSEL_INTERVAL = 5000;
 
 /**
  * UTMate 소개 Carousel
@@ -17,7 +50,7 @@ export function UTMateCarousel() {
 
     const interval = setInterval(() => {
       api.scrollNext();
-    }, 5000);
+    }, CAROUSEL_INTERVAL);
 
     return () => clearInterval(interval);
   }, [api]);
@@ -33,85 +66,84 @@ export function UTMateCarousel() {
     });
   }, [api]);
 
-  const slides = [
-    {
-      title: '사용자 행동을 기록하세요',
-      description: '실제 사용자가 어떻게 서비스를 이용하는지 세션 리플레이로 확인할 수 있습니다.',
-      gradient: 'from-primary/20 to-primary/5',
-      // TODO: 이미지 경로 추가
-      imagePlaceholder: '🎬',
-    },
-    {
-      title: '데이터로 증명하세요',
-      description: '클릭, 스크롤, 체류 시간 등 모든 행동 데이터를 수집하고 분석합니다.',
-      gradient: 'from-secondary/20 to-secondary/5',
-      // TODO: 이미지 경로 추가
-      imagePlaceholder: '📊',
-    },
-    {
-      title: '미션으로 테스트하세요',
-      description: '특정 작업을 수행하도록 요청하고 성공률과 완료 시간을 측정합니다.',
-      gradient: 'from-primary/20 to-primary/5',
-      // TODO: 이미지 경로 추가
-      imagePlaceholder: '🎯',
-    },
-    {
-      title: '인사이트를 얻으세요',
-      description: '수집된 데이터를 시각화된 대시보드로 확인하고 개선점을 찾아보세요.',
-      gradient: 'from-secondary/20 to-secondary/5',
-      // TODO: 이미지 경로 추가
-      imagePlaceholder: '📈',
-    },
-  ];
-
   return (
-    <div className='flex h-full flex-col items-center justify-center gap-8 p-8'>
-      <Carousel
-        setApi={setApi}
-        opts={{
-          align: 'start',
-          loop: true,
-        }}
-        className='w-full max-w-lg'
-      >
-        <CarouselContent>
-          {slides.map((slide, index) => (
-            <CarouselItem key={index}>
-              <div
-                className={`flex h-125 flex-col items-center justify-center gap-6 rounded-2xl bg-linear-to-br ${slide.gradient} p-12 text-center`}
-              >
-                {/* 이미지 영역 (나중에 실제 이미지로 교체) */}
-                <div className='mb-4 flex h-48 w-full items-center justify-center rounded-xl bg-white/50 backdrop-blur-sm'>
-                  <div className='text-center'>
-                    <div className='mb-2 text-6xl'>{slide.imagePlaceholder}</div>
-                    <p className='text-xs text-muted-foreground'>이미지 영역 (추후 교체)</p>
+    <Carousel
+      setApi={setApi}
+      opts={{
+        align: 'start',
+        loop: true,
+      }}
+      className="hidden h-full flex-1 bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50 lg:flex"
+    >
+      <CarouselContent className="h-full w-full flex-1">
+        {slides.map((slide, index) => {
+          const isActive = index === current;
+
+          return (
+            <CarouselItem key={index} className="relative h-full pl-0">
+              {/* 배경 장식 */}
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="bg-primary-200/30 absolute -top-20 -right-20 h-80 w-80 rounded-full blur-3xl" />
+                <div className="bg-primary-200/30 absolute -bottom-20 -left-20 h-80 w-80 rounded-full blur-3xl" />
+              </div>
+
+              {/* 메인 콘텐츠 영역 */}
+              <div className="relative flex h-full flex-col items-start justify-center px-12">
+                {/* 이미지 - 작은 크기로 중앙 배치 + 등장 애니메이션 */}
+                <div
+                  className={cn(
+                    'relative mx-auto mb-8 transition-all duration-900 ease-out',
+                    isActive
+                      ? 'translate-y-0 scale-100 opacity-100'
+                      : 'translate-y-8 scale-95 opacity-0',
+                  )}
+                >
+                  <div
+                    className="relative h-64 w-64 xl:h-80 xl:w-80"
+                    style={{
+                      animation: isActive ? 'float 3s ease-in-out infinite' : 'none',
+                    }}
+                  >
+                    <Image
+                      src={slide.image}
+                      alt={slide.title}
+                      fill
+                      sizes="320px"
+                      className="object-contain drop-shadow-2xl"
+                      priority={index === 0}
+                    />
                   </div>
                 </div>
 
-                {/* 타이틀 */}
-                <h3 className='text-2xl font-bold text-foreground'>{slide.title}</h3>
-
-                {/* 설명 */}
-                <p className='text-base leading-relaxed text-muted-foreground'>{slide.description}</p>
+                {/* 텍스트 콘텐츠 */}
+                <div className="flex flex-col gap-3 text-left">
+                  <h3 className="max-w-md text-2xl font-bold tracking-tight break-keep text-gray-700 xl:text-3xl">
+                    {slide.title}
+                  </h3>
+                  <p className="max-w-sm text-base leading-relaxed break-keep text-gray-600">
+                    {slide.description}
+                  </p>
+                </div>
               </div>
             </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+          );
+        })}
+      </CarouselContent>
 
-      {/* 페이지네이션 인디케이터 */}
-      <div className='flex gap-2'>
+      {/* 페이지네이션 인디케이터 (하단 중앙) */}
+      <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => api?.scrollTo(index)}
-            className={`h-2 rounded-full transition-all ${
-              index === current ? 'w-8 bg-primary' : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
-            }`}
+            className={cn(
+              'h-2.5 rounded-full transition-all duration-500',
+              index === current ? 'bg-primary w-8' : 'w-2.5 bg-gray-300 hover:bg-gray-400',
+            )}
             aria-label={`슬라이드 ${index + 1}로 이동`}
           />
         ))}
       </div>
-    </div>
+    </Carousel>
   );
 }
