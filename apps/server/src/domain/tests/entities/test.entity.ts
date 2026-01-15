@@ -31,6 +31,9 @@ export class Test {
   @JoinColumn({ name: 'owner_id' })
   owner: User;
 
+  @Column({ name: 'owner_id' })
+  ownerId: number;
+
   @Column()
   title: string;
 
@@ -60,8 +63,7 @@ export class Test {
   static createTest(title: string, ownerId: number): Test {
     const test = new Test();
     test.title = title;
-    test.owner = new User();
-    test.owner.id = ownerId;
+    test.ownerId = ownerId;
     return test;
   }
 

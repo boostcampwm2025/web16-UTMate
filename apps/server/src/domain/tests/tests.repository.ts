@@ -55,17 +55,12 @@ export class TestsRepository {
       .getOne();
   }
 
-  async findWithMissionsByPublicIdAndOwner(
-    publicId: string,
-    ownerId: number,
-    manager?: EntityManager,
-  ) {
+  async findByPublicIdWithMissions(publicId: string, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo
       .createQueryBuilder('tests')
       .leftJoinAndSelect('tests.missions', 'mission')
       .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId })
       .getOne();
   }
 
@@ -84,5 +79,13 @@ export class TestsRepository {
       .execute();
 
     return result.affected || 0;
+  }
+
+  async findIdByPublicId(publicId: string) {
+    return await this.testsRepository
+      .createQueryBuilder('tests')
+      .select(['tests.id'])
+      .where('tests.publicId = :publicId', { publicId })
+      .getOne();
   }
 }

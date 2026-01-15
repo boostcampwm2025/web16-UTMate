@@ -5,6 +5,8 @@ import { Test, TestStatus } from '../entities/test.entity';
 
 import { MissionDto } from './mission.dto';
 
+import { MissionProgressDto } from '#domain/participants/dto/mission-progress.dto';
+
 export class TestDto {
   @IsString()
   publicId: string;
@@ -29,7 +31,7 @@ export class TestDto {
   @Type(() => MissionDto)
   missions: MissionDto[];
 
-  private constructor() {}
+  constructor() {}
 
   static fromTestEntity(test: Test) {
     const dto = new TestDto();
@@ -40,6 +42,29 @@ export class TestDto {
     dto.url = test.url;
     dto.sdkStatus = test.sdkStatus;
     dto.missions = MissionDto.fromMissionEntities(test.missions);
+    return dto;
+  }
+}
+
+export class TestWithProgressDto extends TestDto {
+  finishedMissionCount: number;
+  isPendingMissionExist: boolean;
+  pendingMissionId?: string;
+
+  constructor() {
+    super();
+  }
+
+  static fromTestEntityWithProgress(test: Test, progress: MissionProgressDto) {
+    const dto = new TestWithProgressDto();
+    Object.assign(dto, TestDto.fromTestEntity(test));
+    dto.finishedMissionCount = progress.finishedMissionCount;
+    dto.isPendingMissionExist = progress.isPendingMissionExist;
+    if (progress.pendingMissionId) {
+      dto.pendingMissionId = test.missions.find(
+        (mission) => mission.id === progress.pendingMissionId,
+      )?.publicId;
+    }
     return dto;
   }
 }
