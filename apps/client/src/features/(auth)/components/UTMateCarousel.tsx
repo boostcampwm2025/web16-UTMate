@@ -83,8 +83,8 @@ export function UTMateCarousel() {
             <CarouselItem key={index} className="relative h-full pl-0">
               {/* 배경 장식 */}
               <div className="absolute inset-0 overflow-hidden">
-                <div className="bg-primary-200/30 absolute -top-20 -right-20 h-80 w-80 rounded-full blur-3xl" />
-                <div className="bg-primary-200/30 absolute -bottom-20 -left-20 h-80 w-80 rounded-full blur-3xl" />
+                <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-emerald-200/30 blur-3xl" />
+                <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-teal-200/30 blur-3xl" />
               </div>
 
               {/* 메인 콘텐츠 영역 */}
