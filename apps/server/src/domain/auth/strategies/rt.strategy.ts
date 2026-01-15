@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
+import { JWT_REFRESH } from '../const';
 import { RtPayloadDto } from '../dto/jwt-payload.dto';
 
 import { ENV_KEYS } from '#common/config/env.constants';
@@ -14,7 +15,7 @@ interface Payload {
 }
 
 @Injectable()
-export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
+export class RtStrategy extends PassportStrategy(Strategy, JWT_REFRESH) {
   constructor(private readonly config: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([

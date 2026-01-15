@@ -2,21 +2,20 @@ import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/com
 import { AuthGuard } from '@nestjs/passport';
 
 import { JWT } from '../const';
-import { TokenExpiredException, TokenInvalidException, TokenMissingException } from '../exceptions';
+import { TokenExpiredException } from '../exceptions';
 
-export interface Info {
-  name: string;
-  message: string;
-}
+import { Info } from './jwt-auth.guard';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard(JWT) {
+export class OptionalJwtAuthGuard extends AuthGuard(JWT) {
   handleRequest<JwtPayloadDto>(
     err?: Error,
     user?: JwtPayloadDto,
     info?: Info,
     context?: ExecutionContext,
-  ): JwtPayloadDto {
+  ): JwtPayloadDto | undefined {
+    if (err) throw err;
+
     // 만료된 토큰
     if (info?.name === 'TokenExpiredError') {
       throw new TokenExpiredException();
@@ -30,17 +29,8 @@ export class JwtAuthGuard extends AuthGuard(JWT) {
         response.clearCookie('access_token');
         response.clearCookie('refresh_token');
       }
-      throw new TokenInvalidException();
+      throw new UnauthorizedException('토큰이 유효하지 않습니다.');
     }
-
-    if (!user) {
-      throw new TokenMissingException();
-    }
-
-    // hanldeRequset
-    if (err) {
-      throw err || new UnauthorizedException();
-    }
-    return user;
+    return user || undefined;
   }
 }
