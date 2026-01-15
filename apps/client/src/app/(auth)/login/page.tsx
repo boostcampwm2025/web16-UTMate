@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { LoginForm } from '@/features/(auth)/components/LoginForm';
 import { UTMateCarousel } from '@/features/(auth)/components/UTMateCarousel';
+import { Logo } from '@/shared/components/Logo';
 
 export default function LoginPage() {
   return (
@@ -46,17 +47,25 @@ export default function LoginPage() {
                 에 동의하는 것으로 간주됩니다.
               </p>
             </div>
+
+            {/* 푸터 텍스트 */}
+            <p className="text-muted-foreground text-center text-xs lg:text-left">
+              로그인하면{' '}
+              <a href="#" className="text-primary hover:underline">
+                서비스 약관
+              </a>
+              과{' '}
+              <a href="#" className="text-primary hover:underline">
+                개인정보 처리방침
+              </a>
+              에 동의하는 것으로 간주됩니다.
+            </p>
           </div>
         </div>
 
-        {/* 하단 링크 */}
-        <div className="pb-8 text-center">
-          {/* <a
-            href="#"
-            className="text-xs font-medium text-gray-400 transition-colors hover:text-gray-600"
-          >
-            Forget Password?
-          </a> */}
+        {/* 오른쪽: UTMate Carousel */}
+        <div className="from-primary/5 via-background to-secondary/5 hidden bg-linear-to-br lg:block">
+          <UTMateCarousel />
         </div>
       </div>
 

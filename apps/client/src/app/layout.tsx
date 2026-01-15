@@ -34,8 +34,11 @@ export default function RootLayout({
         <MSWProvider>
           <QueryClientProviders>{children}</QueryClientProviders>
         </MSWProvider>
-        <WebVitalsCollector />
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID as string} />
+
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID as string} />
+        )}
+        {process.env.NEXT_PUBLIC_GA_ID && <WebVitalsCollector />}
         <ConfirmDialogProvider />
       </body>
     </html>
