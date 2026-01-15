@@ -20,7 +20,7 @@ export function TestTableRow({ test }: TestTableRowProps) {
       router.push(`/tests/${test.publicId}?mode=edit`);
       return;
     } else {
-      router.push(`/dashboard/${test.publicId}`);
+      router.push(`/tests/${test.publicId}/result`);
     }
   };
 
