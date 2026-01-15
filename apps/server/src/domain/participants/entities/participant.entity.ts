@@ -68,6 +68,14 @@ export class Participant {
     return participant;
   }
 
+  complete(status: ParticipantStatus, feedback?: string) {
+    if (status !== ParticipantStatus.COMPLETED) {
+      throw new Error('참가자 상태는 COMPLETED로만 변경할 수 있습니다.');
+    }
+    this.status = status;
+    this.feedback = feedback;
+  }
+
   @BeforeInsert()
   generatePublicId() {
     if (!this.publicId) {

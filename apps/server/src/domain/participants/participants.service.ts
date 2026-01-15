@@ -1,5 +1,6 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 
+import { CompleteParticipantDto } from './dto/complete-participant.dto';
 import { MissionProgressDto, MissionProgressDtoV2 } from './dto/mission-progress.dto';
 import { Participant } from './entities/participant.entity';
 import { ParticipantStatus } from './enums';
@@ -48,5 +49,14 @@ export class ParticipantsService {
       throw new BadRequestException('참가자는 이미 테스트를 완료한 상태입니다.');
     }
     return MissionProgressDtoV2.fromMissionResults(participant.missionResults);
+  }
+
+  async completeParticipant(publicId: string, dto: CompleteParticipantDto) {
+    const paricipants = await this.participantsRepository.findByPublicId(publicId);
+    if (!paricipants) {
+      throw new NotFoundException('Participant not found');
+    }
+    paricipants.complete(dto.status, dto.feedback);
+    await this.participantsRepository.save(paricipants);
   }
 }
