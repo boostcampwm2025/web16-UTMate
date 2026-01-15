@@ -83,6 +83,15 @@ export class TestsController {
     return await this.testsService.deleteTest(userId, publicId);
   }
 
+  @Get('/:id/participants/:participantId')
+  @UseGuards(JwtAuthGuard)
+  async getTestWithParticipantInfo(
+    @Param('id') publicId: string,
+    @Param('participantId') participantId: string,
+  ) {
+    return this.testsService.getTestWithParticipantInfo(publicId, participantId);
+  }
+
   @Post('/:id/participants')
   @UseGuards(OptionalJwtAuthGuard)
   async getParticipants(@UserId() userId: number | undefined, @Param('id') publicId: string) {

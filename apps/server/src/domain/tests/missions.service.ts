@@ -43,12 +43,12 @@ export class MissionsService {
     if (deleteMissions.length > 0) await this.missionRepository.deleteAll(deleteMissions, manager);
   }
 
-  async createMissionResult(publicId: string, ParticipantId: string) {
+  async createMissionResult(publicId: string, participantId: string) {
     const mission = await this.missionRepository.findByPublicId(publicId);
     if (!mission) {
       throw new BadRequestException('Mission not found');
     }
-    const participantId = await this.participantsService.findIdByPublicId(ParticipantId);
-    return this.missionResultsService.createMissionResult(mission.id, participantId);
+    const participantPkId = await this.participantsService.findIdByPublicId(participantId);
+    return this.missionResultsService.createMissionResult(mission.id, participantPkId);
   }
 }

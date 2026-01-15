@@ -14,11 +14,19 @@ export class ParticipantsRepository {
     return this.participantsRepository.save(participant);
   }
 
-  async findByPublicId(ParticipantId: string) {
+  async findByPublicId(publicId: string) {
     return this.participantsRepository
       .createQueryBuilder('participant')
       .select('participant.id')
-      .where('participant.publicId = :publicId', { publicId: ParticipantId })
+      .where('participant.publicId = :publicId', { publicId })
+      .getOne();
+  }
+
+  findByPublicIdWithMissionResults(publicId: string) {
+    return this.participantsRepository
+      .createQueryBuilder('participant')
+      .leftJoinAndSelect('participant.missionResults', 'missionResults')
+      .where('participant.publicId = :publicId', { publicId })
       .getOne();
   }
 }

@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, NotFoundException } from '@nes
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
-import { TestDto } from './dto/test.dto';
+import { TestDto, TestWithProgressDto } from './dto/test.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
@@ -162,5 +162,15 @@ export class TestsService {
       throw new BadRequestException('Test is not published');
     }
     return this.participantsService.createParticipant(userId, test.id);
+  }
+
+  async getTestWithParticipantInfo(publicId: string, participantId: string) {
+    const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    const participantMissionProgress =
+      await this.participantsService.getparticipantMissionProgress(participantId);
+    return TestWithProgressDto.fromTestEntityWithProgress(test, participantMissionProgress);
   }
 }

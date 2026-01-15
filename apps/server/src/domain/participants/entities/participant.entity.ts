@@ -5,11 +5,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { ParticipantStatus, UserType } from '../enums';
 
+import { MissionResult } from '#domain/mission-result/entities/mission-result.entity';
 import { Test } from '#domain/tests/entities/test.entity';
 import { User } from '#domain/users/entities/user.entity';
 
@@ -37,6 +39,9 @@ export class Participant {
 
   @Column({ nullable: true, name: 'user_id' })
   userId?: number;
+
+  @OneToMany(() => MissionResult, (missionResult) => missionResult.participant)
+  missionResults: MissionResult[];
 
   @Column({ type: 'enum', enum: ParticipantStatus, default: ParticipantStatus.ONGOING })
   status: ParticipantStatus;
