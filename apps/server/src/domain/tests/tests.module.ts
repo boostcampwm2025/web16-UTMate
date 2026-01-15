@@ -9,10 +9,8 @@ import { TestsController } from './tests.controller';
 import { TestsRepository } from './tests.repository';
 import { TestsService } from './tests.service';
 
-import { UsersModule } from '#domain/users/users.module';
-
 @Module({
-  imports: [TypeOrmModule.forFeature([Test, Mission]), UsersModule],
+  imports: [TypeOrmModule.forFeature([Test, Mission]), TestsModule],
   controllers: [TestsController],
   providers: [TestsService, TestsRepository, MissionsService, MissionRepository],
   exports: [TestsService],

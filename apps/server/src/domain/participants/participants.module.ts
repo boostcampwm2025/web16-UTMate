@@ -6,11 +6,10 @@ import { ParticipantsController } from './paricipants.controller';
 import { ParticipantsRepository } from './participants.repository';
 import { ParticipantsService } from './participants.service';
 
-import { TestsModule } from '#domain/tests/tests.module';
-
 @Module({
-  imports: [TypeOrmModule.forFeature([Participant]), TestsModule],
+  imports: [TypeOrmModule.forFeature([Participant])],
   controllers: [ParticipantsController],
   providers: [ParticipantsService, ParticipantsRepository],
+  exports: [ParticipantsService],
 })
 export class ParticipantsModule {}

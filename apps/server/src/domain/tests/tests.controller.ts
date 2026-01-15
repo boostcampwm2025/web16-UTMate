@@ -82,4 +82,10 @@ export class TestsController {
   async deleteTest(@UserId() userId: number, @Param('id') publicId: string) {
     return await this.testsService.deleteTest(userId, publicId);
   }
+
+  @Post('/:id/participants')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getParticipants(@UserId() userId: number | undefined, @Param('id') publicId: string) {
+    return this.testsService.createParticipant(userId, publicId);
+  }
 }

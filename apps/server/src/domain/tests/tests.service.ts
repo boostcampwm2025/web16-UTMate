@@ -10,12 +10,14 @@ import { MissionsService } from './missions.service';
 import { TestsRepository } from './tests.repository';
 
 import { ENV_KEYS } from '#common/config/env.constants';
+import { ParticipantsService } from '#domain/participants/participants.service';
 
 @Injectable()
 export class TestsService {
   constructor(
     @Inject() private readonly testsRepository: TestsRepository,
     @Inject() private readonly missionsService: MissionsService,
+    @Inject() private readonly participantsService: ParticipantsService,
     @Inject() private readonly dataSource: DataSource,
     @Inject() private readonly configService: ConfigService,
   ) {}
@@ -149,5 +151,16 @@ export class TestsService {
       throw new NotFoundException('Test not found');
     }
     return tests.id;
+  }
+
+  async createParticipant(userId: number | undefined, publicId: string) {
+    const test = await this.testsRepository.findIdByPublicId(publicId);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    if (test.status !== TestStatus.PUBLISHED) {
+      throw new BadRequestException('Test is not published');
+    }
+    return this.participantsService.createParticipant(userId, test.id);
   }
 }
