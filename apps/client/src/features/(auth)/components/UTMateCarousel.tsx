@@ -75,18 +75,12 @@ export function UTMateCarousel() {
       }}
       className="hidden h-full flex-1 bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50 lg:flex"
     >
-      <CarouselContent className="h-full w-full flex-1">
+      <CarouselContent className="ml-0 h-full w-full flex-1">
         {slides.map((slide, index) => {
           const isActive = index === current;
 
           return (
             <CarouselItem key={index} className="relative h-full pl-0">
-              {/* 배경 장식 */}
-              <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-emerald-200/30 blur-3xl" />
-                <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-teal-200/30 blur-3xl" />
-              </div>
-
               {/* 메인 콘텐츠 영역 */}
               <div className="relative flex h-full flex-col items-start justify-center px-12">
                 {/* 이미지 - 작은 크기로 중앙 배치 + 등장 애니메이션 */}
