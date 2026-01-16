@@ -65,7 +65,7 @@
 
 ## CI/CD
 
-![CI/CD](https://github.com/boostcampwm2025/web16-UTMate/wiki/images/cicd.png)
+![CI/CD](https://github.com/boostcampwm2025/web16-UTMate/wiki/image-cicd.png)
 
 ---
 
