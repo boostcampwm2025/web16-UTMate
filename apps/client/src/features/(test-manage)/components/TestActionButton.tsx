@@ -27,26 +27,27 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
   const router = useRouter();
   const { confirm, setLoading, close } = useConfirmStore();
 
-  const handleStatusChange = async (status: TestStatus) => {
-    const actionLabel = status === TestStatus.PUBLISHED ? '공개' : '종료';
-    const confirmed = await confirm(
-      `테스트 ${actionLabel}`,
-      `정말로 이 테스트를 ${actionLabel}하시겠습니까?`,
-    );
+  const handlePublish = async () => {
+    const confirmed = await confirm('테스트 공개', '한번 공개된 테스트는 수정이 불가능합니다.');
 
     if (!confirmed) return;
 
     setLoading(true);
     const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 800));
     try {
-      await updateTestStatus(testId, status);
+      await updateTestStatus(testId, TestStatus.PUBLISHED);
       await minLoadingTime;
       await queryClient.invalidateQueries({ queryKey: ['tests'] });
       close();
+
+      await confirm(
+        '테스트 공개',
+        '테스트가 공개되었습니다. 테스트 참여링크는 작업 > 참여 링크 확인 버튼을 통해 확인할 수 있습니다.',
+      );
     } catch (error) {
       await confirm(
-        `테스트 ${actionLabel} 실패`,
-        error instanceof Error ? error.message : `테스트 ${actionLabel}에 실패했습니다.`,
+        '테스트 공개 실패',
+        error instanceof Error ? error.message : '테스트 공개에 실패했습니다.',
         { isAlert: true },
       );
     } finally {
@@ -54,12 +55,27 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
     }
   };
 
-  const handlePublish = async () => {
-    await handleStatusChange(TestStatus.PUBLISHED);
-  };
-
   const handleArchive = async () => {
-    await handleStatusChange(TestStatus.ARCHIVED);
+    const confirmed = await confirm('테스트 종료', '한번 종료된 테스트는 다시 공개할 수 없습니다.');
+
+    if (!confirmed) return;
+
+    setLoading(true);
+    const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      await updateTestStatus(testId, TestStatus.ARCHIVED);
+      await minLoadingTime;
+      await queryClient.invalidateQueries({ queryKey: ['tests'] });
+      close();
+    } catch (error) {
+      await confirm(
+        '테스트 종료 실패',
+        error instanceof Error ? error.message : '테스트 종료에 실패했습니다.',
+        { isAlert: true },
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async () => {
