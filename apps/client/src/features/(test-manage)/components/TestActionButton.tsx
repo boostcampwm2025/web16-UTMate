@@ -91,6 +91,17 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
     }
   };
 
+  const handleTestParticipateLinkCheck = async () => {
+    const isDev = process.env.NODE_ENV === 'development';
+    const baseUrl = isDev ? 'http://localhost:3000' : 'https://utmate.me';
+    const url = `${baseUrl}/participate/${testId}/`;
+
+    //TODO : 테스트 링크 복사 기능 추가
+    const confirmed = await confirm('참여 링크 확인', `참여 링크: ${url}`);
+
+    if (!confirmed) return;
+  };
+
   const handleUpdate = () => {
     router.push(`/tests/${testId}?mode=edit`);
   };
@@ -117,6 +128,15 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
             className="cursor-pointer text-base"
           >
             공개
+          </DropdownMenuItem>
+        )}
+        {testStatus === TestStatus.PUBLISHED && (
+          <DropdownMenuItem
+            onClick={handleTestParticipateLinkCheck}
+            disabled={isUpdating}
+            className="cursor-pointer text-base"
+          >
+            참여 링크 확인
           </DropdownMenuItem>
         )}
         {testStatus === TestStatus.PUBLISHED && (
