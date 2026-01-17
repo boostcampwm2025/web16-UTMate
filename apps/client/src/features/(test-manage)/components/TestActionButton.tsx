@@ -14,7 +14,7 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { deleteTest, updateTestStatus } from '@/features/(test-manage)/api';
 import { TestStatus } from '@/features/(test-manage)/types';
-import { useConfirmStore } from '@/shared/stores/useConfrimStore';
+import { useDialogStore } from '@/shared/stores/useDialogStore';
 
 interface TestActionButtonProps {
   testId: string;
@@ -25,7 +25,7 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
   const [isUpdating, setIsUpdating] = useState(false);
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { confirm, setLoading, close } = useConfirmStore();
+  const { confirm, setLoading, close } = useDialogStore();
 
   const handlePublish = async () => {
     const confirmed = await confirm('테스트 공개', '한번 공개된 테스트는 수정이 불가능합니다.');
@@ -43,12 +43,13 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
       await confirm(
         '테스트 공개',
         '테스트가 공개되었습니다. 테스트 참여링크는 작업 > 참여 링크 확인 버튼을 통해 확인할 수 있습니다.',
+        { hasCancel: false },
       );
     } catch (error) {
       await confirm(
         '테스트 공개 실패',
         error instanceof Error ? error.message : '테스트 공개에 실패했습니다.',
-        { isAlert: true },
+        { isAlert: true, hasCancel: false },
       );
     } finally {
       setLoading(false);
@@ -71,7 +72,7 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
       await confirm(
         '테스트 종료 실패',
         error instanceof Error ? error.message : '테스트 종료에 실패했습니다.',
-        { isAlert: true },
+        { isAlert: true, hasCancel: false },
       );
     } finally {
       setLoading(false);
@@ -82,9 +83,7 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
     const confirmed = await confirm(
       '테스트 삭제',
       '정말로 이 테스트를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
-      {
-        isAlert: true,
-      },
+      { isAlert: true },
     );
 
     if (!confirmed) return;
@@ -100,7 +99,7 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
       await confirm(
         '테스트 삭제 실패',
         error instanceof Error ? error.message : '테스트 삭제에 실패했습니다.',
-        { isAlert: true },
+        { isAlert: true, hasCancel: false },
       );
     } finally {
       setLoading(false);
