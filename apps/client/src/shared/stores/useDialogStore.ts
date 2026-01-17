@@ -25,7 +25,8 @@ interface DialogState {
 interface DialogActions {
   confirm: (
     title: string,
-    descriptionOrContent: string | ReactNode,
+    description?: string,
+    content?: ReactNode,
     options?: DialogOptions,
   ) => Promise<boolean>;
   setLoading: (isLoading: boolean) => void;
@@ -48,26 +49,20 @@ const INITIAL_STATE: DialogState = {
   onCancel: () => {},
 };
 
-const isReactNode = (value: string | ReactNode): value is ReactNode => {
-  return typeof value !== 'string';
-};
-
 export const useDialogStore = create<DialogStore>((set) => ({
   ...INITIAL_STATE,
 
   setLoading: (isLoading) => set({ isLoading }),
   close: () => set({ isOpen: false, isLoading: false }),
 
-  confirm: (title, descriptionOrContent, options) => {
+  confirm: (title, description = '', content = null, options) => {
     return new Promise((resolve) => {
-      const isContent = isReactNode(descriptionOrContent);
-
       set({
         isOpen: true,
         isLoading: false,
         title,
-        description: isContent ? '' : descriptionOrContent,
-        content: isContent ? descriptionOrContent : null,
+        description,
+        content,
         cancelText: options?.cancelText ?? INITIAL_STATE.cancelText,
         confirmText: options?.confirmText ?? INITIAL_STATE.confirmText,
         isAlert: options?.isAlert ?? INITIAL_STATE.isAlert,

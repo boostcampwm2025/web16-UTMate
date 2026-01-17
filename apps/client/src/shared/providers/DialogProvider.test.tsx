@@ -68,7 +68,7 @@ describe('DialogProvider', () => {
     render(<DialogProvider />);
 
     const { confirm } = useDialogStore.getState();
-    confirm('경고', '위험한 작업입니다', { isAlert: true });
+    confirm('경고', '위험한 작업입니다', null, { isAlert: true });
 
     await waitFor(() => {
       const confirmButton = screen.getByRole('button', { name: '확인' });
@@ -80,7 +80,7 @@ describe('DialogProvider', () => {
     render(<DialogProvider />);
 
     const { confirm } = useDialogStore.getState();
-    confirm('알림', '작업이 완료되었습니다.', { hasCancel: false });
+    confirm('알림', '작업이 완료되었습니다.', null, { hasCancel: false });
 
     await waitFor(() => {
       expect(screen.getByRole('alertdialog')).toBeInTheDocument();
@@ -103,7 +103,7 @@ describe('DialogProvider', () => {
         </ul>
       </div>
     );
-    confirm('커스텀 다이얼로그', customContent);
+    confirm('커스텀 다이얼로그', '', customContent);
 
     await waitFor(() => {
       expect(screen.getByRole('alertdialog')).toBeInTheDocument();
