@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MoreVertical, Copy, CopyCheck } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
@@ -15,7 +15,8 @@ import {
 import { deleteTest, updateTestStatus } from '@/features/(test-manage)/api';
 import { TestStatus } from '@/features/(test-manage)/types';
 import { useDialogStore } from '@/shared/stores/useDialogStore';
-import { useCopyToClipboard } from '@/shared/hooks/useCopyToClipboard';
+
+import { TestParticipateLinkCheck } from './TestParticipateLinkCheck';
 
 interface TestActionButtonProps {
   testId: string;
@@ -44,7 +45,7 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
       await confirm(
         '테스트 공개',
         '테스트가 공개되었습니다. 테스트 참여링크는 작업 > 참여 링크 확인 버튼을 통해 확인할 수 있습니다.',
-        null,
+        <TestParticipateLinkCheck testId={testId} />,
         { hasCancel: false },
       );
     } catch (error) {
@@ -113,15 +114,10 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
   };
 
   const handleTestParticipateLinkCheck = async () => {
-    const isDev = process.env.NODE_ENV === 'development';
-    const baseUrl = isDev ? 'http://localhost:3000' : 'https://utmate.me';
-    const url = `${baseUrl}/participate/${testId}/`;
-
-    //TODO : 테스트 링크 복사 기능 추가
     const confirmed = await confirm(
       '참여 링크 확인',
       '참여 링크를 테스트 참여자에게 공유하여 테스트를 시작하세요.',
-      <TestParticipateLinkCheck url={url} />,
+      <TestParticipateLinkCheck testId={testId} />,
     );
 
     if (!confirmed) return;
@@ -183,22 +179,5 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-interface TestParticipateLinkCheckProps {
-  url: string;
-}
-
-export function TestParticipateLinkCheck({ url }: TestParticipateLinkCheckProps) {
-  const [copiedText, copy] = useCopyToClipboard();
-
-  return (
-    <div className="flex items-center space-x-2">
-      <span className="text-muted-foreground text-sm">{url}</span>
-      <Button variant="outline" size="icon" onClick={() => copy(url)} className="rounded-full">
-        {copiedText ? <CopyCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-      </Button>
-    </div>
   );
 }
