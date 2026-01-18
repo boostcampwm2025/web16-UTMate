@@ -15,8 +15,8 @@ describe('UserService', () => {
   const mockUserRepository = {
     findByOAuth: jest.fn(),
     save: jest.fn(),
-    findSummaryByPublicId: jest.fn(),
-    deleteByPublicId: jest.fn(),
+    findSummary: jest.fn(),
+    delete: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -103,11 +103,11 @@ describe('UserService', () => {
       mockUser.username = 'testuser';
       mockUser.avatarUrl = 'https://avatar.url';
 
-      mockUserRepository.findSummaryByPublicId.mockResolvedValue(mockUser);
+      mockUserRepository.findSummary.mockResolvedValue(mockUser);
 
-      const result = await service.getUserSummary('user-123');
+      const result = await service.getUserSummary(1);
 
-      expect(repository.findSummary).toHaveBeenCalledWith('user-123');
+      expect(repository.findSummary).toHaveBeenCalledWith(1);
       expect(result).toBeInstanceOf(UserSummaryDto);
       expect(result.publicId).toBe('user-123');
       expect(result.username).toBe('testuser');
@@ -115,18 +115,18 @@ describe('UserService', () => {
     });
 
     it('사용자가 존재하지 않으면 BadRequestException을 던져야 한다', async () => {
-      mockUserRepository.findSummaryByPublicId.mockResolvedValue(null);
+      mockUserRepository.findSummary.mockResolvedValue(null);
 
-      await expect(service.getUserSummary('non-existent')).rejects.toThrow(BadRequestException);
-      await expect(service.getUserSummary('non-existent')).rejects.toThrow('User not found');
+      await expect(service.getUserSummary(999)).rejects.toThrow(BadRequestException);
+      await expect(service.getUserSummary(999)).rejects.toThrow('User not found');
     });
   });
 
   describe('deleteUser', () => {
-    it('레포지토리의 deleteByPublicId를 호출해야 한다', async () => {
-      await service.deleteUser('user-123');
+    it('레포지토리의 delete를 호출해야 한다', async () => {
+      await service.deleteUser(1);
 
-      expect(repository.delete).toHaveBeenCalledWith('user-123');
+      expect(repository.delete).toHaveBeenCalledWith(1);
     });
   });
 });
