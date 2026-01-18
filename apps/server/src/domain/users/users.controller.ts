@@ -11,8 +11,7 @@ import {
 
 import { UsersService } from './users.service';
 
-import { JwtPayload } from '#domain/auth/decorator/param.decorator';
-import { JwtPayloadDto } from '#domain/auth/dto/jwt-payload.dto';
+import { UserId } from '#domain/auth/decorator/param.decorator';
 import { JwtAuthGuard } from '#domain/auth/guards/jwt-auth.guard';
 
 @Controller('users')
@@ -21,15 +20,15 @@ export class UsersController {
 
   @Get('/me')
   @UseGuards(JwtAuthGuard)
-  getProfile(@JwtPayload() payload: JwtPayloadDto) {
-    return this.usersService.getUserSummary(payload.userId);
+  getProfile(@UserId() userId: number) {
+    return this.usersService.getUserSummary(userId);
   }
 
   @Delete('/me')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteProfile(@JwtPayload() payload: JwtPayloadDto) {
-    return this.usersService.deleteUser(payload.userId);
+  deleteProfile(@UserId() userId: number) {
+    return this.usersService.deleteUser(userId);
   }
 
   @Patch()

@@ -146,7 +146,7 @@ export default function ProfilePage() {
             </Avatar>
             <div className="space-y-1">
               <h3 className="text-2xl font-semibold">{user.username}</h3>
-              <p className="text-muted-foreground text-sm">User ID: {user.publicId}</p>
+              <p className="text-muted-foreground text-sm">email: {'나중에 고칠 예정'}</p>
             </div>
           </div>
 
@@ -158,8 +158,8 @@ export default function ProfilePage() {
               <Input id="username" value={user.username} disabled />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="publicId">Public ID</Label>
-              <Input id="publicId" value={user.publicId} disabled />
+              <Label htmlFor="publicId">이메일</Label>
+              <Input id="publicId" value={'나중에 고칠 예정'} disabled />
             </div>
           </div>
         </CardContent>

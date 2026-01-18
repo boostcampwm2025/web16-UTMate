@@ -14,9 +14,9 @@ export default function SocialLoginButtons() {
   // 환경변수에서 백엔드 API URL 가져오기
 
   return (
-    <Button asChild variant="outline" size="lg" className="w-full">
+    <Button asChild size="lg" variant="default" className="h-12 w-full">
       <a href={`${CLIENT_BASE_URL}/auth/github`}>
-        <GithubIcon className="mr-2 h-4 w-4" />
+        <GithubIcon className="mr-2 h-5 w-5" />
         GitHub로 로그인
       </a>
     </Button>

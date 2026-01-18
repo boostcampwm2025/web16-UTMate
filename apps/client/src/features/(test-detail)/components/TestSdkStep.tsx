@@ -1,34 +1,48 @@
 'use client';
 
-import { Copy, Loader2 } from 'lucide-react';
+import { Copy, CheckCircle, XCircle } from 'lucide-react';
 import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui/button';
+import { verifySdkInstallation } from '@/shared/api/test';
+
+const SDK_URL = process.env.NEXT_PUBLIC_SDK_DOMAIN || 'https://utmate.me/sdk/utmate-sdk.iife.js';
+const SDK_CODE = `<script src="${SDK_URL}"></script>`;
 
 interface TestSdkStepProps {
-  testPublicId: string;
-  onPrev: () => void;
-  onSave: () => Promise<void>;
-  loading: boolean;
+  testId: string;
+  initialSdkStatus: boolean;
 }
 
-export function TestSdkStep({ testPublicId, onPrev, onSave, loading }: TestSdkStepProps) {
+export function TestSdkStep({ testId, initialSdkStatus }: TestSdkStepProps) {
+  const [sdkStatus, setSdkStatus] = useState(initialSdkStatus);
   const [copied, setCopied] = useState(false);
-
-  const sdkCode = `<script src="https://cdn.utmate.com/sdk.js"></script>
-<script>
-  UTMate.init({
-    testId: '${testPublicId}',
-  });
-</script>`;
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(sdkCode);
+      await navigator.clipboard.writeText(SDK_CODE);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('복사 실패:', err);
+    }
+  };
+
+  const handleVerifySdk = async () => {
+    try {
+      setIsVerifying(true);
+      setVerifyError(null);
+      const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 800));
+      const response = await verifySdkInstallation(testId);
+      await minLoadingTime;
+      setSdkStatus(response.sdkStatus);
+    } catch (err) {
+      console.error('SDK 연동 확인 실패:', err);
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -52,7 +66,7 @@ export function TestSdkStep({ testPublicId, onPrev, onSave, loading }: TestSdkSt
           {/* TODO: SDK 배포 우리 SDK에 맞게 내용 수정 */}
           <div className="relative">
             <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-gray-100">
-              <code>{sdkCode}</code>
+              <code>{SDK_CODE}</code>
             </pre>
             <Button
               variant="outline"
@@ -74,22 +88,29 @@ export function TestSdkStep({ testPublicId, onPrev, onSave, loading }: TestSdkSt
         <div>
           <h3 className="mb-2 font-semibold">2. SDK 연동 확인</h3>
           <p className="mb-4 text-sm text-gray-600">아래 버튼을 눌러서 확인하세요</p>
-          {/* TODO: SDK 연동 확인 API 구현 후 연동 */}
-          <Button variant="outline" size="sm">
-            확인
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleVerifySdk} disabled={isVerifying}>
+              {isVerifying && <Loader2 className="mr-2 size-4 animate-spin" />}확인
+            </Button>
+            {sdkStatus ? (
+              <div className="flex items-center text-sm text-gray-600">
+                <CheckCircle className="text-success mr-2 size-4" />
+                SDK 연동이 확인되었습니다.
+              </div>
+            ) : (
+              <div className="flex items-center text-sm text-gray-600">
+                <XCircle className="text-destructive mr-2 size-4" />
+                SDK 연동이 확인되지 않았습니다.
+              </div>
+            )}
+            {verifyError && (
+              <div className="flex items-center text-sm text-gray-600">
+                <XCircle className="text-destructive mr-2 size-4" />
+                {verifyError}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-
-      {/* 네비게이션 버튼 */}
-      <div className="flex justify-between border-t pt-6">
-        <Button variant="outline" onClick={onPrev}>
-          이전
-        </Button>
-        <Button onClick={onSave} disabled={loading}>
-          {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
-          저장하기
-        </Button>
       </div>
     </div>
   );
