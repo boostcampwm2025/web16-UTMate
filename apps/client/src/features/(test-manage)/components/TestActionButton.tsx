@@ -23,6 +23,7 @@ interface TestActionButtonProps {
   testStatus: TestStatus;
 }
 
+//TODO : 각 액션들을 리스트 컴포넌트로 끌어올려서, TestActionButton은 onDelete, onArchive, onPublish, onUpdate 등의 함수를 props로 받도록 수정
 export function TestActionButton({ testId, testStatus }: TestActionButtonProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const queryClient = useQueryClient();
