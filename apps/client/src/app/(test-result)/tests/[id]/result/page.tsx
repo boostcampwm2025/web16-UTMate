@@ -1,6 +1,7 @@
-
+import { Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Calendar, Users, CheckCircle, Clock } from 'lucide-react';
+import { TestBasicInfo } from '@/features/(test-result)/components/TestBasicInfo';
 
 export default async function TestResultSummaryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: testId } = await params;
@@ -34,14 +35,9 @@ export default async function TestResultSummaryPage({ params }: { params: Promis
   return (
     <div className="space-y-6">
       {/* 테스트 기본 정보 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{summaryData.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">{summaryData.description}</p>
-        </CardContent>
-      </Card>
+      <Suspense fallback={<div>Loading...</div>}>
+        <TestBasicInfo testId={testId} />
+      </Suspense>
 
       {/* 주요 지표 */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

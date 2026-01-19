@@ -3,6 +3,7 @@ import type { eventWithTime } from '@rrweb/types';
 import type { SimpleMissionResult } from '../types';
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import type { ApiErrorResponse } from '@/shared/types/api';
+import type { TestSummary } from '../types';
 
 export const getTestResult = async (testid: string): Promise<SimpleMissionResult[]> => {
   // TODO: 현재 임시 API이므로 나중에 API로 대체해야 합니다.
@@ -10,6 +11,17 @@ export const getTestResult = async (testid: string): Promise<SimpleMissionResult
   if (!response.ok) {
     const error = (await response.json()) as ApiErrorResponse;
     throw new Error(error.message || '테스트 결과를 불러오는데 실패했습니다.');
+  }
+  return response.json();
+};
+
+export const getTestSummary = async (testId: string): Promise<TestSummary> => {
+  const response = await fetch(`${CLIENT_BASE_URL}/tests/${testId}/result`, {
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    const error = (await response.json()) as ApiErrorResponse;
+    throw new Error(error.message || '테스트 요약 정보를 불러오는데 실패했습니다.');
   }
   return response.json();
 };
