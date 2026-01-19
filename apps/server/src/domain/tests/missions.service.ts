@@ -17,6 +17,16 @@ export class MissionsService {
     @Inject() private readonly missionResultsService: MissionResultsService,
   ) {}
 
+  /**
+   * 미션들에 대한 업데이트를 처리합니다.
+   * updateMissionDtos에 포함된 publicId를 기준으로 기존 미션들을 업데이트합니다.
+   * updateMissionDtos에 publicId가 없는 경우 새로운 미션으로 간주하여 추가합니다.
+   * 기존에 존재하는 미션 중 updateMissionDtos에 포함되지 않은 미션은 삭제합니다.
+   *
+   * @param test 테스트 엔티티( 미션들이 속한 테스트 )
+   * @param updateMissionDtos 업데이트할 미션 DTO 배열
+   * @param manager 트랜잭션 매니저(Optional) : 트랜잭션 내에서 호출할 경우 전달
+   */
   async updateMissions(test: Test, updateMissionDtos: UpdateMissionDto[], manager?: EntityManager) {
     const missions = await this.missionRepository.findAllByTest(test, manager);
 

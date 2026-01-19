@@ -23,6 +23,14 @@ export class MissionResultsService {
     private readonly s3StorageService: S3StorageService,
   ) {}
 
+  /**
+   * 각 Mission에 대한 MissionResults 생성합니다.
+   *
+   * @param missions 미션 배열
+   * @param participantId 참가자 id
+   * @param manager 트랜잭션 매니저(Optional) : 트랜잭션 내에서 호출할 경우 전달
+   * @returns MissionResultDto 배열
+   */
   async createMissionResults(missions: Mission[], participantId: number, manager?: EntityManager) {
     const missionResults = missions.map((mission) =>
       MissionResult.create(mission.id, participantId),
@@ -32,6 +40,13 @@ export class MissionResultsService {
     return this.getMissionResultsByParticipantId(participantId, manager);
   }
 
+  /**
+   * 참가자 id로 미션 결과들을 조회합니다.
+   *
+   * @param participantId 참가자 id
+   * @param manager 트랜잭션 매니저(Optional) : 트랜잭션 내에서 호출할 경우 전달
+   * @returns MissionResultDto 배열
+   */
   async getMissionResultsByParticipantId(participantId: number, manager?: EntityManager) {
     const missionResults = await this.missionResultsRepository.findByParticipantIdWithMissions(
       participantId,
@@ -42,9 +57,12 @@ export class MissionResultsService {
 
   /**
    * 파일 시스템에 저장된 로그 파일을 S3로 업로드하고 업로드한 파일 이름을 업데이트합니다.
-   * 추후 로그 파일을 분석하여
-   * @param publicId
-   * @returns
+   * 추후 로그 파일을 분석하여 미션 결과에 반영하는 로직 추가 예정
+   *
+   * @param publicId 미션 결과 publicId
+   * @throws NotFoundException 미션 결과를 찾을 수 없는 경우
+   * @throws NotFoundException 로그 파일을 찾을 수 없는 경우 ( 하위 서비스에서 전파 )
+   * @throws InternalServerErrorException 로그 파일 업로드에 실패한 경우
    */
   async createMissionResultRecord(publicId: string) {
     const missionResult = await this.missionResultsRepository.findByPublicId(publicId);
@@ -75,10 +93,12 @@ export class MissionResultsService {
   }
 
   /**
-   * 미션 결과 업데이트
-   * @param missionResultId
-   * @param dto
-   * @returns MissionResultDto
+   * dto를 기반으로 미션 결과의 상태 및 피드백을 업데이트합니다.
+   *
+   * @param publicId 미션 결과 publicId
+   * @param dto 업데이트할 데이터
+   * @throws NotFoundException 미션 결과를 찾을 수 없는 경우
+   * @throws BadRequestException 잘못된 상태로 변경하려는 경우
    */
   async updateMissionResult(publicId: string, dto: UpdateMissionResultDto) {
     // 미션 결과 조회

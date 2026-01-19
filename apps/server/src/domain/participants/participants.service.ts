@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
 import { CompleteParticipantDto } from './dto/complete-participant.dto';
@@ -17,6 +17,16 @@ export class ParticipantsService {
     @Inject() private readonly dataSource: DataSource,
   ) {}
 
+  /**
+   * 참가자 생성 및 각 미션에 대한 미션 결과를 생성합니다.
+   * 참가자 생성과 미션 결과 생성은 하나의 트랜잭션으로 처리됩니다.
+   * 미션 결과 생성은 MissionResultsService에 위임합니다.
+   *
+   * @param userId 참가자 userId (Optional)
+   * @param testId 테스트 id
+   * @param missions 미션 배열
+   * @returns 생성된 참가자 정보 및 미션 결과 배열
+   */
   async createParticipant(userId: number | undefined, testId: number, missions: Mission[]) {
     return await this.dataSource.transaction(async (manager) => {
       // Participant 생성
@@ -34,6 +44,13 @@ export class ParticipantsService {
     });
   }
 
+  /**
+   * PublicId로 참가자와 해당 참가자의 미션 결과들을 조회합니다.
+   *
+   * @param publicId 참가자 publicId
+   * @returns 참가자 정보 및 미션 결과 배열
+   * @throws NotFoundException 참가자를 찾을 수 없는 경우
+   */
   async getParticipantWithMissionResults(publicId: string) {
     const participant = await this.participantsRepository.findByPublicId(publicId);
     if (!participant) {
@@ -47,12 +64,24 @@ export class ParticipantsService {
     return ParticipantDto.fromEntity(participant, missionResults);
   }
 
+  /**
+   * 참가자의 상태 및 피드백을 완료 상태로 업데이트합니다.
+   *
+   * @param publicId 참가자 publicId
+   * @param dto 완료 상태 및 피드백 정보
+   * @throws NotFoundException 참가자를 찾을 수 없는 경우
+   * @throws BadRequestException 잘못된 상태로 변경하려는 경우
+   */
   async completeParticipant(publicId: string, dto: CompleteParticipantDto) {
     const paricipants = await this.participantsRepository.findByPublicId(publicId);
     if (!paricipants) {
       throw new NotFoundException('Participant not found');
     }
-    paricipants.complete(dto.status, dto.feedback);
-    await this.participantsRepository.save(paricipants);
+    try {
+      paricipants.complete(dto.status, dto.feedback);
+      await this.participantsRepository.save(paricipants);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

@@ -73,7 +73,7 @@ export class Test {
     this.url = url;
   }
 
-  handleStatusChange(status: TestStatus) {
+  transitionStatus(status: TestStatus) {
     switch (status) {
       case TestStatus.DRAFT:
         throw new Error('Draft 상태로 변경할 수 없습니다.');
