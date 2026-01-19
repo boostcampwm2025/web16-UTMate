@@ -8,6 +8,7 @@ export default async function TestResultSummaryPage({ params }: { params: Promis
   const { id: testId } = await params;
 
   //TODO: 404 처리
+  //TODO: 401 처리
 
   return (
     <div className="space-y-4">
