@@ -9,7 +9,6 @@ import { EntityManager } from 'typeorm';
 import { MissionResultDto } from './dto/mission-result.dto';
 import { UpdateMissionResultDto } from './dto/update-mission-result.dto';
 import { MissionResult } from './entities/mission-result.entity';
-import { MissionResultStatus } from './enums';
 import { MissionResultsRepository } from './mission-results.repository';
 
 import { S3StorageService } from '#common/storage/s3-storage.service';
@@ -26,7 +25,7 @@ export class MissionResultsService {
 
   async createMissionResults(missions: Mission[], participantId: number, manager?: EntityManager) {
     const missionResults = missions.map((mission) =>
-      MissionResult.start(mission.id, participantId),
+      MissionResult.create(mission.id, participantId),
     );
 
     await this.missionResultsRepository.saveAll(missionResults, manager);
@@ -74,8 +73,9 @@ export class MissionResultsService {
       throw new InternalServerErrorException('로그 파일 업로드에 실패했습니다.');
     }
   }
+
   /**
-   * @description 미션 결과 업데이트
+   * 미션 결과 업데이트
    * @param missionResultId
    * @param dto
    * @returns MissionResultDto
@@ -86,19 +86,13 @@ export class MissionResultsService {
     if (!missionResult) {
       throw new NotFoundException('미션 결과를 찾을 수 없습니다.');
     }
-    if (missionResult.status !== MissionResultStatus.PENDING) {
-      throw new BadRequestException('이미 완료된 미션 결과는 수정할 수 없습니다.');
-    }
-    if (dto.status === MissionResultStatus.PENDING) {
-      throw new BadRequestException('미션 결과 상태를 PENDING으로 변경할 수 없습니다.');
-    }
-    if (!missionResult.filename) {
-      throw new BadRequestException(
-        '녹화 파일이 존재하지 않습니다. 녹화 완료를 먼저 진행해주세요.',
-      );
-    }
 
-    missionResult.complete(dto.status, dto.feedback);
-    await this.missionResultsRepository.save(missionResult);
+    // 상태 전이 및 저장
+    try {
+      missionResult.transition(dto.status, dto.feedback);
+      await this.missionResultsRepository.save(missionResult);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

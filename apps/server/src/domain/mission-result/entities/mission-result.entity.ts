@@ -68,19 +68,44 @@ export class MissionResult {
     this.updatedAt = new Date();
   }
 
-  static start(missionId: number, participantId: number): MissionResult {
+  static create(missionId: number, participantId: number): MissionResult {
     return new MissionResult(missionId, participantId);
+  }
+
+  transition(status: MissionResultStatus, feedback: string | undefined) {
+    switch (status) {
+      case MissionResultStatus.IN_PROGRESS:
+        this.start();
+        break;
+      case MissionResultStatus.SUCCESS:
+      case MissionResultStatus.FAILED:
+        this.complete(status, feedback);
+        break;
+      default:
+        throw new Error('유효하지 않은 미션 결과 상태입니다.');
+    }
+  }
+
+  private start() {
+    if (this.status !== MissionResultStatus.PENDING) {
+      throw new Error('미션 결과는 대기 상태에서만 시작할 수 있습니다.');
+    }
+    this.status = MissionResultStatus.IN_PROGRESS;
+  }
+
+  private complete(status: MissionResultStatus, feedback?: string) {
+    if (this.status !== MissionResultStatus.IN_PROGRESS) {
+      throw new Error('미션 결과는 진행 중 상태에서만 완료할 수 있습니다.');
+    }
+    if (!this.filename) {
+      throw new Error('녹화 파일이 존재하지 않습니다. 녹화 완료를 먼저 진행해주세요.');
+    }
+    this.status = status;
+    this.feedback = feedback;
   }
 
   recordUploadedFile(filename: string) {
     this.filename = filename;
-  }
-
-  complete(status: MissionResultStatus, feedback?: string) {
-    this.status = status;
-    if (feedback) {
-      this.feedback = feedback;
-    }
   }
 
   @BeforeInsert()
