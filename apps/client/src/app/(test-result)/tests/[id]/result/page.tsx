@@ -1,12 +1,10 @@
-'use client';
 
-import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Calendar, Users, CheckCircle, Clock } from 'lucide-react';
 
-export default function TestResultSummaryPage() {
-  const params = useParams();
-  const testId = params.id as string;
+export default async function TestResultSummaryPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: testId } = await params;
+  
 
   // TODO: API 연동 필요 - GET /api/tests/:testId/summary
   const summaryData = {
