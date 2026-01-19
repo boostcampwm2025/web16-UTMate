@@ -8,34 +8,45 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
-import { useConfirmStore } from '@/shared/stores/useConfrimStore';
+import { useDialogStore } from '@/shared/stores/useDialogStore';
 import { Button } from '@/shared/components/ui/button';
 import { Loader2 } from 'lucide-react';
 
-export const ConfirmDialogProvider = () => {
+export const DialogProvider = () => {
   const {
     isOpen,
     isLoading,
     title,
     description,
+    content,
     cancelText,
     confirmText,
     isAlert,
+    hasCancel,
     onConfirm,
     onCancel,
-  } = useConfirmStore();
+  } = useDialogStore();
+
+  function handleOnOpenChange(open: boolean) {
+    if (!open && !isLoading) {
+      onCancel();
+    }
+  }
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={(open) => !open && !isLoading && onCancel()}>
+    <AlertDialog open={isOpen} onOpenChange={handleOnOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
+          {content}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <Button variant="outline" onClick={onCancel} disabled={isLoading}>
-            {cancelText}
-          </Button>
+          {hasCancel && (
+            <Button variant="outline" onClick={onCancel} disabled={isLoading}>
+              {cancelText}
+            </Button>
+          )}
           <Button
             variant={isAlert ? 'destructive' : 'default'}
             onClick={onConfirm}
