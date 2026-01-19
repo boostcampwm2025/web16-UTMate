@@ -1,4 +1,9 @@
-// 백엔드 GET /tests/:id 응답 타입
+// ===== 백엔드 API 응답 타입 =====
+
+/** 테스트 상태 */
+export type TestStatus = 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'COMPLETED';
+
+/** 미션 정보 (GET /tests/:id 응답의 일부) */
 export interface Mission {
   publicId: string;
   order: number;
@@ -8,63 +13,60 @@ export interface Mission {
   estimatedDuration: number; // 분 단위
 }
 
+/** 테스트 정보 (GET /tests/:id 응답) */
 export interface TestInfo {
   publicId: string;
   title: string;
   description: string;
-  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'COMPLETED';
+  status: TestStatus;
   url: string;
   sdkStatus: boolean;
   missions: Mission[];
 }
 
-// 미션 결과 타입 (클라이언트 상태 관리용)
-export interface MissionResult {
-  missionPublicId: string;
-  completed: boolean;
-  feedback?: string;
-}
-
-// 테스트 세션 상태 (클라이언트 상태 관리용)
-export type TestStep = 'start' | 'mission' | 'feedback' | 'complete';
-
-export interface TestSession {
-  currentStep: TestStep;
-  currentMissionIndex: number;
-  missionResults: MissionResult[];
-  overallFeedback?: string;
-  participantId?: string; // API 연동 시 사용
-  currentMissionResultId?: string; // 현재 미션의 결과 ID
-}
-
-// 미션 진행 상황 조회 응답 타입 (GET /participants/:id/mission-progress)
-export interface MissionProgress {
-  finishedMissionCount: number;
-  isPendingMissionExist: boolean;
-  pendingMissionId?: string;
-}
-
-// 백엔드 MissionResult 상태
+/** 미션 결과 상태 */
 export type MissionResultStatus = 'PENDING' | 'SUCCESS' | 'FAILED';
 
-// 백엔드 Participant 상태
+/** 참가자 상태 */
 export type ParticipantStatus = 'ongoing' | 'completed';
 
-// 백엔드 MissionResult 응답 타입
+/** 서버에서 받은 미션 결과 */
 export interface MissionResultFromServer {
   id: string;
   missionId: string;
   status: MissionResultStatus;
 }
 
-// POST /tests/:testId/participants 응답 타입
+/** 테스트 시작 응답 (POST /tests/:testId/participants) */
 export interface StartTestResponse {
   participantId: string;
   missionResults: MissionResultFromServer[];
 }
 
-// GET /participants/:id 응답 타입 (이어하기용)
+/** 참가자 정보 응답 (GET /participants/:id) */
 export interface ParticipantResponse {
   status: ParticipantStatus;
   missionResults: MissionResultFromServer[];
+}
+
+// ===== 클라이언트 상태 관리용 타입 =====
+
+/** 테스트 진행 단계 */
+export type TestStep = 'start' | 'mission' | 'feedback' | 'complete';
+
+/** 클라이언트 측 미션 결과 (store에서 관리) */
+export interface MissionResult {
+  missionPublicId: string;
+  completed: boolean;
+  feedback?: string;
+}
+
+/** 테스트 세션 상태 (store에서 관리) */
+export interface TestSession {
+  currentStep: TestStep;
+  currentMissionIndex: number;
+  missionResults: MissionResult[];
+  overallFeedback?: string;
+  participantId?: string;
+  currentMissionResultId?: string;
 }
