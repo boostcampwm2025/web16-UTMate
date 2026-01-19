@@ -16,6 +16,7 @@ export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
   });
 
   // 미션별 성공률을 계산
+  // TODO : 통계 계산로직 분리
   const missionStats = useMemo(() => {
     const statsMap: Record<number, { successCount: number; totalCount: number }> = {};
 
