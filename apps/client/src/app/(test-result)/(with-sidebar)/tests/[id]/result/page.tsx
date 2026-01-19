@@ -3,8 +3,11 @@ import { TestBasicInfo } from '@/features/(test-result)/components/TestBasicInfo
 import { TestMissionsSummary } from '@/features/(test-result)/components/TestMissionsSummary';
 import { TestMainFeedback } from '@/features/(test-result)/components/TestMainFeedback';
 
-
-export default async function TestResultSummaryPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function TestResultSummaryPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id: testId } = await params;
 
   //TODO: 404 처리

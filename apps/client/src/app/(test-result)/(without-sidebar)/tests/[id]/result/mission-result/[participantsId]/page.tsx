@@ -128,7 +128,7 @@ export default function MissionResultDetailPage() {
             <h1 className="text-lg font-semibold">
               {missionResultData.missionTitle} - {missionResultData.userId}
             </h1>
-            <p className="text-sm text-muted-foreground">{missionResultData.persona}</p>
+            <p className="text-muted-foreground text-sm">{missionResultData.persona}</p>
           </div>
         </div>
       </header>
@@ -144,11 +144,11 @@ export default function MissionResultDetailPage() {
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <div>
-                  <p className="font-medium text-muted-foreground">미션 설명</p>
+                  <p className="text-muted-foreground font-medium">미션 설명</p>
                   <p className="mt-1">{missionResultData.missionDescription}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-muted-foreground">성공 기준</p>
+                  <p className="text-muted-foreground font-medium">성공 기준</p>
                   <ul className="mt-1 list-inside list-disc space-y-1">
                     {missionResultData.successCriteria.map((criterion, index) => (
                       <li key={index}>{criterion}</li>
@@ -168,9 +168,7 @@ export default function MissionResultDetailPage() {
                   <span className="text-muted-foreground">상태</span>
                   <span
                     className={`font-medium ${
-                      missionResultData.status === 'success'
-                        ? 'text-green-600'
-                        : 'text-red-600'
+                      missionResultData.status === 'success' ? 'text-green-600' : 'text-red-600'
                     }`}
                   >
                     {missionResultData.status === 'success' ? '성공' : '실패'}
@@ -274,12 +272,10 @@ export default function MissionResultDetailPage() {
                           {event.type === 'pageview' && (
                             <MapPin className="h-4 w-4 text-green-500" />
                           )}
-                          {event.type === 'input' && (
-                            <Clock className="h-4 w-4 text-purple-500" />
-                          )}
+                          {event.type === 'input' && <Clock className="h-4 w-4 text-purple-500" />}
                           <span className="text-sm font-medium">{event.description}</span>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">{event.url}</p>
+                        <p className="text-muted-foreground mt-1 text-xs">{event.url}</p>
                       </div>
                     </button>
                   ))}

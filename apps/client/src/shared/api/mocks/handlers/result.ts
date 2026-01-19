@@ -1,6 +1,11 @@
 import { http, HttpResponse } from 'msw';
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
-import type { TestSummary, ParticipantResult, MainFeedback, MissionResultWithParticipant } from '@/features/(test-result)/types';
+import type {
+  TestSummary,
+  ParticipantResult,
+  MainFeedback,
+  MissionResultWithParticipant,
+} from '@/features/(test-result)/types';
 import { TestStatus } from '@/features/(test-manage)/types';
 
 const mockTestSummaries: TestSummary[] = [
@@ -57,26 +62,80 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
       participantId: 'tester-1',
       persona: 'GUEST',
       missionResults: [
-        { missionId: 1, missionOrder: 1, status: 'SUCCESS', createdAt: '2026-03-02', feedback: '매우 만족스러웠습니다.', duration: 300 },
-        { missionId: 2, missionOrder: 2, status: 'SUCCESS', createdAt: '2026-03-02', feedback: '무난했습니다.', duration: 120 },
-        { missionId: 3, missionOrder: 3, status: 'SUCCESS', createdAt: '2026-03-02', feedback: '생각보다 오래 걸렸네요.', duration: 600 },
+        {
+          missionId: 1,
+          missionOrder: 1,
+          status: 'SUCCESS',
+          createdAt: '2026-03-02',
+          feedback: '매우 만족스러웠습니다.',
+          duration: 300,
+        },
+        {
+          missionId: 2,
+          missionOrder: 2,
+          status: 'SUCCESS',
+          createdAt: '2026-03-02',
+          feedback: '무난했습니다.',
+          duration: 120,
+        },
+        {
+          missionId: 3,
+          missionOrder: 3,
+          status: 'SUCCESS',
+          createdAt: '2026-03-02',
+          feedback: '생각보다 오래 걸렸네요.',
+          duration: 600,
+        },
       ],
     },
     {
       participantId: 'tester-2',
       persona: 'GUEST',
       missionResults: [
-        { missionId: 1, missionOrder: 1, status: 'SUCCESS', createdAt: '2026-03-02', feedback: '좋아요', duration: 150 },
-        { missionId: 2, missionOrder: 2, status: 'FAILURE', createdAt: '2026-03-02', feedback: '어디로 가야할지 모르겠어요.', duration: 450 },
-        { missionId: 4, missionOrder: 3, status: 'SUCCESS', createdAt: '2026-03-02', feedback: '겨우 완료했습니다.', duration: 500 },
+        {
+          missionId: 1,
+          missionOrder: 1,
+          status: 'SUCCESS',
+          createdAt: '2026-03-02',
+          feedback: '좋아요',
+          duration: 150,
+        },
+        {
+          missionId: 2,
+          missionOrder: 2,
+          status: 'FAILURE',
+          createdAt: '2026-03-02',
+          feedback: '어디로 가야할지 모르겠어요.',
+          duration: 450,
+        },
+        {
+          missionId: 4,
+          missionOrder: 3,
+          status: 'SUCCESS',
+          createdAt: '2026-03-02',
+          feedback: '겨우 완료했습니다.',
+          duration: 500,
+        },
       ],
     },
     {
       participantId: 'tester-3',
       persona: 'GUEST',
       missionResults: [
-        { missionId: 1, missionOrder: 1, status: 'SUCCESS', createdAt: '2026-03-02', duration: 200 },
-        { missionId: 2, missionOrder: 2, status: 'SUCCESS', createdAt: '2026-03-02', duration: 180 },
+        {
+          missionId: 1,
+          missionOrder: 1,
+          status: 'SUCCESS',
+          createdAt: '2026-03-02',
+          duration: 200,
+        },
+        {
+          missionId: 2,
+          missionOrder: 2,
+          status: 'SUCCESS',
+          createdAt: '2026-03-02',
+          duration: 180,
+        },
         { missionId: 3, missionOrder: 3, status: 'DROPPED', createdAt: '2026-03-02', duration: 50 },
         { missionId: 4, missionOrder: 4, status: 'DROPPED', createdAt: '2026-03-02', duration: 30 },
       ],
@@ -85,10 +144,28 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
       participantId: 'tester-4',
       persona: 'GUEST',
       missionResults: [
-        { missionId: 1, missionOrder: 1, status: 'SUCCESS', createdAt: '2026-03-02', duration: 100 },
+        {
+          missionId: 1,
+          missionOrder: 1,
+          status: 'SUCCESS',
+          createdAt: '2026-03-02',
+          duration: 100,
+        },
         { missionId: 2, missionOrder: 2, status: 'SUCCESS', createdAt: '2026-03-02', duration: 90 },
-        { missionId: 3, missionOrder: 3, status: 'IN_PROGRESS', createdAt: '2026-03-02', duration: 0 },
-        { missionId: 4, missionOrder: 4, status: 'IN_PROGRESS', createdAt: '2026-03-02', duration: 0 },
+        {
+          missionId: 3,
+          missionOrder: 3,
+          status: 'IN_PROGRESS',
+          createdAt: '2026-03-02',
+          duration: 0,
+        },
+        {
+          missionId: 4,
+          missionOrder: 4,
+          status: 'IN_PROGRESS',
+          createdAt: '2026-03-02',
+          duration: 0,
+        },
       ],
     },
   ],
@@ -98,7 +175,14 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
       participantId: 'tester-5',
       persona: 'GUEST',
       missionResults: [
-        { missionId: 1, missionOrder: 1, status: 'SUCCESS', createdAt: '2026-03-02', feedback: '플래너 작성이 쉬웠습니다.', duration: 200 },
+        {
+          missionId: 1,
+          missionOrder: 1,
+          status: 'SUCCESS',
+          createdAt: '2026-03-02',
+          feedback: '플래너 작성이 쉬웠습니다.',
+          duration: 200,
+        },
       ],
     },
   ],
@@ -108,7 +192,14 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
       participantId: 'tester-6',
       persona: 'GUEST',
       missionResults: [
-        { missionId: 1, missionOrder: 1, status: 'SUCCESS', createdAt: '2026-03-02', feedback: '테스트 완료', duration: 150 },
+        {
+          missionId: 1,
+          missionOrder: 1,
+          status: 'SUCCESS',
+          createdAt: '2026-03-02',
+          feedback: '테스트 완료',
+          duration: 150,
+        },
       ],
     },
   ],
@@ -126,9 +217,7 @@ const mockMainFeedbacks: Record<number, MainFeedback[]> = {
     { id: 2, content: 'UI가 깔끔하고 사용하기 편했습니다.' },
   ],
   4: [],
-  5: [
-    { id: 1, content: '테스트 5의 주요 피드백입니다.' },
-  ],
+  5: [{ id: 1, content: '테스트 5의 주요 피드백입니다.' }],
 };
 
 // 특정 미션의 결과 데이터 (missionId별로 필터링된 결과)
@@ -282,7 +371,7 @@ export const resultHandlers = [
 
     console.log('[MSW] Intercepted request for testId:', testId);
 
-    const summary = mockTestSummaries.find(s => s.id === Number(testId));
+    const summary = mockTestSummaries.find((s) => s.id === Number(testId));
 
     if (!summary) {
       console.warn(`[MSW] Summary not found for testId: ${testId}`);

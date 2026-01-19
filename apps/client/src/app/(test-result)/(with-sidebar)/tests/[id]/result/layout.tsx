@@ -29,7 +29,7 @@ export default async function TestResultLayout({
       <div className="flex flex-1 overflow-hidden">
         <TestResultSidebar />
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 bg-gray-50">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-gray-50 p-4">{children}</main>
       </div>
     </div>
   );

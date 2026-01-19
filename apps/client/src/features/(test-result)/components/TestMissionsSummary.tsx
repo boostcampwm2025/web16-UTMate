@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useMemo } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -25,10 +25,10 @@ export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
         if (!statsMap[result.missionId]) {
           statsMap[result.missionId] = { successCount: 0, totalCount: 0 };
         }
-        
+
         // 해당 미션에 도달한 전체 횟수(성공+실패+이탈 등)를 카운트
         statsMap[result.missionId].totalCount += 1;
-        
+
         // 성공인 경우만 카운트
         if (result.status === 'SUCCESS') {
           statsMap[result.missionId].successCount += 1;
@@ -40,9 +40,8 @@ export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
     return Object.entries(statsMap)
       .map(([id, stats]) => ({
         id: Number(id),
-        successRate: stats.totalCount > 0 
-          ? Math.round((stats.successCount / stats.totalCount) * 100) 
-          : 0,
+        successRate:
+          stats.totalCount > 0 ? Math.round((stats.successCount / stats.totalCount) * 100) : 0,
       }))
       .sort((a, b) => a.id - b.id);
   }, [participantsData]);
@@ -57,9 +56,7 @@ export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
           {missionStats.map((mission) => (
             <div key={mission.id} className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">
-                  {mission.id}번 미션
-                </span>
+                <span className="text-sm font-medium">{mission.id}번 미션</span>
                 <span className="text-sm font-bold">{mission.successRate}%</span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
@@ -71,7 +68,7 @@ export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
             </div>
           ))}
           {missionStats.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-4">
+            <p className="text-muted-foreground py-4 text-center text-sm">
               분석할 미션 결과 데이터가 없습니다.
             </p>
           )}

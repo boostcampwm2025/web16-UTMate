@@ -35,9 +35,9 @@ export function MissionResultItem({ order, status }: MissionResultItemProps) {
   return (
     <div
       className={cn(
-        'flex h-[75px] w-[85px] shrink-0 flex-col items-center justify-center rounded-xl border-2 font-bold shadow-sm transition-transform hover:scale-105 text-[13px]',
+        'flex h-[75px] w-[85px] shrink-0 flex-col items-center justify-center rounded-xl border-2 text-[13px] font-bold shadow-sm transition-transform hover:scale-105',
         config.bg,
-        config.border
+        config.border,
       )}
     >
       <span>{order}번 미션</span>

@@ -7,7 +7,6 @@ interface MissionResultSummaryProps {
 }
 
 export function MissionResultSummary({ missionLogs }: MissionResultSummaryProps) {
-
   //TODO : 통계 계산로직 분리
   const stats = useMemo(() => {
     const total = missionLogs.length;
@@ -24,11 +23,15 @@ export function MissionResultSummary({ missionLogs }: MissionResultSummaryProps)
     const successCount = missionLogs.filter((l) => l.status === 'SUCCESS').length;
     const failureCount = missionLogs.filter((l) => l.status === 'FAILURE').length;
     const dropCount = missionLogs.filter((l) => l.status === 'DROPPED').length;
-    const successLogsWithDuration = missionLogs.filter(l => l.status === 'SUCCESS' && l.duration);
-    
-    const avgDurationSeconds = successLogsWithDuration.length > 0 
-      ? Math.round(successLogsWithDuration.reduce((acc, curr) => acc + (curr.duration || 0), 0) / successLogsWithDuration.length)
-      : 0;
+    const successLogsWithDuration = missionLogs.filter((l) => l.status === 'SUCCESS' && l.duration);
+
+    const avgDurationSeconds =
+      successLogsWithDuration.length > 0
+        ? Math.round(
+            successLogsWithDuration.reduce((acc, curr) => acc + (curr.duration || 0), 0) /
+              successLogsWithDuration.length,
+          )
+        : 0;
 
     const totalAttempts = successCount + failureCount;
     const successRate = totalAttempts > 0 ? Math.round((successCount / totalAttempts) * 100) : 0;
@@ -43,12 +46,17 @@ export function MissionResultSummary({ missionLogs }: MissionResultSummaryProps)
     };
   }, [missionLogs]);
 
-
-  const summaryCards = useMemo(() => [
-    { title: '성공률(성공/성공+실패)', value: `${stats.success}/${stats.totalCount} ${stats.successRate}%` },
-    { title: '평균 소요시간', value: stats.avgDuration },
-    { title: '이탈율', value: stats.dropRate },
-  ], [stats]);
+  const summaryCards = useMemo(
+    () => [
+      {
+        title: '성공률(성공/성공+실패)',
+        value: `${stats.success}/${stats.totalCount} ${stats.successRate}%`,
+      },
+      { title: '평균 소요시간', value: stats.avgDuration },
+      { title: '이탈율', value: stats.dropRate },
+    ],
+    [stats],
+  );
 
   return (
     <Card>
@@ -71,7 +79,7 @@ interface SummaryCardProps {
 
 export const SummaryCard = ({ title, value }: SummaryCardProps) => {
   return (
-    <Card className=" border-none">
+    <Card className="border-none">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-bold text-gray-700">{title}</CardTitle>
       </CardHeader>

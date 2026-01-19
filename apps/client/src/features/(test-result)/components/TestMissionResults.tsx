@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
-
 import { getTestByIdClient } from '@/features/(test-detail)/api';
 import { QueryBoundary } from '@/shared/components/QueryBoundary';
 
@@ -30,7 +29,6 @@ export function TestMissionResults({ testId }: { testId: string }) {
     }
   }, [missions, selectedMissionId]);
 
-
   return (
     <div className="w-full space-y-4">
       {/* 미션 목록 섹션 */}
@@ -38,15 +36,13 @@ export function TestMissionResults({ testId }: { testId: string }) {
         <TestMissionTab
           missions={missions}
           selectedMissionId={selectedMissionId}
-          onMissionClick={setSelectedMissionId} />
+          onMissionClick={setSelectedMissionId}
+        />
       </QueryBoundary>
 
       {/* 선택된 미션 상세 섹션 */}
       <QueryBoundary>
-        <MissionResultDetail
-          testId={testId}
-          selectedMissionId={selectedMissionId}
-        />
+        <MissionResultDetail testId={testId} selectedMissionId={selectedMissionId} />
       </QueryBoundary>
     </div>
   );

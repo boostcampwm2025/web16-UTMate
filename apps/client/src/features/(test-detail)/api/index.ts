@@ -4,7 +4,6 @@ import type { ApiErrorResponse } from '@/shared/types/api';
 import { ApiError } from '@/shared/constants/api';
 
 export const getTestByIdClient = async (id: string): Promise<TestDetail> => {
-
   const response = await fetch(`${CLIENT_BASE_URL}/tests/${id}`, {
     credentials: 'include',
   });

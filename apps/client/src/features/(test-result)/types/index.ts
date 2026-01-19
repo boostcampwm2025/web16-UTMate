@@ -1,5 +1,4 @@
-import { TestStatus } from "@/features/(test-manage)/types";
-
+import { TestStatus } from '@/features/(test-manage)/types';
 
 type MissionResultStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'SKIPPED';
 

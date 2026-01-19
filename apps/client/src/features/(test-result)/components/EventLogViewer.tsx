@@ -88,24 +88,24 @@ export function EventLogViewer({ logs, onLogClick }: EventLogViewerProps) {
   };
 
   return (
-    <div className="p-4 space-y-2 h-96 overflow-y-auto border rounded-md w-full">
-      <div className="text-sm text-gray-600 mb-2">
+    <div className="h-96 w-full space-y-2 overflow-y-auto rounded-md border p-4">
+      <div className="mb-2 text-sm text-gray-600">
         총 {groupedLogs.length}개의 인터랙션 그룹 (원본 {logs.length}개)
       </div>
       {groupedLogs.map((entry, index) => (
         <div
           key={`${entry.log.timestamp}-${index}`}
-          className="p-2 bg-gray-50 rounded border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
+          className="cursor-pointer rounded border border-gray-200 bg-gray-50 p-2 transition-colors hover:bg-gray-100"
           onClick={() => onLogClick?.(entry.log.timestamp - startTime)}
         >
           <div className="font-medium">
             {getEventLabel(entry.log)}
             {entry.scrollDirection && (
-              <span className="text-gray-600 ml-1">({entry.scrollDirection})</span>
+              <span className="ml-1 text-gray-600">({entry.scrollDirection})</span>
             )}
-            {entry.count > 1 && <span className="text-blue-600 ml-2">({entry.count}회 연속)</span>}
+            {entry.count > 1 && <span className="ml-2 text-blue-600">({entry.count}회 연속)</span>}
           </div>
-          <div className="text-xs text-gray-500 flex gap-2">
+          <div className="flex gap-2 text-xs text-gray-500">
             <span>{formatRelativeTime(entry.log.timestamp)}</span>
             <span className="text-gray-300">|</span>
             <span>

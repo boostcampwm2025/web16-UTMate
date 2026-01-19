@@ -36,7 +36,7 @@ export function TestResultSidebar() {
   ];
 
   return (
-    <aside className="w-64 shrink-0 border-r bg-sidebar p-4 overflow-y-auto">
+    <aside className="bg-sidebar w-64 shrink-0 overflow-y-auto border-r p-4">
       <div className="space-y-3">
         {navItems.map((item) => (
           <Link
@@ -46,7 +46,7 @@ export function TestResultSidebar() {
               'flex h-12 items-center rounded-lg px-4 font-medium transition-colors',
               isActive(item.href)
                 ? 'bg-primary text-primary-foreground'
-                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
             )}
           >
             {item.label}

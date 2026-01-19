@@ -1,6 +1,12 @@
 import type { eventWithTime } from '@rrweb/types';
 
-import type { ParticipantResult, ParticipantMissionResult, SimpleMissionResult, MainFeedback, MissionResultWithParticipant } from '../types';
+import type {
+  ParticipantResult,
+  ParticipantMissionResult,
+  SimpleMissionResult,
+  MainFeedback,
+  MissionResultWithParticipant,
+} from '../types';
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import type { ApiErrorResponse } from '@/shared/types/api';
 import type { TestSummary } from '../types';
@@ -15,8 +21,6 @@ export const getTestResult = async (testid: string): Promise<SimpleMissionResult
   }
   return response.json();
 };
-
-
 
 export const getMissionResult = async (testid: string, missionResultId: string) => {
   // TODO: 현재 임시 API이므로 나중에 API로 대체해야 합니다.
@@ -97,7 +101,9 @@ export const getTestMainFeedback = async (testId: string): Promise<MainFeedback[
 };
 
 // GET /missions/:missionId/result - 특정 미션의 결과 조회
-export const getTestMissionsResultById = async (missionId: number): Promise<MissionResultWithParticipant[]> => {
+export const getTestMissionsResultById = async (
+  missionId: number,
+): Promise<MissionResultWithParticipant[]> => {
   const response = await fetch(`${CLIENT_BASE_URL}/missions/${missionId}/result`, {
     credentials: 'include',
   });
