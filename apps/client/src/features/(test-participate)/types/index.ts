@@ -36,3 +36,35 @@ export interface TestSession {
   participantId?: string; // API 연동 시 사용
   currentMissionResultId?: string; // 현재 미션의 결과 ID
 }
+
+// 미션 진행 상황 조회 응답 타입 (GET /participants/:id/mission-progress)
+export interface MissionProgress {
+  finishedMissionCount: number;
+  isPendingMissionExist: boolean;
+  pendingMissionId?: string;
+}
+
+// 백엔드 MissionResult 상태
+export type MissionResultStatus = 'PENDING' | 'SUCCESS' | 'FAILED';
+
+// 백엔드 Participant 상태
+export type ParticipantStatus = 'ongoing' | 'completed';
+
+// 백엔드 MissionResult 응답 타입
+export interface MissionResultFromServer {
+  id: string;
+  missionId: string;
+  status: MissionResultStatus;
+}
+
+// POST /tests/:testId/participants 응답 타입
+export interface StartTestResponse {
+  participantId: string;
+  missionResults: MissionResultFromServer[];
+}
+
+// GET /participants/:id 응답 타입 (이어하기용)
+export interface ParticipantResponse {
+  status: ParticipantStatus;
+  missionResults: MissionResultFromServer[];
+}
