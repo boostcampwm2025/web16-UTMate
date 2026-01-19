@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import type { MissionResult, TestSession, TestStep } from '../types';
+import type { MissionResult, MissionResultFromServer, TestSession, TestStep } from '../types';
 
 export type MissionState = 'ready' | 'recording' | 'completed' | 'feedback';
 
@@ -12,8 +12,11 @@ interface TestParticipateState extends TestSession {
   // 이어하기 관련 상태 (persist 안 함)
   needsResume: boolean;
 
+  // 서버에서 받은 미션 결과 목록 (미션 시작 시 생성됨)
+  serverMissionResults: MissionResultFromServer[];
+
   // Actions
-  startTest: (participantId: string) => void;
+  startTest: (participantId: string, missionResults: MissionResultFromServer[]) => void;
   setMissionState: (state: MissionState) => void;
   setMissionResultId: (id: string) => void;
   completeMission: (missionResult: MissionResult) => void;
@@ -27,10 +30,11 @@ const initialState = {
   currentStep: 'start' as TestStep,
   currentMissionIndex: 0,
   currentMissionState: 'ready' as MissionState,
-  missionResults: [],
+  missionResults: [] as MissionResult[],
   overallFeedback: undefined,
   participantId: undefined,
   currentMissionResultId: undefined,
+  serverMissionResults: [] as MissionResultFromServer[],
 };
 
 export const useTestParticipateStore = create<TestParticipateState>()(
@@ -40,13 +44,18 @@ export const useTestParticipateStore = create<TestParticipateState>()(
       needsResume: false, // 초기값 (onRehydrateStorage에서 설정)
 
       // 테스트 시작
-      startTest: (participantId: string) => {
+      startTest: (participantId: string, missionResults: MissionResultFromServer[]) => {
+        // 첫 번째 PENDING 상태의 미션 결과 ID를 현재 미션 결과 ID로 설정
+        const firstPendingMission = missionResults.find((mr) => mr.status === 'PENDING');
+
         set({
           currentStep: 'mission',
           currentMissionIndex: 0,
           currentMissionState: 'ready',
           participantId,
           needsResume: false,
+          serverMissionResults: missionResults,
+          currentMissionResultId: firstPendingMission?.id,
         });
       },
 
@@ -120,6 +129,7 @@ export const useTestParticipateStore = create<TestParticipateState>()(
         overallFeedback: state.overallFeedback,
         participantId: state.participantId,
         currentMissionResultId: state.currentMissionResultId,
+        serverMissionResults: state.serverMissionResults,
       }),
       onRehydrateStorage: () => (state) => {
         // localStorage에서 복원된 후 실행

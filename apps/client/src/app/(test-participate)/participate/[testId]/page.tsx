@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { CompleteStep } from '@/features/(test-participate)/components/CompleteStep';
 import { FeedbackStep } from '@/features/(test-participate)/components/FeedbackStep';
@@ -10,44 +11,21 @@ import { ResumeTestStep } from '@/features/(test-participate)/components/ResumeT
 import { TestParticipateLayout } from '@/features/(test-participate)/components/TestParticipateLayout';
 import { TestStartStep } from '@/features/(test-participate)/components/TestStartStep';
 import { useTestParticipateStore } from '@/features/(test-participate)/stores/useTestParticipateStore';
-import type { TestInfo } from '@/features/(test-participate)/types';
-import { CLIENT_BASE_URL } from '@/shared/constants/api';
-import { getTestForParticipation, startTestParticipation } from '@/features/(test-participate)/api';
-
-// TODO: 백엔드 API 준비되면 제거
-const MOCK_TEST: TestInfo = {
-  publicId: '1',
-  title: '사용성 테스트',
-  description: '제품의 주요 기능을 테스트하고 피드백을 제공해주세요.',
-  status: 'ACTIVE',
-  url: 'https://example.com',
-  sdkStatus: true,
-  missions: [
-    {
-      publicId: 'm1',
-      order: 1,
-      name: '홈페이지 탐색',
-      description: '홈페이지에 접속하여\n주요 기능을 확인해보세요.',
-      missionUrl: 'https://ryurain.info',
-      estimatedDuration: 3,
-    },
-    {
-      publicId: 'm2',
-      order: 2,
-      name: '로그인 기능 테스트',
-      description: '로그인 버튼을 찾아\n클릭해주세요.',
-      missionUrl: 'https://ryurain.info/login',
-      estimatedDuration: 5,
-    },
-  ],
-};
+import {
+  completeTestParticipation,
+  getParticipant,
+  getTestForParticipation,
+  startTestParticipation,
+} from '@/features/(test-participate)/api';
 
 export default function TestParticipatePage() {
   const params = useParams();
   const testId = params.testId as string;
 
-  // React Query로 테스트 정보 가져오기 (임시로 Mock 데이터 사용)
-  // TODO: 백엔드 API 준비되면 getTestForParticipation(testId)로 변경
+  // 이미 완료된 테스트인지 여부
+  const [isAlreadyCompleted, setIsAlreadyCompleted] = useState(false);
+
+  // React Query로 테스트 정보 가져오기
   const { data: testInfo } = useQuery({
     queryKey: ['test', testId],
     queryFn: async () => {
@@ -59,17 +37,41 @@ export default function TestParticipatePage() {
   const currentStep = useTestParticipateStore((state) => state.currentStep);
   const currentMissionIndex = useTestParticipateStore((state) => state.currentMissionIndex);
   const needsResume = useTestParticipateStore((state) => state.needsResume);
+  const participantId = useTestParticipateStore((state) => state.participantId);
   const startTest = useTestParticipateStore((state) => state.startTest);
   const submitFeedback = useTestParticipateStore((state) => state.submitFeedback);
+  const clearSession = useTestParticipateStore((state) => state.clearSession);
+
+  // 이어하기 진입 시 참가자 정보 조회 (완료된 테스트 체크)
+  useEffect(() => {
+    const checkParticipantStatus = async () => {
+      if (needsResume && participantId) {
+        const participant = await getParticipant(participantId);
+
+        if (!participant) {
+          // 참가자가 없으면 세션 초기화
+          clearSession();
+          return;
+        }
+
+        if (participant.status === 'completed') {
+          // 이미 완료된 테스트
+          setIsAlreadyCompleted(true);
+          clearSession();
+        }
+      }
+    };
+
+    checkParticipantStatus();
+  }, [needsResume, participantId, clearSession]);
 
   // 테스트 시작 mutation
-  // TODO: 백엔드 API 준비되면 startTestParticipation(testId) 사용
   const startTestMutation = useMutation({
     mutationFn: async () => {
       return await startTestParticipation(testId);
     },
     onSuccess: (data) => {
-      startTest(data.participantId);
+      startTest(data.participantId, data.missionResults);
     },
     onError: (error) => {
       console.error('Failed to start test:', error);
@@ -78,11 +80,10 @@ export default function TestParticipatePage() {
   });
 
   // 테스트 완료 mutation
-  // TODO: 백엔드 API 준비되면 completeTestParticipation 사용
   const completeTestMutation = useMutation({
     mutationFn: async (feedback: string) => {
-      // 임시로 성공 반환
-      return Promise.resolve();
+      if (!participantId) throw new Error('참가자 정보가 없습니다.');
+      return await completeTestParticipation(participantId, feedback);
     },
     onSuccess: (_, feedback) => {
       submitFeedback(feedback);
@@ -144,6 +145,29 @@ export default function TestParticipatePage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-muted-foreground">로딩 중...</div>
+      </div>
+    );
+  }
+
+  // 이미 완료된 테스트인 경우
+  if (isAlreadyCompleted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
+        <div className="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-lg">
+          <div className="mb-4 text-4xl">✅</div>
+          <h2 className="mb-2 text-xl font-bold">이미 완료된 테스트입니다</h2>
+          <p className="text-muted-foreground mb-6">
+            이 테스트는 이미 참여를 완료하셨습니다.
+            <br />
+            참여해 주셔서 감사합니다!
+          </p>
+          <a
+            href="/"
+            className="inline-block rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+          >
+            홈으로 돌아가기
+          </a>
+        </div>
       </div>
     );
   }
