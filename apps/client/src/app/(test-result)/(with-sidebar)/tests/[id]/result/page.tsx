@@ -7,7 +7,7 @@ export default async function TestResultSummaryPage({ params }: { params: Promis
   const { id: testId } = await params;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* 테스트 기본 정보 */}
       <QueryBoundary>
         <TestBasicInfo testId={testId} />
