@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw';
+import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import type { Test, TestDetail, TestMission, UserSummary } from '@/features/(test-manage)/types';
 import { TestStatus } from '@/features/(test-manage)/types';
 
@@ -12,7 +13,7 @@ const mockUsers: UserSummary[] = [
 ];
 
 const mockMissions: Record<string, TestMission[]> = {
-  'test-1': [
+  '1': [
     {
       publicId: 'mission-1',
       order: 0,
@@ -30,7 +31,8 @@ const mockMissions: Record<string, TestMission[]> = {
       estimatedDuration: 10,
     },
   ],
-  'test-3': [
+  '2': [],
+  '3': [
     {
       publicId: 'mission-3',
       order: 0,
@@ -40,11 +42,13 @@ const mockMissions: Record<string, TestMission[]> = {
       estimatedDuration: 15,
     },
   ],
+  '4': [],
+  '5': [],
 };
 
 const mockTests: Test[] = [
   {
-    publicId: 'test-1',
+    publicId: '1',
     title: 'New maze 3',
     description: 'Notion 서비스 사용성 테스트',
     status: TestStatus.PUBLISHED,
@@ -53,7 +57,7 @@ const mockTests: Test[] = [
     owner: mockUsers[0],
   },
   {
-    publicId: 'test-2',
+    publicId: '2',
     title: 'New maze 2',
     description: '',
     status: TestStatus.DRAFT,
@@ -62,7 +66,7 @@ const mockTests: Test[] = [
     owner: mockUsers[0],
   },
   {
-    publicId: 'test-3',
+    publicId: '3',
     title: '셀프플레너',
     description: '플래너 앱 테스트',
     status: TestStatus.PUBLISHED,
@@ -70,11 +74,29 @@ const mockTests: Test[] = [
     sdkStatus: true,
     owner: mockUsers[0],
   },
+  {
+    publicId: '4',
+    title: '테스트 4',
+    description: '네 번째 테스트입니다.',
+    status: TestStatus.DRAFT,
+    url: '',
+    sdkStatus: false,
+    owner: mockUsers[0],
+  },
+  {
+    publicId: '5',
+    title: '테스트 5',
+    description: '다섯 번째 테스트입니다.',
+    status: TestStatus.PUBLISHED,
+    url: 'https://example.com/test5',
+    sdkStatus: true,
+    owner: mockUsers[0],
+  },
 ];
 
 export const testsHandlers = [
   // GET /tests - 스터디(테스트) 목록 조회
-  http.get('http://localhost:3000/tests', ({ request }) => {
+  http.get(`${CLIENT_BASE_URL}/tests`, ({ request }) => {
     const url = new URL(request.url);
     const scope = url.searchParams.get('scope');
 
@@ -92,7 +114,7 @@ export const testsHandlers = [
   }),
 
   // GET /tests/:id - 테스트 개별 조회
-  http.get('http://localhost:3000/tests/:id', ({ params }) => {
+  http.get(`${CLIENT_BASE_URL}/tests/:id`, ({ params }) => {
     const { id } = params;
     const test = mockTests.find((t) => t.publicId === id);
 
@@ -112,9 +134,10 @@ export const testsHandlers = [
   }),
 
   // POST /tests - 테스트 생성
-  http.post('http://localhost:3000/tests', async () => {
+  http.post(`${CLIENT_BASE_URL}/tests`, async () => {
+    const newTestId = String(mockTests.length + 1);
     const newTest: Test = {
-      publicId: `test-${mockTests.length + 1}`,
+      publicId: newTestId,
       title: '새 테스트',
       description: '',
       status: TestStatus.DRAFT,
@@ -124,12 +147,13 @@ export const testsHandlers = [
     };
 
     mockTests.push(newTest);
+    mockMissions[newTestId] = [];
 
     return HttpResponse.json(newTest, { status: 201 });
   }),
 
   // PUT /tests/:id - 테스트 수정
-  http.put('http://localhost:3000/tests/:id', async ({ params, request }) => {
+  http.put(`${CLIENT_BASE_URL}/tests/:id`, async ({ params, request }) => {
     const { id } = params;
     const testIndex = mockTests.findIndex((t) => t.publicId === id);
 

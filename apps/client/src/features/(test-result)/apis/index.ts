@@ -1,6 +1,6 @@
 import type { eventWithTime } from '@rrweb/types';
 
-import type { ParticipantResult, SimpleMissionResult, MainFeedback } from '../types';
+import type { ParticipantResult, ParticipantMissionResult, SimpleMissionResult, MainFeedback, MissionResultWithParticipant } from '../types';
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import type { ApiErrorResponse } from '@/shared/types/api';
 import type { TestSummary } from '../types';
@@ -92,6 +92,18 @@ export const getTestMainFeedback = async (testId: string): Promise<MainFeedback[
   if (!response.ok) {
     const error = (await response.json()) as ApiErrorResponse;
     throw new Error(error.message || '주요 피드백 정보를 불러오는데 실패했습니다.');
+  }
+  return response.json();
+};
+
+// GET /missions/:missionId/result - 특정 미션의 결과 조회
+export const getTestMissionsResultById = async (missionId: number): Promise<MissionResultWithParticipant[]> => {
+  const response = await fetch(`${CLIENT_BASE_URL}/missions/${missionId}/result`, {
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    const error = (await response.json()) as ApiErrorResponse;
+    throw new Error(error.message || '미션 결과를 불러오는데 실패했습니다.');
   }
   return response.json();
 };

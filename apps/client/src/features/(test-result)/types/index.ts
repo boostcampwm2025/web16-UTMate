@@ -36,6 +36,9 @@ export interface ParticipantMissionResult {
   missionId: number;
   missionOrder: number;
   status: ParticipantMissionStatus;
+  duration?: number;
+  feedback?: string | null;
+  createdAt?: string;
 }
 
 export interface ParticipantResult {
@@ -48,4 +51,10 @@ export interface ParticipantResult {
 export interface MainFeedback {
   id: number;
   content: string;
+}
+
+// 특정 미션의 결과 (participant 정보 포함)
+export interface MissionResultWithParticipant extends ParticipantMissionResult {
+  participantId: string;
+  persona: string;
 }
