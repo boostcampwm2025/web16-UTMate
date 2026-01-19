@@ -86,7 +86,7 @@ export class TestsService {
   }
 
   async updateTestStatus(ownerId: number, publicId: string, status: TestStatus) {
-    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId);
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithMissions(publicId, ownerId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }

@@ -76,8 +76,7 @@ export class Test {
   handleStatusChange(status: TestStatus) {
     switch (status) {
       case TestStatus.DRAFT:
-        this.draft();
-        break;
+        throw new Error('Draft 상태로 변경할 수 없습니다.');
       case TestStatus.PUBLISHED:
         this.publish();
         break;
@@ -89,13 +88,12 @@ export class Test {
     }
   }
 
-  private draft() {
-    this.status = TestStatus.DRAFT;
-  }
-
   private publish() {
     if (this.sdkStatus === false) {
       throw new Error('SDK 연결이 확인되지 않아 테스트를 게시할 수 없습니다.');
+    }
+    if (!this.missions || this.missions.length === 0) {
+      throw new Error('미션이 확인되지 않아 테스트를 게시할 수 없습니다.');
     }
     this.status = TestStatus.PUBLISHED;
   }
