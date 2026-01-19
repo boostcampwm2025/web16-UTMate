@@ -28,19 +28,20 @@ export default function TestParticipatePage() {
   // React Query로 테스트 정보 가져오기
   const { data: testInfo } = useQuery({
     queryKey: ['test', testId],
-    queryFn: async () => {
-      return getTestForParticipation(testId);
-    },
+    queryFn: () => getTestForParticipation(testId),
   });
 
-  // Zustand store에서 상태 및 액션 가져오기
-  const currentStep = useTestParticipateStore((state) => state.currentStep);
-  const currentMissionIndex = useTestParticipateStore((state) => state.currentMissionIndex);
-  const needsResume = useTestParticipateStore((state) => state.needsResume);
-  const participantId = useTestParticipateStore((state) => state.participantId);
-  const startTest = useTestParticipateStore((state) => state.startTest);
-  const submitFeedback = useTestParticipateStore((state) => state.submitFeedback);
-  const clearSession = useTestParticipateStore((state) => state.clearSession);
+  // testId별 Zustand store 인스턴스 가져오기
+  const store = useTestParticipateStore(testId);
+
+  // store에서 상태 및 액션 가져오기
+  const currentStep = store((state) => state.currentStep);
+  const currentMissionIndex = store((state) => state.currentMissionIndex);
+  const needsResume = store((state) => state.needsResume);
+  const participantId = store((state) => state.participantId);
+  const startTest = store((state) => state.startTest);
+  const submitFeedback = store((state) => state.submitFeedback);
+  const clearSession = store((state) => state.clearSession);
 
   // 이어하기 진입 시 참가자 정보 조회 (완료된 테스트 체크)
   useEffect(() => {
@@ -49,13 +50,11 @@ export default function TestParticipatePage() {
         const participant = await getParticipant(participantId);
 
         if (!participant) {
-          // 참가자가 없으면 세션 초기화
           clearSession();
           return;
         }
 
         if (participant.status === 'completed') {
-          // 이미 완료된 테스트
           setIsAlreadyCompleted(true);
           clearSession();
         }
@@ -67,9 +66,7 @@ export default function TestParticipatePage() {
 
   // 테스트 시작 mutation
   const startTestMutation = useMutation({
-    mutationFn: async () => {
-      return await startTestParticipation(testId);
-    },
+    mutationFn: () => startTestParticipation(testId),
     onSuccess: (data) => {
       startTest(data.participantId, data.missionResults);
     },
@@ -81,9 +78,9 @@ export default function TestParticipatePage() {
 
   // 테스트 완료 mutation
   const completeTestMutation = useMutation({
-    mutationFn: async (feedback: string) => {
+    mutationFn: (feedback: string) => {
       if (!participantId) throw new Error('참가자 정보가 없습니다.');
-      return await completeTestParticipation(participantId, feedback);
+      return completeTestParticipation(participantId, feedback);
     },
     onSuccess: (_, feedback) => {
       submitFeedback(feedback);
@@ -93,14 +90,6 @@ export default function TestParticipatePage() {
       alert('테스트 완료 처리에 실패했습니다.');
     },
   });
-
-  const handleStart = () => {
-    startTestMutation.mutate();
-  };
-
-  const handleFeedbackSubmit = (feedback: string) => {
-    completeTestMutation.mutate(feedback);
-  };
 
   // 현재 단계에 따른 프로그레스 계산
   const getCurrentStepNumber = (): number => {
@@ -177,12 +166,15 @@ export default function TestParticipatePage() {
       {/* 이어하기 안내 */}
       {needsResume ? (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-          <ResumeTestStep testInfo={testInfo} />
+          <ResumeTestStep testInfo={testInfo} testId={testId} />
         </div>
-      ) : /* 시작 단계는 프로그레스 바 없이 */
-      currentStep === 'start' ? (
+      ) : currentStep === 'start' ? (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-          <TestStartStep testInfo={testInfo} onStart={handleStart} />
+          <TestStartStep
+            testInfo={testInfo}
+            onStart={() => startTestMutation.mutate()}
+            isLoading={startTestMutation.isPending}
+          />
         </div>
       ) : currentStep === 'complete' ? (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
@@ -197,13 +189,19 @@ export default function TestParticipatePage() {
           {currentStep === 'mission' && (
             <MissionStep
               key={testInfo.missions[currentMissionIndex].publicId}
+              testId={testId}
               mission={testInfo.missions[currentMissionIndex]}
               missionNumber={currentMissionIndex + 1}
               totalMissions={testInfo.missions.length}
             />
           )}
 
-          {currentStep === 'feedback' && <FeedbackStep onSubmit={handleFeedbackSubmit} />}
+          {currentStep === 'feedback' && (
+            <FeedbackStep
+              onSubmit={(feedback) => completeTestMutation.mutate(feedback)}
+              isLoading={completeTestMutation.isPending}
+            />
+          )}
         </TestParticipateLayout>
       )}
     </>
