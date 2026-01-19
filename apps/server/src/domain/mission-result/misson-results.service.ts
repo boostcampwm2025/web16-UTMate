@@ -4,14 +4,17 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { EntityManager } from 'typeorm';
 
-import { UpdateMissionResultDto } from './dtos/update-mission-result.dto';
+import { MissionResultDto } from './dto/mission-result.dto';
+import { UpdateMissionResultDto } from './dto/update-mission-result.dto';
 import { MissionResult } from './entities/mission-result.entity';
 import { MissionResultStatus } from './enums';
 import { MissionResultsRepository } from './mission-results.repository';
 
 import { S3StorageService } from '#common/storage/s3-storage.service';
 import { StorageService } from '#common/storage/storage.service';
+import { Mission } from '#domain/tests/entities/mission.entity';
 
 @Injectable()
 export class MissionResultsService {
@@ -21,22 +24,21 @@ export class MissionResultsService {
     private readonly s3StorageService: S3StorageService,
   ) {}
 
-  /**
-   * @description MissionResult Entity 생성
-   * @param missionId
-   * @param participantId
-   * @returns publicId
-   */
-  async createMissionResult(missionId: number, participantId: number) {
-    const existsPendingMission =
-      await this.missionResultsRepository.existsPendingMissionByParticipantId(participantId);
-    if (existsPendingMission) {
-      throw new BadRequestException('이미 진행 중인 미션이 존재합니다. 완료 후 다시 시도해주세요.');
-    }
+  async createMissionResults(missions: Mission[], participantId: number, manager?: EntityManager) {
+    const missionResults = missions.map((mission) =>
+      MissionResult.start(mission.id, participantId),
+    );
 
-    const missionResult = MissionResult.start(missionId, participantId);
-    const savedMissionResult = await this.missionResultsRepository.save(missionResult);
-    return { missionResultId: savedMissionResult.publicId };
+    await this.missionResultsRepository.saveAll(missionResults, manager);
+    return this.getMissionResultsByParticipantId(participantId, manager);
+  }
+
+  async getMissionResultsByParticipantId(participantId: number, manager?: EntityManager) {
+    const missionResults = await this.missionResultsRepository.findByParticipantIdWithMissions(
+      participantId,
+      manager,
+    );
+    return MissionResultDto.fromMissionResultEntities(missionResults);
   }
 
   /**

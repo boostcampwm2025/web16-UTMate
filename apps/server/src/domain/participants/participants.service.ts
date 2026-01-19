@@ -1,54 +1,50 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 
 import { CompleteParticipantDto } from './dto/complete-participant.dto';
-import { MissionProgressDto, MissionProgressDtoV2 } from './dto/mission-progress.dto';
+import { ParticipantDto } from './dto/participant.dto';
 import { Participant } from './entities/participant.entity';
-import { ParticipantStatus } from './enums';
 import { ParticipantsRepository } from './participants.repository';
+
+import { MissionResultsService } from '#domain/mission-result/misson-results.service';
+import { Mission } from '#domain/tests/entities/mission.entity';
 
 @Injectable()
 export class ParticipantsService {
-  constructor(@Inject() private readonly participantsRepository: ParticipantsRepository) {}
+  constructor(
+    @Inject() private readonly participantsRepository: ParticipantsRepository,
+    @Inject() private readonly missionResultsService: MissionResultsService,
+    @Inject() private readonly dataSource: DataSource,
+  ) {}
 
-  async createParticipant(userId: number | undefined, testId: number) {
-    const participant = Participant.create(userId, testId);
-    const savedParticipant = await this.participantsRepository.save(participant);
-    return { participantId: savedParticipant.publicId };
+  async createParticipant(userId: number | undefined, testId: number, missions: Mission[]) {
+    return await this.dataSource.transaction(async (manager) => {
+      // Participant 생성
+      const participant = Participant.create(userId, testId);
+      const savedParticipant = await this.participantsRepository.save(participant, manager);
+
+      // 각 미션에 대해 MissionResult 생성
+      const missionResults = await this.missionResultsService.createMissionResults(
+        missions,
+        savedParticipant.id,
+        manager,
+      );
+
+      return ParticipantDto.fromEntity(savedParticipant, missionResults);
+    });
   }
 
-  async findIdByPublicId(publicId: string) {
+  async getParticipantWithMissionResults(publicId: string) {
     const participant = await this.participantsRepository.findByPublicId(publicId);
     if (!participant) {
       throw new NotFoundException('Participant not found');
     }
-    return participant.id;
-  }
 
-  async getparticipantMissionProgress(publicId: string) {
-    const participant =
-      await this.participantsRepository.findByPublicIdWithMissionResults(publicId);
+    const missionResults = await this.missionResultsService.getMissionResultsByParticipantId(
+      participant.id,
+    );
 
-    if (!participant) {
-      throw new NotFoundException('Participant not found');
-    }
-
-    if (participant.status === ParticipantStatus.COMPLETED) {
-      throw new BadRequestException('참가자는 이미 테스트를 완료한 상태입니다.');
-    }
-
-    return MissionProgressDto.fromMissionResults(participant.missionResults);
-  }
-
-  async getMissionProgress(publicId: string) {
-    const participant =
-      await this.participantsRepository.findByPublicIdWithMissionResultsAndMission(publicId);
-    if (!participant) {
-      throw new NotFoundException('Participant not found');
-    }
-    if (participant.status === ParticipantStatus.COMPLETED) {
-      throw new BadRequestException('참가자는 이미 테스트를 완료한 상태입니다.');
-    }
-    return MissionProgressDtoV2.fromMissionResults(participant.missionResults);
+    return ParticipantDto.fromEntity(participant, missionResults);
   }
 
   async completeParticipant(publicId: string, dto: CompleteParticipantDto) {

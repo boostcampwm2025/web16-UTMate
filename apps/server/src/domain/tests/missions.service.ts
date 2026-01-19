@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
 import { UpdateMissionDto } from './dto/update-mission.dto';
@@ -41,14 +41,5 @@ export class MissionsService {
     if (saveMissions.length > 0) await this.missionRepository.saveAll(saveMissions, manager);
     // 참조되지 않는 미션 삭제
     if (deleteMissions.length > 0) await this.missionRepository.deleteAll(deleteMissions, manager);
-  }
-
-  async createMissionResult(publicId: string, participantId: string) {
-    const mission = await this.missionRepository.findByPublicId(publicId);
-    if (!mission) {
-      throw new BadRequestException('Mission not found');
-    }
-    const participantPkId = await this.participantsService.findIdByPublicId(participantId);
-    return this.missionResultsService.createMissionResult(mission.id, participantPkId);
   }
 }

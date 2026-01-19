@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, NotFoundException } from '@nes
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
-import { TestDto, TestWithProgressDto } from './dto/test.dto';
+import { TestDto } from './dto/test.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
@@ -145,32 +145,14 @@ export class TestsService {
     }
   }
 
-  async findIdByPublicId(testId: string) {
-    const tests = await this.testsRepository.findIdByPublicId(testId);
-    if (!tests) {
-      throw new NotFoundException('Test not found');
-    }
-    return tests.id;
-  }
-
-  async createParticipant(userId: number | undefined, publicId: string) {
-    const test = await this.testsRepository.findByPublicId(publicId);
+  async participateTest(userId: number | undefined, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
     if (test.status !== TestStatus.PUBLISHED) {
       throw new BadRequestException('Test is not published');
     }
-    return this.participantsService.createParticipant(userId, test.id);
-  }
-
-  async getTestWithParticipantInfo(publicId: string, participantId: string) {
-    const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
-    if (!test) {
-      throw new NotFoundException('Test not found');
-    }
-    const participantMissionProgress =
-      await this.participantsService.getparticipantMissionProgress(participantId);
-    return TestWithProgressDto.fromTestEntityWithProgress(test, participantMissionProgress);
+    return this.participantsService.createParticipant(userId, test.id, test.missions);
   }
 }
