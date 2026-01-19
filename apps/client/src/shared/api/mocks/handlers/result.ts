@@ -41,7 +41,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
       missionResults: [
         { missionId: 1, missionOrder: 1, status: 'SUCCESS' },
         { missionId: 2, missionOrder: 2, status: 'FAILURE' },
-        { missionId: 3, missionOrder: 3, status: 'SUCCESS' },
+        { missionId: 4, missionOrder: 3, status: 'SUCCESS' },
       ],
     },
     {
@@ -51,7 +51,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
         { missionId: 1, missionOrder: 1, status: 'SUCCESS' },
         { missionId: 2, missionOrder: 2, status: 'SUCCESS' },
         { missionId: 3, missionOrder: 3, status: 'DROPPED' },
-        { missionId: 3, missionOrder: 3, status: 'DROPPED' },
+        { missionId: 4, missionOrder: 4, status: 'DROPPED' },
       ],
     },
     {
@@ -61,7 +61,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
         { missionId: 1, missionOrder: 1, status: 'SUCCESS' },
         { missionId: 2, missionOrder: 2, status: 'SUCCESS' },
         { missionId: 3, missionOrder: 3, status: 'IN_PROGRESS' },
-        { missionId: 3, missionOrder: 3, status: 'IN_PROGRESS' },
+        { missionId: 4, missionOrder: 4, status: 'IN_PROGRESS' },
       ],
     },
   ],

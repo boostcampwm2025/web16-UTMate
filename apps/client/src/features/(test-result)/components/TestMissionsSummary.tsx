@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { getTestParticipantsResults } from '../apis';
+import { testParticipantsResultsQuery } from '../queries';
 
 interface TestMissionsSummaryProps {
   testId: string;
@@ -12,8 +12,7 @@ interface TestMissionsSummaryProps {
 
 export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
   const { data: participantsData } = useSuspenseQuery({
-    queryKey: ['testMissionsSummary', testId],
-    queryFn: () => getTestParticipantsResults(testId),
+    ...testParticipantsResultsQuery(testId),
   });
 
   // 미션별 성공률을 계산
