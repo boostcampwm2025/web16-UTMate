@@ -26,6 +26,7 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
   const missionResultId = store((state) => state.currentMissionResultId);
   const setMissionState = store((state) => state.setMissionState);
   const completeMission = store((state) => state.completeMission);
+  const participantId = store((state) => state.participantId);
 
   // 로컬 상태
   const [missionCompleted, setMissionCompleted] = useState<boolean | null>(null);
@@ -48,7 +49,11 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
       return;
     }
 
-    const newWindow = window.open(mission.missionUrl, '_blank', 'width=1200,height=800');
+    const newWindow = window.open(
+      `${mission.missionUrl}?participant-id=${participantId}&mission-id=${mission.publicId}`,
+      '_blank',
+      'width=1200,height=800',
+    );
     setMissionWindow(newWindow);
     setMissionState('recording');
   };
@@ -129,12 +134,17 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
         {/* 미션 설명 */}
         <div className="space-y-2">
           <h3 className="font-semibold">미션 설명</h3>
-          <p className="text-muted-foreground whitespace-pre-wrap text-sm">{mission.description}</p>
+          <p className="text-muted-foreground text-sm whitespace-pre-wrap">{mission.description}</p>
         </div>
 
         {/* 1. 미션 수행 페이지 열기 */}
         <div className={!isStateActive('ready') ? 'opacity-50' : ''}>
-          <Button onClick={handleOpenMission} disabled={!isStateActive('ready')} className="w-full" size="lg">
+          <Button
+            onClick={handleOpenMission}
+            disabled={!isStateActive('ready')}
+            className="w-full"
+            size="lg"
+          >
             미션 수행 페이지 열기 (새 창)
           </Button>
         </div>
@@ -145,7 +155,9 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
             <div className="space-y-4">
               <div className="bg-muted rounded-lg p-4">
                 <p className="text-sm">새 창에서 미션을 수행해주세요.</p>
-                <p className="text-muted-foreground text-xs">미션을 완료했다면 아래 버튼을 눌러주세요.</p>
+                <p className="text-muted-foreground text-xs">
+                  미션을 완료했다면 아래 버튼을 눌러주세요.
+                </p>
               </div>
               <Button
                 onClick={handleStopRecording}
@@ -201,7 +213,9 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
 
             <div className="space-y-2">
               <h3 className="font-semibold">피드백 (선택)</h3>
-              <p className="text-muted-foreground text-sm">이 미션에 대한 의견이 있다면 남겨주세요.</p>
+              <p className="text-muted-foreground text-sm">
+                이 미션에 대한 의견이 있다면 남겨주세요.
+              </p>
               <Textarea
                 placeholder="예: 버튼을 찾기 어려웠어요 / 설명이 명확했어요"
                 value={feedback}
@@ -210,7 +224,12 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
               />
             </div>
 
-            <Button onClick={handleNext} disabled={submitMissionMutation.isPending} className="w-full" size="lg">
+            <Button
+              onClick={handleNext}
+              disabled={submitMissionMutation.isPending}
+              className="w-full"
+              size="lg"
+            >
               {submitMissionMutation.isPending ? '제출 중...' : '다음'}
             </Button>
           </div>

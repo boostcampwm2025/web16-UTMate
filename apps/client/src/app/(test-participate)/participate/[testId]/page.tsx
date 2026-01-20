@@ -68,7 +68,7 @@ export default function TestParticipatePage() {
   const startTestMutation = useMutation({
     mutationFn: () => startTestParticipation(testId),
     onSuccess: (data) => {
-      startTest(data.participantId, data.missionResults);
+      startTest(data.id, data.missionResults);
     },
     onError: (error) => {
       console.error('Failed to start test:', error);
