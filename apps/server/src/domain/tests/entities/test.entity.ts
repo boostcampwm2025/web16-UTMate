@@ -68,8 +68,6 @@ export class Test {
   @OneToMany(() => Participant, (participant) => participant.test)
   participants: Participant[];
 
-  totalParticipants: number;
-
   private constructor() {}
 
   static createTest(title: string, ownerId: number): Test {

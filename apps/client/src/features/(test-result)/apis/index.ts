@@ -102,7 +102,7 @@ export const getTestMainFeedback = async (testId: string): Promise<MainFeedback[
 
 // GET /missions/:missionId/result - 특정 미션의 결과 조회
 export const getTestMissionsResultById = async (
-  missionId: number,
+  missionId: string,
 ): Promise<MissionResultWithParticipant[]> => {
   const response = await fetch(`${CLIENT_BASE_URL}/missions/${missionId}/result`, {
     credentials: 'include',

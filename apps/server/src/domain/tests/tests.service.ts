@@ -261,7 +261,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
   async getTestResultSummary(userId: number, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipantsCount(
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipants(
       publicId,
       userId,
     );

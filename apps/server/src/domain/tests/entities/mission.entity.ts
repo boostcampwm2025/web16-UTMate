@@ -1,7 +1,16 @@
 import { nanoid } from 'nanoid';
-import { BeforeInsert, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Test } from './test.entity';
+
+import { MissionResult } from '#domain/mission-result/entities/mission-result.entity';
 
 @Entity('missions')
 export class Mission {
@@ -26,13 +35,14 @@ export class Mission {
   @Column()
   missionUrl: string;
 
-  // TODO : 완료 기준 필드 추가 필요
-
   @Column()
   estimatedDuration: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
+
+  @OneToMany(() => MissionResult, (missionResult) => missionResult.mission)
+  missionResults: MissionResult[];
 
   private constructor() {}
 

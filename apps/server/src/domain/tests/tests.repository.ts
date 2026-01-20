@@ -107,12 +107,12 @@ export class TestsRepository {
     return this.testsRepository.findOneBy({ publicId });
   }
 
-  async findByPublicIdAndOwnerWithParticipantsCount(publicId: string, ownerId: number) {
+  findByPublicIdAndOwnerWithParticipants(publicId: string, ownerId: number) {
     return this.testsRepository
       .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.participants', 'participants')
       .where('tests.publicId = :publicId', { publicId })
       .andWhere('tests.owner_id = :ownerId', { ownerId })
-      .loadRelationCountAndMap('tests.totalParticipants', 'tests.participants')
       .getOne();
   }
 
@@ -122,15 +122,6 @@ export class TestsRepository {
       .leftJoinAndSelect('tests.missions', 'missions')
       .leftJoinAndSelect('tests.participants', 'participants')
       .leftJoinAndSelect('participants.missionResults', 'missionResults')
-      .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId })
-      .getOne();
-  }
-
-  findByPublicIdAndOwnerWithParticipants(publicId: string, ownerId: number) {
-    return this.testsRepository
-      .createQueryBuilder('tests')
-      .leftJoinAndSelect('tests.participants', 'participants')
       .where('tests.publicId = :publicId', { publicId })
       .andWhere('tests.owner_id = :ownerId', { ownerId })
       .getOne();

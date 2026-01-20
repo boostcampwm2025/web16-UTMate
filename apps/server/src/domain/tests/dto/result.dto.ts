@@ -80,3 +80,34 @@ export class MainFeedbackDto {
       .filter((feedback): feedback is MainFeedbackDto => feedback !== null);
   }
 }
+
+export class MissionOverviewDto {
+  missionId: string;
+  missionOrder: number;
+  status: MissionResultStatus;
+  duration?: number;
+  feedback?: string;
+  createdAt?: Date;
+
+  participantId: string;
+  persona: string;
+
+  static fromEntity(missions: Mission, missionResult: MissionResult) {
+    const dto = new MissionOverviewDto();
+    dto.missionId = missions.publicId;
+    dto.missionOrder = missions.order;
+    dto.status = missionResult.status;
+    dto.duration = missionResult.duration;
+    dto.feedback = missionResult.feedback;
+    dto.createdAt = missionResult.createdAt;
+
+    dto.participantId = missionResult.participant.publicId;
+    // TODO : 참가자 페르소나 기능 구현 시 수정 필요
+    dto.persona = 'GUEST';
+    return dto;
+  }
+
+  static fromEntities(mission: Mission, missionResults: MissionResult[]) {
+    return missionResults.map((mr) => this.fromEntity(mission, mr));
+  }
+}

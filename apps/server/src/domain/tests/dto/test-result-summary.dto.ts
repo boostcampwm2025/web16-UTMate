@@ -35,7 +35,7 @@ export class TestResultSummaryDto {
     dto.description = test.description;
     dto.startDate = test.startDate;
     dto.endDate = test.endDate;
-    dto.totalParticipants = test.totalParticipants;
+    dto.totalParticipants = test.participants.length;
     return dto;
   }
 }

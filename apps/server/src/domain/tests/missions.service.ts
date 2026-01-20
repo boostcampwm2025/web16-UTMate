@@ -1,6 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
+import { MissionOverviewDto } from './dto/result.dto';
 import { UpdateMissionDto } from './dto/update-mission.dto';
 import { Mission } from './entities/mission.entity';
 import { Test } from './entities/test.entity';
@@ -53,7 +54,14 @@ export class MissionsService {
     if (deleteMissions.length > 0) await this.missionRepository.deleteAll(deleteMissions, manager);
   }
 
-  getMissionResultById(missionId: string) {
-    throw new Error('Method not implemented.');
+  async getMissionResultById(userId: number, missionId: string) {
+    const mission = await this.missionRepository.findByPublicIdWithAllRelations(missionId);
+    if (!mission) {
+      throw new NotFoundException('Mission not found');
+    }
+    if (mission.test.ownerId !== userId) {
+      throw new NotFoundException('Mission not found');
+    }
+    return MissionOverviewDto.fromEntities(mission, mission.missionResults);
   }
 }

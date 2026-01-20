@@ -33,4 +33,14 @@ export class MissionRepository {
   findByPublicId(publicId: string) {
     return this.missionRepository.findOneBy({ publicId });
   }
+
+  findByPublicIdWithAllRelations(missionId: string) {
+    return this.missionRepository
+      .createQueryBuilder('missions')
+      .leftJoinAndSelect('missions.test', 'test')
+      .leftJoinAndSelect('missions.missionResults', 'missionResults')
+      .leftJoinAndSelect('missionResults.participant', 'participant')
+      .where('missions.publicId = :missionId', { missionId })
+      .getOne();
+  }
 }
