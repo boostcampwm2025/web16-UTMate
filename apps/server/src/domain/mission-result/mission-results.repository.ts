@@ -42,6 +42,7 @@ export class MissionResultsRepository {
       .createQueryBuilder('missionResult')
       .where('missionResult.participant_id = :participantId', { participantId })
       .leftJoinAndSelect('missionResult.mission', 'mission')
+      .orderBy('mission.order', 'ASC')
       .getMany();
   }
 
