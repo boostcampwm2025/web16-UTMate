@@ -52,4 +52,8 @@ export class MissionsService {
     // 참조되지 않는 미션 삭제
     if (deleteMissions.length > 0) await this.missionRepository.deleteAll(deleteMissions, manager);
   }
+
+  getMissionResultById(missionId: string) {
+    throw new Error('Method not implemented.');
+  }
 }

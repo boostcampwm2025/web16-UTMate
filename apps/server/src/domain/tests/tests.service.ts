@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
 import { TestDto } from './dto/test.dto';
+import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
@@ -248,5 +249,32 @@ export class TestsService {
       throw new BadRequestException('Test is not published');
     }
     return this.participantsService.createParticipant(userId, test.id, test.missions);
+  }
+
+  /**
+   * 테스트 결과 요약 정보를 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns 테스트 결과 요약 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
+  async getTestResultSummary(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipantsCount(
+      publicId,
+      userId,
+    );
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return TestResultSummaryDto.fromTest(test);
+  }
+
+  getTestMainFeedback(userId: number, publicId: string) {
+    throw new Error('Method not implemented.');
+  }
+
+  getTestParticipantsResults(userId: number, publicId: string) {
+    throw new Error('Method not implemented.');
   }
 }
