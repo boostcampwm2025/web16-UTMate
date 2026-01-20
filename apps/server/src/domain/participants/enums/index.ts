@@ -1,9 +1,9 @@
 export enum UserType {
-  GUEST = 'guest',
-  REGISTERED = 'registered',
+  GUEST = 'GUEST',
+  REGISTERED = 'REGISTERED',
 }
 
 export enum ParticipantStatus {
-  ONGOING = 'ongoing',
-  COMPLETED = 'completed',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
 }

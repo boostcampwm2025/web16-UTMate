@@ -1,8 +1,11 @@
-import type { TestInfo, TestSession } from '../types';
+import type { ParticipantResponse, StartTestResponse, TestInfo } from '../types';
 
 import { CLIENT_BASE_URL as API_BASE_URL } from '@/shared/constants/api';
 
-// 테스트 정보 조회
+/**
+ * 테스트 정보 조회
+ * GET /tests/:testId
+ */
 export async function getTestForParticipation(testId: string): Promise<TestInfo | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/tests/${testId}`, {
@@ -17,100 +20,61 @@ export async function getTestForParticipation(testId: string): Promise<TestInfo 
       throw new Error('Failed to fetch test');
     }
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error('Error fetching test:', error);
     throw error;
   }
 }
 
-// 1. 테스트 시작 (시작 버튼 클릭)
-export async function startTestParticipation(testId: string): Promise<{ participantId: string }> {
+/**
+ * 테스트 시작 (참가자 생성 + 모든 미션 결과 PENDING 상태로 생성)
+ * POST /tests/:testId/participants
+ */
+export async function startTestParticipation(testId: string): Promise<StartTestResponse> {
   const response = await fetch(`${API_BASE_URL}/tests/${testId}/participants`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify({ testId }),
   });
 
-  console.log('startTestParticipation response', response);
-
   if (!response.ok) {
-    console.log(response.ok);
     throw new Error('Failed to start test participation');
-  }
-
-  const data = await response.json();
-
-  // 로컬스토리지에 participantId 저장
-  localStorage.setItem('participantId', data.participantId);
-
-  return data;
-}
-
-// 2. 미션 시작 (미션 수행 페이지 열기)
-export async function startMission(
-  missionId: string,
-  participantId: string,
-): Promise<{ id: string }> {
-  const response = await fetch(`${API_BASE_URL}/missionResult`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({
-      missionId,
-      participantsId: participantId, // 백엔드 스펙대로 participantsId
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to start mission');
   }
 
   return await response.json();
 }
 
-// 3. 녹화 종료 (녹화 종료 버튼 클릭)
-export async function finishMissionRecording(missionResultId: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/missionResult/${missionResultId}/finish`, {
+/**
+ * 녹화 업로드 (녹화 종료 시 S3에 로그 파일 업로드)
+ * POST /mission-results/:missionResultId/record
+ */
+export async function uploadMissionRecording(missionResultId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/mission-results/${missionResultId}/record`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     credentials: 'include',
-    body: JSON.stringify({
-      endTime: new Date().toISOString(),
-    }),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to finish mission recording');
+    throw new Error('녹화 업로드에 실패했습니다.');
   }
 }
 
-// 4. 미션 결과 제출 (다음 버튼 클릭)
+/**
+ * 미션 결과 제출 (다음 버튼 클릭 시)
+ * PATCH /mission-results/:missionResultId
+ */
 export async function submitMissionResult(
   missionResultId: string,
   status: 'SUCCESS' | 'FAILED',
   feedback?: string,
 ): Promise<void> {
-  const body: { status: string; feedback?: string } = { status };
-  if (feedback) {
-    body.feedback = feedback;
-  }
-
-  const response = await fetch(`${API_BASE_URL}/missionResult/${missionResultId}`, {
+  const response = await fetch(`${API_BASE_URL}/mission-results/${missionResultId}`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify(body),
+    body: JSON.stringify({ status, feedback }),
   });
 
   if (!response.ok) {
@@ -118,36 +82,30 @@ export async function submitMissionResult(
   }
 }
 
-// 5. 테스트 완료 (제출하기 버튼 클릭)
-export async function completeTestParticipation(
-  participantId: string,
-  overallFeedback: string,
-): Promise<void> {
+/**
+ * 테스트 완료 (전체 피드백 제출 시)
+ * PATCH /participants/:participantId
+ */
+export async function completeTestParticipation(participantId: string, feedback?: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/participants/${participantId}`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({
-      status: 'complete',
-      overallFeedback,
-    }),
+    body: JSON.stringify({ status: 'completed', feedback }),
   });
 
   if (!response.ok) {
     throw new Error('Failed to complete test participation');
   }
-
-  // 로컬스토리지에서 participantId 제거
-  localStorage.removeItem('participantId');
 }
 
-// 6. 세션 복원 (페이지 새로고침 시 진행 상황 조회)
-// TODO: 백엔드 API 준비 필요 - GET /participants/:participantId/progress
-export async function getParticipantProgress(participantId: string): Promise<TestSession | null> {
+/**
+ * 참가자 정보 조회 (이어하기 진입 시 상태 확인용)
+ * GET /participants/:participantId
+ */
+export async function getParticipant(participantId: string): Promise<ParticipantResponse | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/participants/${participantId}/progress`, {
+    const response = await fetch(`${API_BASE_URL}/participants/${participantId}`, {
       credentials: 'include',
       cache: 'no-store',
     });
@@ -156,36 +114,12 @@ export async function getParticipantProgress(participantId: string): Promise<Tes
       if (response.status === 404) {
         return null;
       }
-      throw new Error('Failed to fetch participant progress');
+      throw new Error('Failed to fetch participant');
     }
 
-    const data = await response.json();
-
-    // 백엔드 응답을 TestSession 형태로 변환
-    // 예상 응답 형태:
-    // {
-    //   participantId: string;
-    //   status: 'in_progress' | 'complete';
-    //   currentMissionIndex: number;
-    //   missionResults: [{ missionPublicId, completed, feedback }];
-    //   overallFeedback?: string;
-    // }
-    const session: TestSession = {
-      currentStep:
-        data.status === 'complete'
-          ? 'complete'
-          : data.currentMissionIndex === -1
-            ? 'feedback'
-            : 'mission',
-      currentMissionIndex: Math.max(0, data.currentMissionIndex),
-      missionResults: data.missionResults || [],
-      overallFeedback: data.overallFeedback,
-      participantId: data.participantId,
-    };
-
-    return session;
+    return await response.json();
   } catch (error) {
-    console.error('Error fetching participant progress:', error);
+    console.error('Error fetching participant:', error);
     return null;
   }
 }

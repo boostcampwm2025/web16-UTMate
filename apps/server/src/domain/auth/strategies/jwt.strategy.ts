@@ -38,8 +38,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT) {
     if (userId) {
       return new JwtPayloadDto(payload.sub, payload.familyId, Number(userId));
     }
-    const user = await this.usersService.getIdByPublicId(payload.sub);
-    await this.userRedis.set(payload.sub, user.id, 'EX', 3600); // 1시간 캐싱
-    return new JwtPayloadDto(payload.sub, payload.familyId, user.id);
+    const findUserId = await this.usersService.getIdByPublicId(payload.sub);
+    await this.userRedis.set(payload.sub, findUserId, 'EX', 3600); // 1시간 캐싱
+    return new JwtPayloadDto(payload.sub, payload.familyId, findUserId);
   }
 }

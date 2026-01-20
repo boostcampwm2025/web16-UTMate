@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui/button';
 import { verifySdkInstallation } from '@/shared/api/test';
+import { CopyToClipboardButton } from '@/shared/components/CopyToClipboardButton';
 
 const SDK_URL = process.env.NEXT_PUBLIC_SDK_DOMAIN || 'https://utmate.me/sdk/utmate-sdk.iife.js';
 const SDK_CODE = `<script src="${SDK_URL}"></script>`;
@@ -17,19 +18,8 @@ interface TestSdkStepProps {
 
 export function TestSdkStep({ testId, initialSdkStatus }: TestSdkStepProps) {
   const [sdkStatus, setSdkStatus] = useState(initialSdkStatus);
-  const [copied, setCopied] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(SDK_CODE);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('복사 실패:', err);
-    }
-  };
 
   const handleVerifySdk = async () => {
     try {
@@ -68,21 +58,7 @@ export function TestSdkStep({ testId, initialSdkStatus }: TestSdkStepProps) {
             <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-gray-100">
               <code>{SDK_CODE}</code>
             </pre>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopy}
-              className="absolute top-2 right-2"
-            >
-              {copied ? (
-                <>✓ 복사됨</>
-              ) : (
-                <>
-                  <Copy className="mr-1 size-4" />
-                  복사
-                </>
-              )}
-            </Button>
+            <CopyToClipboardButton text={SDK_CODE} className="absolute top-2 right-2" />
           </div>
         </div>
         <div>

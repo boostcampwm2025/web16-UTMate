@@ -27,7 +27,14 @@ export class S3StorageService {
     this.bucketName = this.configService.get<string>(ENV_KEYS.S3_BUCKET_NAME)!;
   }
 
-  async uploadToS3(fileName: string, content: Buffer): Promise<string> {
+  /**
+   * 파일 버퍼를 압축 후 S3에 업로드합니다.
+   *
+   * @param fileName 저장할 파일 이름
+   * @param content 파일 내용 버퍼
+   * @returns 업로드된 파일 이름
+   */
+  async uploadToS3(fileName: string, content: Buffer) {
     const compressed = await this.gzip(content);
     const compressedFileName = fileName + '.gz';
 
@@ -45,7 +52,14 @@ export class S3StorageService {
     return compressedFileName;
   }
 
-  async getPresignedUrl(fileName: string, expiresIn: number = 3600): Promise<string> {
+  /**
+   * S3에 저장된 파일의 presigned URL을 생성합니다.
+   *
+   * @param fileName 파일 이름
+   * @param expiresIn URL 만료 시간(초) 기본값: 3600초 (1시간)
+   * @returns presigned URL
+   */
+  async getPresignedUrl(fileName: string, expiresIn: number = 3600) {
     const command = new GetObjectCommand({
       Bucket: this.bucketName,
       Key: fileName,
@@ -54,7 +68,12 @@ export class S3StorageService {
     return await getSignedUrl(this.s3Client, command, { expiresIn });
   }
 
-  async deleteFromS3(fileName: string): Promise<void> {
+  /**
+   * S3에 저장된 파일을 삭제합니다.
+   *
+   * @param fileName 파일 이름
+   */
+  async deleteFromS3(fileName: string) {
     const command = new DeleteObjectCommand({
       Bucket: this.bucketName,
       Key: fileName,

@@ -1,8 +1,14 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
-import { TestDto, TestWithProgressDto } from './dto/test.dto';
+import { TestDto } from './dto/test.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
@@ -22,12 +28,29 @@ export class TestsService {
     @Inject() private readonly configService: ConfigService,
   ) {}
 
+  /**
+   * 테스트를 생성합니다.
+   *
+   * @param ownerId 테스트 소유자 id
+   * @param title 테스트 제목
+   * @returns 생성된 테스트의 public id
+   */
   async createTest(ownerId: number, title: string) {
     const test = Test.createTest(title, ownerId);
     const savedTest = await this.testsRepository.save(test);
     return savedTest.publicId;
   }
 
+  /**
+   * 테스트와 해당 테스트의 미션들을 업데이트합니다.
+   * 하나의 트랜잭션 내에서 테스트 업데이트와 미션 업데이트를 처리합니다.
+   * 미션 업데이트는 MissionsService에 위임합니다.
+   *
+   * @param ownerId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @param updateTestDto 업데이트할 테스트 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
   async updateTest(ownerId: number, publicId: string, updateTestDto: UpdateTestDto) {
     // 트랜잭션 시작
     await this.dataSource.transaction(async (manager) => {
@@ -48,11 +71,27 @@ export class TestsService {
     });
   }
 
+  /**
+   * 내가 소유한 테스트들을 요약 정보만 조회합니다.
+   *
+   * @param ownerId 테스트 소유자 id
+   * @returns 테스트 요약 DTO 배열
+   */
   async getMyTests(ownerId: number) {
-    const test = await this.testsRepository.findSummariesByOwner(ownerId);
-    return TestSummaryDto.fromTestEntities(test);
+    const tests = await this.testsRepository.findSummariesByOwner(ownerId);
+    return TestSummaryDto.fromTestEntities(tests);
   }
 
+  /**
+   * 특정 테스트의 상세 정보를 조회합니다.
+   * 공개된 테스트이거나, 소유자가 조회하는 경우에만 접근을 허용합니다.
+   *
+   * @param ownerId 테스트 소유자 id (Optional)
+   * @param publicId 테스트 public id
+   * @returns 테스트 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없는 경우
+   * @throws ForbiddenException 공개 상태가 아닌 테스트에 대해 소유자가 이외의 사용자가 접근하는 경우
+   */
   async getTestById(ownerId: number | undefined, publicId: string) {
     const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
     if (!test) {
@@ -61,12 +100,20 @@ export class TestsService {
 
     if (test.status === TestStatus.PUBLISHED) return TestDto.fromTestEntity(test);
 
-    if (test.ownerId === ownerId) {
-      return TestDto.fromTestEntity(test);
+    if (test.ownerId !== ownerId) {
+      throw new ForbiddenException('Test not found');
     }
-    throw new NotFoundException('Test not found');
+    return TestDto.fromTestEntity(test);
   }
 
+  /**
+   * SDK의 설치 상태만 조회합니다.
+   *
+   * @param ownerId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns SDK 설치 상태
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
   async getSdkStatus(ownerId: number, publicId: string) {
     const test = await this.testsRepository.findSdkStatusByPublicIdAndOwner(publicId, ownerId);
     if (!test) {
@@ -75,6 +122,13 @@ export class TestsService {
     return { sdkStatus: test.sdkStatus };
   }
 
+  /**
+   * 테스트를 삭제합니다.
+   *
+   * @param ownerId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
   async deleteTest(ownerId: number, publicId: string) {
     // 테스트 삭제
     // 관련된 미션들은 Test 엔티티의 onDelete: 'CASCADE' 옵션에 의해 자동 삭제됨
@@ -85,19 +139,36 @@ export class TestsService {
     await this.testsRepository.remove(test);
   }
 
+  /**
+   * 테스트 상태를 업데이트합니다.
+   *
+   * @param ownerId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @param status 업데이트할 테스트 상태
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   * @throws BadRequestException 잘못된 상태로 변경하려는 경우
+   */
   async updateTestStatus(ownerId: number, publicId: string, status: TestStatus) {
-    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId);
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithMissions(publicId, ownerId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
     try {
-      test.handleStatusChange(status);
+      test.transitionStatus(status);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
     await this.testsRepository.save(test);
   }
 
+  /**
+   * SDK 설치를 검증합니다.
+   *
+   * @param ownerId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns SDK 설치 상태
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
   async verifySdkInstallation(ownerId: number, publicId: string) {
     const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId);
     if (!test) {
@@ -112,6 +183,13 @@ export class TestsService {
     return { sdkStatus: test.sdkStatus };
   }
 
+  /**
+   * SDK 설치 여부를 검증하는 실제 로직입니다.
+   * fetch를 사용하여 테스트 URL에 접근하고, 페이지 내에 SDK 스크립트가 포함되어 있는지 정규식을 통해 확인합니다.
+   *
+   * @param destination 테스트 URL
+   * @returns SDK 설치 여부
+   */
   private async verifySdkInstallationLogic(destination: string): Promise<boolean> {
     try {
       const response = await fetch(destination);
@@ -138,6 +216,12 @@ export class TestsService {
     }
   }
 
+  /**
+   * SDK를 통해 테스트의 SDK 설치 정보를 업데이트합니다.
+   *
+   * @param publicId 테스트 public id
+   * @throws NotFoundException 테스트를 찾을 수 없는 경우
+   */
   async verifySdkInstallationBySDK(publicId: string) {
     const affectedRows = await this.testsRepository.updateSdkStatus(publicId, true);
     if (affectedRows === 0) {
@@ -145,32 +229,24 @@ export class TestsService {
     }
   }
 
-  async findIdByPublicId(testId: string) {
-    const tests = await this.testsRepository.findIdByPublicId(testId);
-    if (!tests) {
-      throw new NotFoundException('Test not found');
-    }
-    return tests.id;
-  }
-
-  async createParticipant(userId: number | undefined, publicId: string) {
-    const test = await this.testsRepository.findByPublicId(publicId);
+  /**
+   * 테스트에 참여자를 생성합니다.
+   * 참여자 생성은 ParticipantsService에 위임합니다.
+   *
+   * @param userId 사용자 id (Optional)
+   * @param publicId 테스트 public id
+   * @returns 참여자 정보 및 미션 결과 배열
+   * @throws NotFoundException 테스트를 찾을 수 없는 경우
+   * @throws BadRequestException 테스트가 게시되지 않은 경우
+   */
+  async participateTest(userId: number | undefined, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
     if (test.status !== TestStatus.PUBLISHED) {
       throw new BadRequestException('Test is not published');
     }
-    return this.participantsService.createParticipant(userId, test.id);
-  }
-
-  async getTestWithParticipantInfo(publicId: string, participantId: string) {
-    const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
-    if (!test) {
-      throw new NotFoundException('Test not found');
-    }
-    const participantMissionProgress =
-      await this.participantsService.getparticipantMissionProgress(participantId);
-    return TestWithProgressDto.fromTestEntityWithProgress(test, participantMissionProgress);
+    return this.participantsService.createParticipant(userId, test.id, test.missions);
   }
 }
