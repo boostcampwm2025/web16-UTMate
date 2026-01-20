@@ -15,9 +15,10 @@ export class TokenService {
 
   /**
    * Access Token, Refresh Token 쌍을 생성합니다.
+   *
    * @param sub payload 내 sub로 사용됩니다.
    * @param familyId payload 내 familyId로 사용됩니다.
-   * @returns TokenDto
+   * @returns TokenDto (액세스 토큰, 리프레시 토큰)
    */
   async generateTokenPair(sub: string, familyId: string): Promise<TokenDto> {
     const [accessToken, refreshToken] = await Promise.all([

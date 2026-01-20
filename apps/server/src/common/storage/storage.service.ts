@@ -10,12 +10,12 @@ export class StorageService {
   constructor() {}
 
   /**
-   * @description stream 형태의 파일을 지정된 경로에 저장합니다.
-   * @param filename
-   * @param content
-   * @returns
+   * stream 형태로 파일을 지정된 경로에 저장합니다.
+   *
+   * @param filename 파일 이름
+   * @param content 파일 내용 스트림
    */
-  async save(filename: string, content: Readable): Promise<string> {
+  async save(filename: string, content: Readable) {
     const filePath = path.join(this.uploadDir, filename);
     const dir = path.dirname(filePath);
 
@@ -28,17 +28,16 @@ export class StorageService {
       writeStream.on('finish', () => resolve());
       writeStream.on('error', (error) => reject(error));
     });
-
-    return filePath;
   }
 
   /**
-   * @Deprecated
-   * @description 지정된 경로의 파일을 스트림 형태로 반환합니다.
-   * @param filename
+   * 지정된 경로의 파일을 스트림 형태로 반환합니다.
+   *
+   * @param filename 파일 이름
    * @returns 지정된 경로의 파일 스트림
+   * @throws NotFoundException 파일을 찾을 수 없는 경우
    */
-  async getReadStreamByFilename(filename: string): Promise<Readable> {
+  async getReadStreamByFilename(filename: string) {
     const filePath = path.join(this.uploadDir, filename);
     try {
       await fs.promises.access(filePath);
@@ -49,11 +48,13 @@ export class StorageService {
   }
 
   /**
-   * @description 지정된 경로의 파일을 버퍼로 반환합니다.
-   * @param filename
+   * 지정된 경로의 파일을 버퍼 형태로 반환합니다.
+   *
+   * @param filename 파일 이름
    * @returns 지정된 경로의 파일 버퍼
+   * @throws NotFoundException 파일을 찾을 수 없는 경우
    */
-  async getBufferByFilename(filename: string): Promise<Buffer> {
+  async getBufferByFilename(filename: string) {
     const filePath = path.join(this.uploadDir, filename);
     try {
       return await fs.promises.readFile(filePath);

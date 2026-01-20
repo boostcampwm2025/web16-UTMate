@@ -43,7 +43,7 @@ export class Participant {
   @OneToMany(() => MissionResult, (missionResult) => missionResult.participant)
   missionResults: MissionResult[];
 
-  @Column({ type: 'enum', enum: ParticipantStatus, default: ParticipantStatus.ONGOING })
+  @Column({ type: 'enum', enum: ParticipantStatus, default: ParticipantStatus.IN_PROGRESS })
   status: ParticipantStatus;
 
   @Column({ type: 'text', nullable: true })

@@ -7,9 +7,9 @@ import { ParticipantsService } from './participants.service';
 export class ParticipantsController {
   constructor(@Inject() private readonly participantsService: ParticipantsService) {}
 
-  @Get('/:id/mission-progress')
-  async getMissionProgress(@Param('id') publicId: string) {
-    return this.participantsService.getMissionProgress(publicId);
+  @Get('/:id')
+  async getParticipantById(@Param('id') publicId: string) {
+    return await this.participantsService.getParticipantWithMissionResults(publicId);
   }
 
   @Patch('/:id')

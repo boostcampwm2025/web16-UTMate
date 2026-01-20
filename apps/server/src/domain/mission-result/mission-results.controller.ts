@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 
-import { UpdateMissionResultDto } from './dtos/update-mission-result.dto';
+import { UpdateMissionResultDto } from './dto/update-mission-result.dto';
 import { MissionResultsService } from './misson-results.service';
 
 @Controller('/mission-results')
