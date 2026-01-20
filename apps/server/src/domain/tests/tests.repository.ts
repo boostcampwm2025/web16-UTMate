@@ -22,6 +22,20 @@ export class TestsRepository {
       .getOne();
   }
 
+  async findByPublicIdAndOwnerWithMissions(
+    publicId: string,
+    ownerId: number,
+    manager?: EntityManager,
+  ) {
+    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
+    return repo
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .getOne();
+  }
+
   async findSummariesByOwner(ownerId: number, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo
@@ -59,7 +73,7 @@ export class TestsRepository {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo
       .createQueryBuilder('tests')
-      .leftJoinAndSelect('tests.missions', 'mission')
+      .leftJoinAndSelect('tests.missions', 'missions')
       .where('tests.publicId = :publicId', { publicId })
       .getOne();
   }

@@ -4,14 +4,16 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { EntityManager } from 'typeorm';
 
-import { UpdateMissionResultDto } from './dtos/update-mission-result.dto';
+import { MissionResultDto } from './dto/mission-result.dto';
+import { UpdateMissionResultDto } from './dto/update-mission-result.dto';
 import { MissionResult } from './entities/mission-result.entity';
-import { MissionResultStatus } from './enums';
 import { MissionResultsRepository } from './mission-results.repository';
 
 import { S3StorageService } from '#common/storage/s3-storage.service';
 import { StorageService } from '#common/storage/storage.service';
+import { Mission } from '#domain/tests/entities/mission.entity';
 
 @Injectable()
 export class MissionResultsService {
@@ -22,28 +24,45 @@ export class MissionResultsService {
   ) {}
 
   /**
-   * @description MissionResult Entity 생성
-   * @param missionId
-   * @param participantId
-   * @returns publicId
+   * 각 Mission에 대한 MissionResults 생성합니다.
+   *
+   * @param missions 미션 배열
+   * @param participantId 참가자 id
+   * @param manager 트랜잭션 매니저(Optional) : 트랜잭션 내에서 호출할 경우 전달
+   * @returns MissionResultDto 배열
    */
-  async createMissionResult(missionId: number, participantId: number) {
-    const existsPendingMission =
-      await this.missionResultsRepository.existsPendingMissionByParticipantId(participantId);
-    if (existsPendingMission) {
-      throw new BadRequestException('이미 진행 중인 미션이 존재합니다. 완료 후 다시 시도해주세요.');
-    }
+  async createMissionResults(missions: Mission[], participantId: number, manager?: EntityManager) {
+    const missionResults = missions.map((mission) =>
+      MissionResult.create(mission.id, participantId),
+    );
 
-    const missionResult = MissionResult.start(missionId, participantId);
-    const savedMissionResult = await this.missionResultsRepository.save(missionResult);
-    return { missionResultId: savedMissionResult.publicId };
+    await this.missionResultsRepository.saveAll(missionResults, manager);
+    return this.getMissionResultsByParticipantId(participantId, manager);
+  }
+
+  /**
+   * 참가자 id로 미션 결과들을 조회합니다.
+   *
+   * @param participantId 참가자 id
+   * @param manager 트랜잭션 매니저(Optional) : 트랜잭션 내에서 호출할 경우 전달
+   * @returns MissionResultDto 배열
+   */
+  async getMissionResultsByParticipantId(participantId: number, manager?: EntityManager) {
+    const missionResults = await this.missionResultsRepository.findByParticipantIdWithMissions(
+      participantId,
+      manager,
+    );
+    return MissionResultDto.fromMissionResultEntities(missionResults);
   }
 
   /**
    * 파일 시스템에 저장된 로그 파일을 S3로 업로드하고 업로드한 파일 이름을 업데이트합니다.
-   * 추후 로그 파일을 분석하여
-   * @param publicId
-   * @returns
+   * 추후 로그 파일을 분석하여 미션 결과에 반영하는 로직 추가 예정
+   *
+   * @param publicId 미션 결과 publicId
+   * @throws NotFoundException 미션 결과를 찾을 수 없는 경우
+   * @throws NotFoundException 로그 파일을 찾을 수 없는 경우 ( 하위 서비스에서 전파 )
+   * @throws InternalServerErrorException 로그 파일 업로드에 실패한 경우
    */
   async createMissionResultRecord(publicId: string) {
     const missionResult = await this.missionResultsRepository.findByPublicId(publicId);
@@ -72,11 +91,14 @@ export class MissionResultsService {
       throw new InternalServerErrorException('로그 파일 업로드에 실패했습니다.');
     }
   }
+
   /**
-   * @description 미션 결과 업데이트
-   * @param missionResultId
-   * @param dto
-   * @returns MissionResultDto
+   * dto를 기반으로 미션 결과의 상태 및 피드백을 업데이트합니다.
+   *
+   * @param publicId 미션 결과 publicId
+   * @param dto 업데이트할 데이터
+   * @throws NotFoundException 미션 결과를 찾을 수 없는 경우
+   * @throws BadRequestException 잘못된 상태로 변경하려는 경우
    */
   async updateMissionResult(publicId: string, dto: UpdateMissionResultDto) {
     // 미션 결과 조회
@@ -84,19 +106,13 @@ export class MissionResultsService {
     if (!missionResult) {
       throw new NotFoundException('미션 결과를 찾을 수 없습니다.');
     }
-    if (missionResult.status !== MissionResultStatus.PENDING) {
-      throw new BadRequestException('이미 완료된 미션 결과는 수정할 수 없습니다.');
-    }
-    if (dto.status === MissionResultStatus.PENDING) {
-      throw new BadRequestException('미션 결과 상태를 PENDING으로 변경할 수 없습니다.');
-    }
-    if (!missionResult.filename) {
-      throw new BadRequestException(
-        '녹화 파일이 존재하지 않습니다. 녹화 완료를 먼저 진행해주세요.',
-      );
-    }
 
-    missionResult.complete(dto.status, dto.feedback);
-    await this.missionResultsRepository.save(missionResult);
+    // 상태 전이 및 저장
+    try {
+      missionResult.transition(dto.status, dto.feedback);
+      await this.missionResultsRepository.save(missionResult);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

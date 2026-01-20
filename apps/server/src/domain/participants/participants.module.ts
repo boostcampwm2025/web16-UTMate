@@ -6,8 +6,10 @@ import { ParticipantsController } from './paricipants.controller';
 import { ParticipantsRepository } from './participants.repository';
 import { ParticipantsService } from './participants.service';
 
+import { MissionResultModule } from '#domain/mission-result/mission-results.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Participant])],
+  imports: [TypeOrmModule.forFeature([Participant]), MissionResultModule],
   controllers: [ParticipantsController],
   providers: [ParticipantsService, ParticipantsRepository],
   exports: [ParticipantsService],

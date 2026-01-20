@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 import { MissionResult } from './entities/mission-result.entity';
 import { MissionResultStatus } from './enums';
@@ -15,6 +15,11 @@ export class MissionResultsRepository {
     return this.repository.save(missionResult);
   }
 
+  async saveAll(missionResults: MissionResult[], manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(MissionResult) : this.repository;
+    return repo.save(missionResults);
+  }
+
   async findByPublicId(publicId: string) {
     return this.repository
       .createQueryBuilder('missionResult')
@@ -26,6 +31,15 @@ export class MissionResultsRepository {
     return this.repository
       .createQueryBuilder('missionResult')
       .where('missionResult.participant_id = :participantId', { participantId })
+      .getMany();
+  }
+
+  async findByParticipantIdWithMissions(participantId: number, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(MissionResult) : this.repository;
+    return repo
+      .createQueryBuilder('missionResult')
+      .where('missionResult.participant_id = :participantId', { participantId })
+      .leftJoinAndSelect('missionResult.mission', 'mission')
       .getMany();
   }
 

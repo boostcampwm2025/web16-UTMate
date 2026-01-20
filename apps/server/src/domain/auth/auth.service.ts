@@ -18,6 +18,7 @@ export class AuthService {
   /**
    * 로그인/회원가입을 처리하고 토큰 쌍을 생성합니다.
    * refreshToken을 redis에 저장합니다.
+   *
    * @param oAuthUserDto  OAuth 인증 후 반환된 사용자 정보
    * @returns TokenDto : 액세스 토큰과 리프레시 토큰
    */
