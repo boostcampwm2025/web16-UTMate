@@ -7,24 +7,26 @@ import type { MissionResult, MissionResultFromServer, TestSession, TestStep } fr
 export type MissionState = 'ready' | 'recording' | 'completed' | 'feedback';
 
 interface TestParticipateState extends TestSession {
-  // 현재 미션의 UI 상태 (복원용)
+  // 현재 미션의 UI 상태
   currentMissionState: MissionState;
 
-  // 이어하기 관련 상태 (persist 안 함)
+  // 이어하기 관련 상태
   needsResume: boolean;
+  isLoadingResume: boolean;
 
   // 서버에서 받은 미션 결과 목록 (미션 시작 시 생성됨)
   serverMissionResults: MissionResultFromServer[];
 
   // Actions
   startTest: (participantId: string, missionResults: MissionResultFromServer[]) => void;
+  resumeTest: (missionResults: MissionResultFromServer[], totalMissions: number) => void;
   setMissionState: (state: MissionState) => void;
   setMissionResultId: (id: string) => void;
   completeMission: (missionResult: MissionResult) => void;
   submitFeedback: (feedback: string) => void;
   clearSession: () => void;
   resetToStart: () => void;
-  confirmResume: () => void;
+  setLoadingResume: (loading: boolean) => void;
 }
 
 const initialState = {
@@ -47,11 +49,11 @@ function createTestParticipateStore(testId: string) {
     persist(
       (set, get) => ({
         ...initialState,
-        needsResume: false, // 초기값 (onRehydrateStorage에서 설정)
+        needsResume: false,
+        isLoadingResume: false,
 
-        // 테스트 시작
+        // 테스트 시작 (새로 시작)
         startTest: (participantId: string, missionResults: MissionResultFromServer[]) => {
-          // 첫 번째 PENDING 상태의 미션 결과 ID를 현재 미션 결과 ID로 설정
           const firstPendingMission = missionResults.find((mr) => mr.status === 'PENDING');
 
           set({
@@ -60,8 +62,50 @@ function createTestParticipateStore(testId: string) {
             currentMissionState: 'ready',
             participantId,
             needsResume: false,
+            isLoadingResume: false,
             serverMissionResults: missionResults,
             currentMissionResultId: firstPendingMission?.id,
+            missionResults: [],
+          });
+        },
+
+        // 이어하기 (서버에서 받은 상태로 복원)
+        resumeTest: (missionResults: MissionResultFromServer[], totalMissions: number) => {
+          // 완료된 미션 수 계산 (PENDING이 아닌 것들)
+          const completedCount = missionResults.filter(
+            (mr) => mr.status === 'SUCCESS' || mr.status === 'FAILED'
+          ).length;
+
+          // 첫 번째 PENDING 미션 찾기
+          const firstPendingMission = missionResults.find((mr) => mr.status === 'PENDING');
+          const firstInProgressMission = missionResults.find((mr) => mr.status === 'IN_PROGRESS');
+
+          // IN_PROGRESS가 있으면 그것부터, 없으면 첫 PENDING부터
+          const currentMission = firstInProgressMission || firstPendingMission;
+          const currentIndex = currentMission
+            ? missionResults.findIndex((mr) => mr.id === currentMission.id)
+            : completedCount;
+
+          // 모든 미션이 완료되었으면 피드백 단계로
+          const allCompleted = completedCount === totalMissions;
+
+          // 완료된 미션들의 결과 생성
+          const completedMissionResults: MissionResult[] = missionResults
+            .filter((mr) => mr.status === 'SUCCESS' || mr.status === 'FAILED')
+            .map((mr) => ({
+              missionPublicId: mr.missionId,
+              completed: mr.status === 'SUCCESS',
+            }));
+
+          set({
+            currentStep: allCompleted ? 'feedback' : 'mission',
+            currentMissionIndex: currentIndex,
+            currentMissionState: firstInProgressMission ? 'ready' : 'ready',
+            needsResume: false,
+            isLoadingResume: false,
+            serverMissionResults: missionResults,
+            currentMissionResultId: currentMission?.id,
+            missionResults: completedMissionResults,
           });
         },
 
@@ -80,14 +124,11 @@ function createTestParticipateStore(testId: string) {
           const { missionResults, currentMissionIndex, serverMissionResults } = get();
           const newMissionResults = [...missionResults, missionResult];
 
-          // serverMissionResults에서 총 미션 수 가져오기
           const totalMissions = serverMissionResults.length;
 
           if (currentMissionIndex < totalMissions - 1) {
-            // 다음 미션의 결과 ID 찾기
             const nextMissionResult = serverMissionResults[currentMissionIndex + 1];
 
-            // 다음 미션으로
             set({
               missionResults: newMissionResults,
               currentMissionIndex: currentMissionIndex + 1,
@@ -95,7 +136,6 @@ function createTestParticipateStore(testId: string) {
               currentMissionResultId: nextMissionResult?.id,
             });
           } else {
-            // 모든 미션 완료 → 피드백 단계로
             set({
               missionResults: newMissionResults,
               currentStep: 'feedback',
@@ -114,7 +154,7 @@ function createTestParticipateStore(testId: string) {
 
         // 세션 초기화 (localStorage도 삭제)
         clearSession: () => {
-          set({ ...initialState, needsResume: false });
+          set({ ...initialState, needsResume: false, isLoadingResume: false });
         },
 
         // 시작 화면으로 리셋 (데이터는 유지)
@@ -122,36 +162,24 @@ function createTestParticipateStore(testId: string) {
           set({ currentStep: 'start' });
         },
 
-        // 이어하기 확인
-        confirmResume: () => {
-          set({ needsResume: false });
+        // 이어하기 로딩 상태 설정
+        setLoadingResume: (loading: boolean) => {
+          set({ isLoadingResume: loading });
         },
       }),
       {
         name: `test-participate-${testId}`, // testId별 localStorage key
         partialize: (state) => ({
-          // persist할 필드만 선택 (actions 제외)
-          currentStep: state.currentStep,
-          currentMissionIndex: state.currentMissionIndex,
-          currentMissionState: state.currentMissionState,
-          missionResults: state.missionResults,
-          overallFeedback: state.overallFeedback,
+          // localStorage에는 participantId만 저장
+          // 나머지 상태는 서버에서 가져옴
           participantId: state.participantId,
-          currentMissionResultId: state.currentMissionResultId,
-          serverMissionResults: state.serverMissionResults,
         }),
         onRehydrateStorage: () => (state) => {
           // localStorage에서 복원된 후 실행
-          if (state) {
-            // 진행 중인 세션이 있고 아직 완료하지 않았다면 이어하기 필요
-            const hasProgress =
-              state.currentStep !== 'start' &&
-              state.currentStep !== 'complete' &&
-              state.participantId;
-
-            if (hasProgress) {
-              state.needsResume = true;
-            }
+          if (state && state.participantId) {
+            // participantId가 있으면 이어하기 필요
+            state.needsResume = true;
+            state.isLoadingResume = true;
           }
         },
       }
