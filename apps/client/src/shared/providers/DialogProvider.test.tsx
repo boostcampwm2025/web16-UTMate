@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DialogProvider } from './DialogProvider';
 import { useDialogStore, DIALOG_INITIAL_STATE } from '@/shared/stores/useDialogStore';
@@ -15,7 +15,9 @@ describe('DialogProvider', () => {
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
 
     const { confirm } = useDialogStore.getState();
-    confirm('삭제 확인', '정말 삭제하시겠습니까?');
+    act(() => {
+      confirm('삭제 확인', '정말 삭제하시겠습니까?');
+    });
 
     await waitFor(() => {
       expect(screen.getByRole('alertdialog')).toBeInTheDocument();
@@ -29,14 +31,17 @@ describe('DialogProvider', () => {
     render(<DialogProvider />);
 
     const { confirm } = useDialogStore.getState();
-    const resultPromise = confirm('제목', '설명');
+    let resultPromise: Promise<boolean>;
+    act(() => {
+      resultPromise = confirm('제목', '설명');
+    });
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: '확인' })).toBeInTheDocument();
     });
     await user.click(screen.getByRole('button', { name: '확인' }));
 
-    const result = await resultPromise;
+    const result = await resultPromise!;
     expect(result).toBe(true);
 
     await waitFor(() => {
@@ -49,14 +54,17 @@ describe('DialogProvider', () => {
     render(<DialogProvider />);
 
     const { confirm } = useDialogStore.getState();
-    const resultPromise = confirm('제목', '설명');
+    let resultPromise: Promise<boolean>;
+    act(() => {
+      resultPromise = confirm('제목', '설명');
+    });
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: '취소' })).toBeInTheDocument();
     });
     await user.click(screen.getByRole('button', { name: '취소' }));
 
-    const result = await resultPromise;
+    const result = await resultPromise!;
     expect(result).toBe(false);
 
     await waitFor(() => {
@@ -68,7 +76,9 @@ describe('DialogProvider', () => {
     render(<DialogProvider />);
 
     const { confirm } = useDialogStore.getState();
-    confirm('경고', '위험한 작업입니다', null, { isAlert: true });
+    act(() => {
+      confirm('경고', '위험한 작업입니다', null, { isAlert: true });
+    });
 
     await waitFor(() => {
       const confirmButton = screen.getByRole('button', { name: '확인' });
@@ -80,7 +90,9 @@ describe('DialogProvider', () => {
     render(<DialogProvider />);
 
     const { confirm } = useDialogStore.getState();
-    confirm('알림', '작업이 완료되었습니다.', null, { hasCancel: false });
+    act(() => {
+      confirm('알림', '작업이 완료되었습니다.', null, { hasCancel: false });
+    });
 
     await waitFor(() => {
       expect(screen.getByRole('alertdialog')).toBeInTheDocument();
@@ -103,7 +115,9 @@ describe('DialogProvider', () => {
         </ul>
       </div>
     );
-    confirm('커스텀 다이얼로그', '', customContent);
+    act(() => {
+      confirm('커스텀 다이얼로그', '', customContent);
+    });
 
     await waitFor(() => {
       expect(screen.getByRole('alertdialog')).toBeInTheDocument();
