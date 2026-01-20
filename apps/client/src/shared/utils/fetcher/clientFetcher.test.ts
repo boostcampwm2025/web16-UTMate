@@ -14,6 +14,11 @@ describe('clientFetcher', () => {
     // 기본적으로 성공 응답을 반환하도록 설정
     (global.fetch as Mock).mockResolvedValue({
       ok: true,
+      status: 200,
+      headers: new Headers({
+        'content-type': 'application/json',
+      }),
+      text: async () => JSON.stringify(mockResponseData),
       json: async () => mockResponseData,
     });
   });
@@ -35,6 +40,10 @@ describe('clientFetcher', () => {
     (global.fetch as Mock).mockResolvedValue({
       ok: false,
       status: 400,
+      headers: new Headers({
+        'content-type': 'application/json',
+      }),
+      text: async () => JSON.stringify(errorData),
       json: async () => errorData,
     });
 
@@ -46,6 +55,10 @@ describe('clientFetcher', () => {
     const tokenExpiredResponse = {
       ok: false,
       status: 401,
+      headers: new Headers({
+        'content-type': 'application/json',
+      }),
+      text: async () => JSON.stringify({ message: 'Token Expired', statusCode: 401, code: 'TOKEN_EXPIRED' }),
       json: async () => ({ message: 'Token Expired', statusCode: 401, code: 'TOKEN_EXPIRED' }),
     };
 
@@ -57,10 +70,20 @@ describe('clientFetcher', () => {
         .mockResolvedValueOnce(tokenExpiredResponse) // 1. 원래 요청 실패
         .mockResolvedValueOnce({ // 2. 재발급 요청 성공
           ok: true,
+          status: 200,
+          headers: new Headers({
+            'content-type': 'application/json',
+          }),
+          text: async () => JSON.stringify({ accessToken: 'new_token' }),
           json: async () => ({ accessToken: 'new_token' }),
         })
         .mockResolvedValueOnce({ // 3. 재시도 성공
           ok: true,
+          status: 200,
+          headers: new Headers({
+            'content-type': 'application/json',
+          }),
+          text: async () => JSON.stringify(mockResponseData),
           json: async () => mockResponseData,
         });
 
@@ -87,6 +110,10 @@ describe('clientFetcher', () => {
         .mockResolvedValueOnce({
           ok: false,
           status: 401,
+          headers: new Headers({
+            'content-type': 'application/json',
+          }),
+          text: async () => JSON.stringify({ message: 'Refresh Token Invalid', statusCode: 401 }),
           json: async () => ({ message: 'Refresh Token Invalid', statusCode: 401 }),
         });
 
@@ -125,14 +152,30 @@ describe('clientFetcher', () => {
       (global.fetch as Mock).mockImplementation(async (url) => {
         if (url === `${CLIENT_BASE_URL}/auth/reissue`) {
           refreshCalled = true;
-          return { ok: true, json: async () => ({}) };
+          return {
+            ok: true,
+            status: 200,
+            headers: new Headers({
+              'content-type': 'application/json',
+            }),
+            text: async () => JSON.stringify({}),
+            json: async () => ({}),
+          };
         }
 
         if (url === mockUrl) {
           if (!refreshCalled) {
             return tokenExpiredResponse;
           } else {
-            return { ok: true, json: async () => mockResponseData };
+            return {
+              ok: true,
+              status: 200,
+              headers: new Headers({
+                'content-type': 'application/json',
+              }),
+              text: async () => JSON.stringify(mockResponseData),
+              json: async () => mockResponseData,
+            };
           }
         }
       });
@@ -153,6 +196,107 @@ describe('clientFetcher', () => {
       // 재발급 요청은 딱 1번만 호출되었는지 확인
       const refreshCalls = (global.fetch as Mock).mock.calls.filter(args => args[0] === `${CLIENT_BASE_URL}/auth/reissue`);
       expect(refreshCalls.length).toBe(1);
+    });
+  });
+
+  describe('빈 응답 및 비JSON 응답 처리', () => {
+    it('빈 응답 본문(sendStatus)을 처리해야 한다', async () => {
+      (global.fetch as Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({
+          'content-type': 'application/json',
+        }),
+        text: async () => '',
+        json: async () => {
+          throw new Error('Unexpected end of JSON input');
+        },
+      });
+
+      const result = await clientFetcher<void>(mockUrl);
+      expect(result).toBeUndefined();
+    });
+
+    it('Content-Type이 없는 빈 응답을 처리해야 한다', async () => {
+      (global.fetch as Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        text: async () => '',
+        json: async () => {
+          throw new Error('Unexpected end of JSON input');
+        },
+      });
+
+      const result = await clientFetcher<void>(mockUrl);
+      expect(result).toBeUndefined();
+    });
+
+    it('비JSON 응답(text/plain)을 처리해야 한다', async () => {
+      (global.fetch as Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({
+          'content-type': 'text/plain',
+        }),
+        text: async () => 'OK',
+        json: async () => {
+          throw new Error('Unexpected token');
+        },
+      });
+
+      const result = await clientFetcher<void>(mockUrl);
+      expect(result).toBeUndefined();
+    });
+
+    it('빈 문자열 응답을 처리해야 한다', async () => {
+      (global.fetch as Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({
+          'content-type': 'application/json',
+        }),
+        text: async () => '   ',
+        json: async () => {
+          throw new Error('Unexpected end of JSON input');
+        },
+      });
+
+      const result = await clientFetcher<void>(mockUrl);
+      expect(result).toBeUndefined();
+    });
+
+    it('유효한 JSON 응답은 정상적으로 파싱해야 한다', async () => {
+      const jsonData = { id: 1, name: 'test' };
+      (global.fetch as Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({
+          'content-type': 'application/json',
+        }),
+        text: async () => JSON.stringify(jsonData),
+        json: async () => jsonData,
+      });
+
+      const result = await clientFetcher<typeof jsonData>(mockUrl);
+      expect(result).toEqual(jsonData);
+    });
+
+    it('잘못된 JSON 형식 응답을 처리해야 한다', async () => {
+      (global.fetch as Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({
+          'content-type': 'application/json',
+        }),
+        text: async () => 'invalid json {',
+        json: async () => {
+          throw new SyntaxError('Unexpected end of JSON input');
+        },
+      });
+
+      const result = await clientFetcher<void>(mockUrl);
+      expect(result).toBeUndefined();
     });
   });
 });

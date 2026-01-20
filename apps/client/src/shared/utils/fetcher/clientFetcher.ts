@@ -1,5 +1,5 @@
 import { CLIENT_BASE_URL, ApiError } from "@/shared/constants/api";
-import { getErrorData } from "./fetcherCommon";
+import { getErrorData, parseResponse } from "./fetcherCommon";
 import type { FetchOptions } from "./fetcherCommon";
 
 interface RetryQueueItem {
@@ -103,5 +103,5 @@ export const clientFetcher = async <T>(url: string, options: FetchOptions = {}):
     throw new ApiError(errorData.message, errorData.statusCode, errorData.code);
   }
 
-  return response.json() as T;
+  return parseResponse<T>(response);
 };

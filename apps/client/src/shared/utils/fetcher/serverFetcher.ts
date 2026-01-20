@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
   
-import { handleBadResponse } from "./fetcherCommon";
+import { handleBadResponse, parseResponse } from "./fetcherCommon";
 import type { FetchOptions } from "./fetcherCommon";
 
 export const serverFetcher = async <T>(url: string, options: FetchOptions) => {
@@ -21,5 +21,5 @@ export const serverFetcher = async <T>(url: string, options: FetchOptions) => {
     return handleBadResponse(response);
   }
 
-  return response.json() as T;
+  return parseResponse<T>(response);
 };
