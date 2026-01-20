@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
-  
+
 import { handleBadResponse, parseResponse } from "./fetcherCommon";
 import type { FetchOptions } from "./fetcherCommon";
 
-export const serverFetcher = async <T>(url: string, options: FetchOptions) => {
+export const serverFetcher = async <T>(url: string, options: FetchOptions = {}) => {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('access_token');
 
