@@ -47,6 +47,23 @@ export async function startTestParticipation(testId: string): Promise<StartTestR
 }
 
 /**
+ * 미션 시작 (PENDING → IN_PROGRESS 상태 전이)
+ * PATCH /mission-results/:missionResultId
+ */
+export async function startMission(missionResultId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/mission-results/${missionResultId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ status: 'IN_PROGRESS' }),
+  });
+
+  if (!response.ok) {
+    throw new Error('미션 시작에 실패했습니다.');
+  }
+}
+
+/**
  * 녹화 업로드 (녹화 종료 시 S3에 로그 파일 업로드)
  * POST /mission-results/:missionResultId/record
  */
