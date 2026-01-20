@@ -8,6 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
+import { MainFeedbackDto, ParticipantResultsDto } from './dto/result.dto';
 import { TestDto } from './dto/test.dto';
 import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
@@ -177,7 +178,7 @@ export class TestsService {
     }
 
     // SDK 설치 여부 검증 로직
-    const isSdkInstalled = await this.verifySdkInstallationLogic(test.url); // 실제 검증 로직으로 대체 필요
+    const isSdkInstalled = await this.verifySdkInstallationLogic(test.url);
     test.sdkStatus = isSdkInstalled;
     await this.testsRepository.save(test);
 
@@ -270,11 +271,25 @@ export class TestsService {
     return TestResultSummaryDto.fromTest(test);
   }
 
-  getTestMainFeedback(userId: number, publicId: string) {
-    throw new Error('Method not implemented.');
+  async getTestParticipantsResults(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithAllRelations(
+      publicId,
+      userId,
+    );
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return ParticipantResultsDto.fromEntities(test.participants, test.missions);
   }
 
-  getTestParticipantsResults(userId: number, publicId: string) {
-    throw new Error('Method not implemented.');
+  async getTestMainFeedback(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipants(
+      publicId,
+      userId,
+    );
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return MainFeedbackDto.fromEntities(test.participants);
   }
 }

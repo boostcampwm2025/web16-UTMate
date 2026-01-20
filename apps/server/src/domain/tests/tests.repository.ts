@@ -115,4 +115,24 @@ export class TestsRepository {
       .loadRelationCountAndMap('tests.totalParticipants', 'tests.participants')
       .getOne();
   }
+
+  findByPublicIdAndOwnerWithAllRelations(publicId: string, ownerId: number) {
+    return this.testsRepository
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .leftJoinAndSelect('tests.participants', 'participants')
+      .leftJoinAndSelect('participants.missionResults', 'missionResults')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .getOne();
+  }
+
+  findByPublicIdAndOwnerWithParticipants(publicId: string, ownerId: number) {
+    return this.testsRepository
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.participants', 'participants')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .getOne();
+  }
 }
