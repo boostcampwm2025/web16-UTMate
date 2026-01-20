@@ -7,7 +7,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Textarea } from '@/shared/components/ui/textarea';
 
-import { submitMissionResult, uploadMissionRecording } from '../api';
+import { startMission, submitMissionResult, uploadMissionRecording } from '../api';
 import { useTestParticipateStore } from '../stores/useTestParticipateStore';
 import type { Mission } from '../types';
 
@@ -41,6 +41,27 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
     setMissionWindow(null);
   }, [mission.publicId]);
 
+  // 미션 시작 mutation (PENDING → IN_PROGRESS)
+  const startMissionMutation = useMutation({
+    mutationFn: async () => {
+      if (!missionResultId) throw new Error('미션 결과 ID가 없습니다.');
+      await startMission(missionResultId);
+    },
+    onSuccess: () => {
+      const newWindow = window.open(
+        `${mission.missionUrl}?participant-id=${participantId}&mission-id=${mission.publicId}`,
+        '_blank',
+        'width=1200,height=800',
+      );
+      setMissionWindow(newWindow);
+      setMissionState('recording');
+    },
+    onError: (error) => {
+      console.error('Failed to start mission:', error);
+      alert('미션 시작에 실패했습니다.');
+    },
+  });
+
   // 미션 수행 페이지 열기 (녹화 시작)
   const handleOpenMission = () => {
     // 이미 창이 열려있고 닫히지 않았다면 포커스만 주기
@@ -49,13 +70,7 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
       return;
     }
 
-    const newWindow = window.open(
-      `${mission.missionUrl}?participant-id=${participantId}&mission-id=${mission.publicId}`,
-      '_blank',
-      'width=1200,height=800',
-    );
-    setMissionWindow(newWindow);
-    setMissionState('recording');
+    startMissionMutation.mutate();
   };
 
   // 녹화 종료 mutation
@@ -141,11 +156,11 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
         <div className={!isStateActive('ready') ? 'opacity-50' : ''}>
           <Button
             onClick={handleOpenMission}
-            disabled={!isStateActive('ready')}
+            disabled={!isStateActive('ready') || startMissionMutation.isPending}
             className="w-full"
             size="lg"
           >
-            미션 수행 페이지 열기 (새 창)
+            {startMissionMutation.isPending ? '시작 중...' : '미션 수행 페이지 열기 (새 창)'}
           </Button>
         </div>
 
