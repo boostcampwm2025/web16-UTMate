@@ -17,6 +17,7 @@ import {
   getTestForParticipation,
   startTestParticipation,
 } from '@/features/(test-participate)/api';
+import type { ParticipantResponse } from '@/features/(test-participate)/types';
 
 export default function TestParticipatePage() {
   const params = useParams();
@@ -24,6 +25,9 @@ export default function TestParticipatePage() {
 
   // 이미 완료된 테스트인지 여부
   const [isAlreadyCompleted, setIsAlreadyCompleted] = useState(false);
+
+  // 서버에서 가져온 참가자 정보 (이어하기용)
+  const [participantData, setParticipantData] = useState<ParticipantResponse | null>(null);
 
   // React Query로 테스트 정보 가져오기
   const { data: testInfo } = useQuery({
@@ -38,31 +42,48 @@ export default function TestParticipatePage() {
   const currentStep = store((state) => state.currentStep);
   const currentMissionIndex = store((state) => state.currentMissionIndex);
   const needsResume = store((state) => state.needsResume);
+  const isLoadingResume = store((state) => state.isLoadingResume);
   const participantId = store((state) => state.participantId);
   const startTest = store((state) => state.startTest);
+  const resumeTest = store((state) => state.resumeTest);
   const submitFeedback = store((state) => state.submitFeedback);
   const clearSession = store((state) => state.clearSession);
+  const setLoadingResume = store((state) => state.setLoadingResume);
 
-  // 이어하기 진입 시 참가자 정보 조회 (완료된 테스트 체크)
+  // 이어하기 진입 시 참가자 정보 조회 (서버에서 현재 상태 가져오기)
   useEffect(() => {
-    const checkParticipantStatus = async () => {
-      if (needsResume && participantId) {
+    const fetchParticipantStatus = async () => {
+      if (needsResume && participantId && isLoadingResume) {
         const participant = await getParticipant(participantId);
 
         if (!participant) {
+          // 참가자 정보가 없으면 세션 초기화
           clearSession();
           return;
         }
 
         if (participant.status === 'completed') {
+          // 이미 완료된 테스트
           setIsAlreadyCompleted(true);
           clearSession();
+          return;
         }
+
+        // 참가자 정보 저장 (이어하기 화면에서 사용)
+        setParticipantData(participant);
+        setLoadingResume(false);
       }
     };
 
-    checkParticipantStatus();
-  }, [needsResume, participantId, clearSession]);
+    fetchParticipantStatus();
+  }, [needsResume, participantId, isLoadingResume, clearSession, setLoadingResume]);
+
+  // 이어하기 확인 핸들러
+  const handleConfirmResume = () => {
+    if (participantData && testInfo) {
+      resumeTest(participantData.missionResults, testInfo.missions.length);
+    }
+  };
 
   // 테스트 시작 mutation
   const startTestMutation = useMutation({
@@ -161,12 +182,25 @@ export default function TestParticipatePage() {
     );
   }
 
+  // 이어하기 로딩 중
+  if (needsResume && isLoadingResume) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-muted-foreground">진행 상황을 불러오는 중...</div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* 이어하기 안내 */}
-      {needsResume ? (
+      {needsResume && participantData ? (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-          <ResumeTestStep testInfo={testInfo} testId={testId} />
+          <ResumeTestStep
+            testInfo={testInfo}
+            participantData={participantData}
+            onConfirmResume={handleConfirmResume}
+          />
         </div>
       ) : currentStep === 'start' ? (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
