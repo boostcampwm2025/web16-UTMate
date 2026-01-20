@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, AlertTriangle, FileText } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
-import { getMyTestList } from '@/features/(test-manage)/api';
+import { getMyTestList } from '@/features/(test-manage)/api/client';
 import { TestTable } from './TestTable';
 import { CreateTestButton } from './CreateTestButton';
 

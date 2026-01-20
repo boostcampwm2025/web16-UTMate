@@ -1,5 +1,3 @@
-
-
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import { clientFetcher } from '@/shared/utils/fetcher/clientFetcher';
 

@@ -1,13 +1,7 @@
-/**
- * GitHub OAuth 로그인 관련 API
- */
-
-
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import { clientFetcher } from '@/shared/utils/fetcher/clientFetcher';
 
 import type { User } from '../types';
-
 
 /**
  * 로그아웃

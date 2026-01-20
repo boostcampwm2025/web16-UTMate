@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import { deleteTest, updateTestStatus } from '@/features/(test-manage)/api';
+import { deleteTest, updateTestStatus } from '@/features/(test-manage)/api/client';
 import { TestStatus } from '@/features/(test-manage)/types';
 import { useDialogStore } from '@/shared/stores/useDialogStore';
 

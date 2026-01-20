@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
 
-import { getTestByIdonServer} from '@/features/(test-detail)/api';
+import { getTestByIdonServer } from '@/features/(test-detail)/api/server';
 import { TestForm } from '@/features/(test-detail)/components/TestForm';
 import { ApiError } from '@/shared/constants/api';
 
