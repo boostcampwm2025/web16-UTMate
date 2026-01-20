@@ -39,7 +39,7 @@ export interface MissionResultFromServer {
 
 /** 테스트 시작 응답 (POST /tests/:testId/participants) */
 export interface StartTestResponse {
-  participantId: string;
+  id: string; // participantId (백엔드에서 id로 반환)
   missionResults: MissionResultFromServer[];
 }
 
