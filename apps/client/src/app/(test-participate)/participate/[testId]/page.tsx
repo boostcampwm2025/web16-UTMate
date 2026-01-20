@@ -105,6 +105,8 @@ export default function TestParticipatePage() {
     },
     onSuccess: (_, feedback) => {
       submitFeedback(feedback);
+      // 테스트 완료 후 localStorage 정리
+      clearSession();
     },
     onError: (error) => {
       console.error('Failed to complete test:', error);
