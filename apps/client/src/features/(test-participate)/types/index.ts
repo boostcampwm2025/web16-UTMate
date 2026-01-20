@@ -25,7 +25,7 @@ export interface TestInfo {
 }
 
 /** 미션 결과 상태 */
-export type MissionResultStatus = 'PENDING' | 'SUCCESS' | 'FAILED';
+export type MissionResultStatus = 'PENDING' | 'IN_PROGRESS' | 'SUCCESS' | 'FAILED';
 
 /** 참가자 상태 */
 export type ParticipantStatus = 'ongoing' | 'completed';
