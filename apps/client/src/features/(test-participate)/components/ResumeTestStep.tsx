@@ -3,48 +3,56 @@
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 
-import { useTestParticipateStore } from '../stores/useTestParticipateStore';
-import type { TestInfo } from '../types';
+import type { ParticipantResponse, TestInfo } from '../types';
 
 interface ResumeTestStepProps {
   testInfo: TestInfo;
-  testId: string;
+  participantData: ParticipantResponse;
+  onConfirmResume: () => void;
 }
 
-export function ResumeTestStep({ testInfo, testId }: ResumeTestStepProps) {
-  const store = useTestParticipateStore(testId);
+export function ResumeTestStep({ testInfo, participantData, onConfirmResume }: ResumeTestStepProps) {
+  // 서버 데이터에서 진행 상황 계산
+  const missionResults = participantData.missionResults;
+  const completedCount = missionResults.filter(
+    (mr) => mr.status === 'SUCCESS' || mr.status === 'FAILED'
+  ).length;
 
-  const currentStep = store((state) => state.currentStep);
-  const currentMissionIndex = store((state) => state.currentMissionIndex);
-  const currentMissionState = store((state) => state.currentMissionState);
-  const confirmResume = store((state) => state.confirmResume);
+  // 첫 번째 진행 중이거나 대기 중인 미션 찾기
+  const inProgressMission = missionResults.find((mr) => mr.status === 'IN_PROGRESS');
+  const pendingMission = missionResults.find((mr) => mr.status === 'PENDING');
+  const currentMission = inProgressMission || pendingMission;
+
+  // 현재 미션 인덱스 계산
+  const currentMissionIndex = currentMission
+    ? missionResults.findIndex((mr) => mr.id === currentMission.id)
+    : completedCount;
+
+  // 모든 미션 완료 여부
+  const allMissionsCompleted = completedCount === testInfo.missions.length;
 
   const getProgressMessage = () => {
-    if (currentStep === 'mission') {
-      const missionNumber = currentMissionIndex + 1;
-
-      if (currentMissionState === 'ready') {
-        return `미션 ${missionNumber}을 시작하려던 중`;
-      } else if (currentMissionState === 'recording') {
-        return `미션 ${missionNumber} 수행 중`;
-      } else if (currentMissionState === 'completed' || currentMissionState === 'feedback') {
-        return `미션 ${missionNumber} 완료 직전`;
-      }
-    } else if (currentStep === 'feedback') {
-      return '전체 피드백 작성 중';
+    if (allMissionsCompleted) {
+      return '모든 미션 완료, 피드백 작성 중';
     }
 
-    return '진행 중';
-  };
+    const missionNumber = currentMissionIndex + 1;
 
-  const getCurrentMission = () => {
-    if (currentStep === 'mission') {
-      return testInfo.missions[currentMissionIndex];
+    if (inProgressMission) {
+      return `미션 ${missionNumber} 수행 중`;
     }
-    return null;
+
+    return `미션 ${missionNumber}을 시작하려던 중`;
   };
 
-  const mission = getCurrentMission();
+  const getCurrentMissionInfo = () => {
+    if (allMissionsCompleted) {
+      return null;
+    }
+    return testInfo.missions[currentMissionIndex];
+  };
+
+  const mission = getCurrentMissionInfo();
 
   return (
     <Card className="w-full max-w-2xl">
@@ -59,7 +67,10 @@ export function ResumeTestStep({ testInfo, testId }: ResumeTestStepProps) {
             <div className="bg-primary h-2 w-2 rounded-full" />
             <p className="font-medium">진행 상황</p>
           </div>
-          <p className="text-muted-foreground pl-4 text-sm">{getProgressMessage()}이었습니다</p>
+          <p className="text-muted-foreground pl-4 text-sm">
+            {completedCount > 0 && `${completedCount}개 미션 완료, `}
+            {getProgressMessage()}이었습니다
+          </p>
 
           {mission && (
             <div className="pl-4 pt-2">
@@ -77,7 +88,7 @@ export function ResumeTestStep({ testInfo, testId }: ResumeTestStepProps) {
         </div>
 
         {/* 이어하기 버튼 */}
-        <Button onClick={confirmResume} className="w-full" size="lg">
+        <Button onClick={onConfirmResume} className="w-full" size="lg">
           이어서 진행하기
         </Button>
       </CardContent>
