@@ -12,7 +12,8 @@ export const SERVER_BASE_URL =
 export class ApiError extends Error {
   constructor(
     message: string,
-    public code: number,
+    public statusCode: number,
+    public errorCode?: string,
   ) {
     super(message);
   }
