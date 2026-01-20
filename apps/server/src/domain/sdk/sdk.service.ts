@@ -16,13 +16,15 @@ export class SdkService {
   /**
    * 세션리플레이 로그를 압축 해제하고 파일로 저장합니다.
    *
-   * @param sessionId 세션 아이디
+   * @param participantId 참여 아이디
    * @param missionId 미션 아이디
    * @param stream 압축된 로그 스트림
    * @throws UnauthorizedException 세션 또는 미션 정보가 없는 경우
    */
-  async saveReplayLog(sessionId: string, missionId: string, stream: Readable) {
-    if (!sessionId || !missionId) {
+  async saveReplayLog(participantId: string, missionId: string, stream: Readable) {
+    console.log('saveReplayLog called:', { participantId, missionId });
+    if (!participantId || !missionId) {
+      console.log('Missing ids - participantId:', participantId, 'missionId:', missionId);
       throw new UnauthorizedException('세션 또는 미션 정보가 없습니다.');
     }
 
@@ -30,7 +32,7 @@ export class SdkService {
     const gunzip = zlib.createGunzip();
     const decompressedStream = stream.pipe(gunzip);
 
-    const filename = `replay_log/missions/${missionId}/${sessionId}.log.jsonl`;
+    const filename = `replay_log/missions/${missionId}/${participantId}.log.jsonl`;
 
     // 스트림을 그대로 StorageService에 전달
     await this.storageService.save(filename, decompressedStream);
