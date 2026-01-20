@@ -108,7 +108,7 @@ export async function completeTestParticipation(participantId: string, feedback?
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ status: 'completed', feedback }),
+    body: JSON.stringify({ status: 'COMPLETED', feedback }),
   });
 
   if (!response.ok) {
