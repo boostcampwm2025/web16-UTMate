@@ -119,6 +119,15 @@ export class MissionResultsService {
     }
   }
 
+  /**
+   * 미션 결과의 상세 정보를 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 미션 결과 public id
+   * @returns 미션 결과 상세 DTO
+   * @throws NotFoundException 미션 결과를 찾을 수 없거나 소유자가 아닌 경우
+   * @throws ForbiddenException 아직 완료되지 않은 미션 결과인 경우
+   */
   async getMissionResultsDetail(userId: number, publicId: string) {
     const missionResults =
       await this.missionResultsRepository.findByPublicIdWithAllRelations(publicId);

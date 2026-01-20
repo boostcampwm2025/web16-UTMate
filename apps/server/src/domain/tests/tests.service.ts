@@ -271,6 +271,14 @@ export class TestsService {
     return TestResultSummaryDto.fromTest(test);
   }
 
+  /**
+   * 테스트 참여자들의 미션 결과들을 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns 테스트 참여자들의 미션 결과 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
   async getTestParticipantsResults(userId: number, publicId: string) {
     const test = await this.testsRepository.findByPublicIdAndOwnerWithAllRelations(
       publicId,
@@ -282,6 +290,14 @@ export class TestsService {
     return ParticipantResultsDto.fromEntities(test.participants, test.missions);
   }
 
+  /**
+   * 테스트의 참가자들의 피드백을 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns 주요 피드백 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
   async getTestMainFeedback(userId: number, publicId: string) {
     const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipants(
       publicId,
