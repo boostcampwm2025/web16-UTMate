@@ -5,27 +5,6 @@
 import type { User } from '../types';
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 
-/**
- * GitHub OAuth 콜백 처리
- * GitHub에서 받은 code를 백엔드로 전송하여 사용자 정보와 토큰을 받아옴
- */
-export async function handleGithubCallback(code: string): Promise<{ user: User; token: string }> {
-  const response = await fetch(`${CLIENT_BASE_URL}/auth/github/callback`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ code }),
-    credentials: 'include', // 쿠키 포함
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'GitHub 로그인에 실패했습니다.');
-  }
-
-  return response.json();
-}
 
 /**
  * 로그아웃
