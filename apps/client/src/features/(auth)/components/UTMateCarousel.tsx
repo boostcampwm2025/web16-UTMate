@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import Autoplay from 'embla-carousel-autoplay';
+
 import {
   Carousel,
   CarouselContent,
@@ -43,16 +45,22 @@ const CAROUSEL_INTERVAL = 5000;
 export function UTMateCarousel() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  const autoplay = Autoplay({ delay: CAROUSEL_INTERVAL });
 
-  // 5초마다 자동 슬라이드
   useEffect(() => {
     if (!api) return;
 
-    const interval = setInterval(() => {
-      api.scrollNext();
-    }, CAROUSEL_INTERVAL);
+    setCurrent(api.selectedScrollSnap());
 
-    return () => clearInterval(interval);
+    const onSelect = () => {
+      setCurrent(api.selectedScrollSnap());
+    };
+
+    api.on('select', onSelect);
+    
+    return () => {
+      api.off('select', onSelect);
+    };
   }, [api]);
 
   // 현재 슬라이드 인덱스 추적
@@ -69,6 +77,7 @@ export function UTMateCarousel() {
   return (
     <Carousel
       setApi={setApi}
+      plugins={[autoplay]}
       opts={{
         align: 'start',
         loop: true,
@@ -126,17 +135,25 @@ export function UTMateCarousel() {
 
       {/* 페이지네이션 인디케이터 (하단 중앙) */}
       <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => api?.scrollTo(index)}
-            className={cn(
-              'h-2.5 rounded-full transition-all duration-500',
-              index === current ? 'bg-primary w-8' : 'w-2.5 bg-gray-300 hover:bg-gray-400',
-            )}
-            aria-label={`슬라이드 ${index + 1}로 이동`}
-          />
-        ))}
+        {slides.map((_, index) => {
+          
+          const handleIndicatorClick = () => {
+            api?.scrollTo(index);
+            api?.plugins().autoplay.reset();
+          };
+
+          return (
+            <button
+              key={index}
+              onClick={handleIndicatorClick}
+              className={cn(
+                'h-2.5 rounded-full transition-all duration-500',
+                index === current ? 'bg-primary w-8' : 'w-2.5 bg-gray-300 hover:bg-gray-400',
+              )}
+              aria-label={`슬라이드 ${index + 1}로 이동`}
+            />
+          );
+        })}
       </div>
     </Carousel>
   );
