@@ -1,16 +1,12 @@
-import { CLIENT_BASE_URL } from '@/shared/constants/api';
+import { CLIENT_BASE_URL, SERVER_BASE_URL } from '@/shared/constants/api';
 import type { TestDetail } from '@/features/(test-manage)/types';
-import type { ApiErrorResponse } from '@/shared/types/api';
-import { ApiError } from '@/shared/constants/api';
+import { clientFetcher } from '@/shared/utils/fetcher/clientFetcher';
+import { serverFetcher } from '@/shared/utils/fetcher/serverFetcher';
 
-export const getTestByIdClient = async (id: string): Promise<TestDetail> => {
-  const response = await fetch(`${CLIENT_BASE_URL}/tests/${id}`, {
-    credentials: 'include',
-  });
+export const getTestById = async (id: string): Promise<TestDetail> => {
+  return clientFetcher<TestDetail>(`${CLIENT_BASE_URL}/tests/${id}`);
+};
 
-  if (!response.ok) {
-    const error = (await response.json()) as ApiErrorResponse;
-    throw new ApiError(error.message || '테스트를 불러오는데 실패했습니다.', error.statusCode);
-  }
-  return response.json();
+export const getTestByIdonServer = async (id: string): Promise<TestDetail> => {
+  return serverFetcher<TestDetail>(`${SERVER_BASE_URL}/tests/${id}`);
 };

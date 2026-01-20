@@ -2,49 +2,34 @@
  * GitHub OAuth 로그인 관련 API
  */
 
-import type { User } from '../types';
+
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
+import { clientFetcher } from '@/shared/utils/fetcher/clientFetcher';
+
+import type { User } from '../types';
 
 
 /**
  * 로그아웃
  */
 export async function logout(): Promise<void> {
-  const response = await fetch(`${CLIENT_BASE_URL}/auth/logout`, {
+  await clientFetcher<void>(`${CLIENT_BASE_URL}/auth/logout`, {
     method: 'POST',
-    credentials: 'include',
   });
-
-  if (!response.ok) {
-    throw new Error('로그아웃에 실패했습니다.');
-  }
 }
 
 /**
  * 현재 로그인한 사용자 정보 가져오기
  */
 export async function getCurrentUser(): Promise<User> {
-  const response = await fetch(`${CLIENT_BASE_URL}/users/me`, {
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error('사용자 정보를 가져오는데 실패했습니다.');
-  }
-
-  return response.json();
+  return clientFetcher<User>(`${CLIENT_BASE_URL}/users/me`);
 }
 
 /**
  * 회원 탈퇴
  */
 export async function deleteUser(): Promise<void> {
-  const response = await fetch(`${CLIENT_BASE_URL}/users/me`, {
+  await clientFetcher<void>(`${CLIENT_BASE_URL}/users/me`, {
     method: 'DELETE',
-    credentials: 'include',
   });
-
-  if (!response.ok) {
-    throw new Error('회원 탈퇴에 실패했습니다.');
-  }
 }
