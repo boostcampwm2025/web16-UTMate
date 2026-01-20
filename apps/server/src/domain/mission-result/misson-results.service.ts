@@ -70,7 +70,7 @@ export class MissionResultsService {
       throw new NotFoundException('미션 결과를 찾을 수 없습니다.');
     }
 
-    const fileName = `replay_log/missions/${missionResult.missionId}/${missionResult.participantId}.log.jsonl`;
+    const fileName = `replay_log/missions/${missionResult.mission.publicId}/${missionResult.participant.publicId}.log.jsonl`;
     try {
       const logBuffer = await this.storageService.getBufferByFilename(fileName);
       const s3FileName = await this.s3StorageService.uploadToS3(fileName, logBuffer);
