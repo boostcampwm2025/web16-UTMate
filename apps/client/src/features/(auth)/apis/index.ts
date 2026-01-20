@@ -18,9 +18,6 @@ export async function logout(): Promise<void> {
   if (!response.ok) {
     throw new Error('로그아웃에 실패했습니다.');
   }
-
-  // 로컬 스토리지 정리
-  localStorage.removeItem('auth_token');
 }
 
 /**
@@ -50,7 +47,4 @@ export async function deleteUser(): Promise<void> {
   if (!response.ok) {
     throw new Error('회원 탈퇴에 실패했습니다.');
   }
-
-  // 로컬 스토리지 정리
-  localStorage.removeItem('auth_token');
 }
