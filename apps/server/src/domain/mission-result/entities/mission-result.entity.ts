@@ -87,10 +87,16 @@ export class MissionResult {
   }
 
   private start() {
-    if (this.status !== MissionResultStatus.PENDING) {
-      throw new Error('미션 결과는 대기 상태에서만 시작할 수 있습니다.');
+    // 수정 함
+    if (this.status === MissionResultStatus.FAILED || this.status === MissionResultStatus.SUCCESS) {
+      throw new Error('이미 완료된 미션입니다. 진행 중 상태로 변경할 수 없습니다.');
     }
     this.status = MissionResultStatus.IN_PROGRESS;
+
+    // if (this.status !== MissionResultStatus.PENDING) {
+    //   throw new Error('미션 결과는 대기 상태에서만 시작할 수 있습니다.');
+    // }
+    // this.status = MissionResultStatus.IN_PROGRESS;
   }
 
   private complete(status: MissionResultStatus, feedback?: string) {
