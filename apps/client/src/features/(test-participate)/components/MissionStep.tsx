@@ -84,18 +84,46 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
     startMissionMutation.mutate();
   };
 
+  // SDK에 flush 요청을 보내고 완료를 기다리는 함수
+  const requestSdkFlush = (targetWindow: Window): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        window.removeEventListener('message', handleMessage);
+        // 타임아웃 시에도 진행 (SDK가 응답하지 않아도 계속 진행)
+        resolve();
+      }, 5000);
+
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data?.type === 'UTM_SDK_FLUSH_COMPLETE') {
+          clearTimeout(timeout);
+          window.removeEventListener('message', handleMessage);
+          if (event.data.success) {
+            resolve();
+          } else {
+            // 실패해도 진행
+            resolve();
+          }
+        }
+      };
+
+      window.addEventListener('message', handleMessage);
+
+      // SDK에 flush 요청 전송
+      targetWindow.postMessage({ type: 'UTM_SDK_FLUSH_REQUEST' }, '*');
+    });
+  };
+
   // 녹화 종료 mutation
   const finishRecordingMutation = useMutation({
     mutationFn: async () => {
-      // 먼저 창을 닫아서 visibilitychange 이벤트 트리거 (SDK가 남은 이벤트 전송)
+      // SDK에 flush 요청을 보내고 완료를 기다림
       if (missionWindow && !missionWindow.closed) {
+        await requestSdkFlush(missionWindow);
         missionWindow.close();
       }
       setMissionWindow(null);
 
-      // SDK가 이벤트를 서버로 전송할 시간을 확보 (visibilitychange 핸들러 완료 대기)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      // SDK flush 완료 후 서버에 녹화 업로드 요청
       if (missionResultId) {
         await uploadMissionRecording(missionResultId);
       }
@@ -202,7 +230,7 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
                 className="w-full"
                 size="lg"
               >
-                {finishRecordingMutation.isPending ? '종료 중...' : '녹화 종료'}
+                {finishRecordingMutation.isPending ? '데이터 전송 중...' : '녹화 종료'}
               </Button>
             </div>
           </div>
