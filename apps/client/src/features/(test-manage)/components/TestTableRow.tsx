@@ -38,7 +38,7 @@ export function TestTableRow({ test }: TestTableRowProps) {
         <TestStatusBadge status={test.status} />
       </td>
       <td className="px-6 py-4 text-center">
-        <IntegrationButton url={test.url} testId={test.publicId} />
+        <IntegrationButton url={test.url} sdkStatus={test.sdkStatus} testId={test.publicId} />
       </td>
       {/* TODO: 테스트 참여자 수 표시 */}
       <td className="px-6 py-4 text-center">
