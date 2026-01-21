@@ -147,4 +147,9 @@ async function verifySdkInstallation(testId: string) {
       await flushEvents(ids, eventQueue, true);
     }
   });
+
+  // 페이지 언로드 시 남은 이벤트 전송 (창 닫기, 탭 닫기 등)
+  window.addEventListener('pagehide', () => {
+    flushEvents(ids, eventQueue, true).catch(() => {});
+  });
 })().catch(() => {});
