@@ -1,9 +1,23 @@
+'use client';
+
 import Link from 'next/link';
 
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 
-export function CompleteStep() {
+import { useTestParticipateStore } from '../stores/useTestParticipateStore';
+
+interface CompleteStepProps {
+  testId: string;
+}
+
+export function CompleteStep({ testId }: CompleteStepProps) {
+  const store = useTestParticipateStore(testId);
+  const clearSession = store((state) => state.clearSession);
+
+  const handleGoHome = () => {
+    clearSession();
+  };
   return (
     <Card className="w-full max-w-3xl">
       <CardHeader>
@@ -23,7 +37,7 @@ export function CompleteStep() {
         </div>
 
         {/* 돌아가기 버튼 */}
-        <Link href="/">
+        <Link href="/" onClick={handleGoHome}>
           <Button className="w-full" size="lg">
             홈으로 돌아가기
           </Button>
