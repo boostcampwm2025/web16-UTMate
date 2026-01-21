@@ -70,6 +70,17 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
       return;
     }
 
+    // recording 상태에서 다시 열기 (창이 닫힌 경우)
+    if (currentMissionState === 'recording') {
+      const newWindow = window.open(
+        `${mission.missionUrl}?participant-id=${participantId}&mission-id=${mission.publicId}`,
+        '_blank',
+        'width=1200,height=800',
+      );
+      setMissionWindow(newWindow);
+      return;
+    }
+
     startMissionMutation.mutate();
   };
 
@@ -153,14 +164,18 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
         </div>
 
         {/* 1. 미션 수행 페이지 열기 */}
-        <div className={!isStateActive('ready') ? 'opacity-50' : ''}>
+        <div className={!isStateActive('ready') && !isStateActive('recording') ? 'opacity-50' : ''}>
           <Button
             onClick={handleOpenMission}
-            disabled={!isStateActive('ready') || startMissionMutation.isPending}
+            disabled={(!isStateActive('ready') && !isStateActive('recording')) || startMissionMutation.isPending}
             className="w-full"
             size="lg"
           >
-            {startMissionMutation.isPending ? '시작 중...' : '미션 수행 페이지 열기 (새 창)'}
+            {startMissionMutation.isPending
+              ? '시작 중...'
+              : currentMissionState === 'recording'
+                ? '미션 수행 페이지 다시 열기'
+                : '미션 수행 페이지 열기 (새 창)'}
           </Button>
         </div>
 
