@@ -32,14 +32,17 @@ export default function MissionResultDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header */}
       <MissionResultHeader testId={testId} missionResultData={missionResultData} />
-      <div className="flex">
+      {/* Body: 남은 높이를 채우도록 flex-1 + min-h-0 */}
+      <div className="flex flex-1 min-h-0">
         {/* Left Sidebar - 테스트 정보 */}
         <MissionResultSidebar missionResultData={missionResultData} />
         {/* Main Content - 리플레이 & 이벤트 로그 */}
-        <EventLogContainer eventLogs={eventLogs} />
+        <div className="flex-1 min-h-0">
+          <EventLogContainer eventLogs={eventLogs} />
+        </div>
       </div>
     </div>
   );
