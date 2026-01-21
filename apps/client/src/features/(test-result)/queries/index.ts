@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import { getTestParticipantsResults } from '../apis';
+import { getTestParticipantsResults } from '../apis/client';
 
 export const testParticipantsResultsQuery = (testId: string) =>
   queryOptions({

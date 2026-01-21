@@ -5,7 +5,7 @@ import { Loader2, Plus } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
-import { createTest } from '@/features/(test-manage)/api';
+import { createTest } from '@/features/(test-manage)/api/client';
 import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
-import { getTestByIdClient } from '@/features/(test-detail)/api';
+import { getTestById } from '@/features/(test-detail)/api/client';
 import { QueryBoundary } from '@/shared/components/QueryBoundary';
 
 import { MissionResultDetail } from './MissionResultDetail';
@@ -15,7 +15,7 @@ export function TestMissionResults({ testId }: { testId: string }) {
   // 테스트 상세 정보 (미션 목록 포함)
   const { data: testDetail } = useSuspenseQuery({
     queryKey: ['testDetail', testId],
-    queryFn: () => getTestByIdClient(testId),
+    queryFn: () => getTestById(testId),
   });
 
   const missions = testDetail.missions || [];

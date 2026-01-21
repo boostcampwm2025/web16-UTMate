@@ -5,7 +5,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { cn } from '@/shared/utils';
 
-import { getTestParticipantsResults } from '../apis';
+import { getTestParticipantsResults } from '../apis/client';
 import type { ParticipantMissionStatus } from '../types';
 import { ParticipantResultRow } from './ParticipantResultRow';
 

@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import { getTestSummary } from '../apis';
+import { getTestSummary } from '../apis/client';
 
 export function TestBasicInfo({ testId }: { testId: string }) {
   const { data: summaryData } = useSuspenseQuery({

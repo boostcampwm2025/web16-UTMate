@@ -4,7 +4,7 @@ import type { MissionResultWithParticipant } from '../types';
 import { MissionResultSummary } from './MissionResultSummary';
 import { MissionResultList } from './MissionResultList';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { getTestMissionsResultById } from '../apis';
+import { getTestMissionsResultById } from '../apis/client';
 
 interface MissionResultDetailProps {
   testId: string;

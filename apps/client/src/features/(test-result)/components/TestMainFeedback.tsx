@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { getTestMainFeedback } from '../apis';
+import { getTestMainFeedback } from '../apis/client';
 
 interface TestMainFeedbackProps {
   testId: string;

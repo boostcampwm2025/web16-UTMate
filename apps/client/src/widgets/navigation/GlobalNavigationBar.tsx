@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import { getCurrentUser, logout } from '@/features/(auth)/apis';
+import { getCurrentUser, logout } from '@/features/(auth)/apis/client';
 import type { User } from '@/features/(auth)/types';
 import { Logo } from '@/shared/components/Logo';
 
