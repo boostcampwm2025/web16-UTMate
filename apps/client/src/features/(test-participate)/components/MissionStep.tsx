@@ -87,14 +87,20 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
   // 녹화 종료 mutation
   const finishRecordingMutation = useMutation({
     mutationFn: async () => {
+      // 먼저 창을 닫아서 visibilitychange 이벤트 트리거 (SDK가 남은 이벤트 전송)
+      if (missionWindow && !missionWindow.closed) {
+        missionWindow.close();
+      }
+      setMissionWindow(null);
+
+      // SDK가 이벤트를 서버로 전송할 시간을 확보 (visibilitychange 핸들러 완료 대기)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       if (missionResultId) {
         await uploadMissionRecording(missionResultId);
       }
     },
     onSuccess: () => {
-      if (missionWindow && !missionWindow.closed) {
-        missionWindow.close();
-      }
       setMissionState('completed');
     },
     onError: (error) => {
