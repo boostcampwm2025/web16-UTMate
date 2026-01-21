@@ -32,3 +32,23 @@ export const getMissionResultById = async (
 ): Promise<MissionResultDetail> => {
   return clientFetcher<MissionResultDetail>(`${CLIENT_BASE_URL}/mission-results/${missionResultId}`);
 };
+
+/**
+ * URL에서 JSONL 파일의 텍스트를 가져옴
+ * 브라우저가 Content-Encoding: gzip 헤더를 자동으로 처리하므로 단순히 텍스트만 반환
+ */
+export const getMissionResultLogsByUrl = async (
+  url: string,
+): Promise<string> => {
+
+  const response = await fetch(url, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch event logs: ${response.status} ${response.statusText}`);
+  }
+
+  return await response.text();
+};
+
