@@ -2,6 +2,8 @@
 
 import { useParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { LayoutDashboard, Target, Users, Share2 } from 'lucide-react';
+
 import { cn } from '@/shared/utils';
 
 export function TestResultSidebar() {
@@ -22,43 +24,55 @@ export function TestResultSidebar() {
 
   const navItems = [
     {
-      label: '서머리',
+      title: '요약',
       href: `/tests/${testId}/result`,
+      icon: LayoutDashboard,
     },
     {
-      label: '미션별 보기',
+      title: '미션별 보기',
       href: `/tests/${testId}/result/missions`,
+      icon: Target,
     },
     {
-      label: '참여자별 보기',
+      title: '참여자별 보기',
       href: `/tests/${testId}/result/participants`,
+      icon: Users,
     },
   ];
 
   return (
-    <aside className="bg-sidebar w-64 shrink-0 overflow-y-auto border-r p-4">
-      <div className="space-y-3">
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
+    <aside className="bg-background w-64 shrink-0 overflow-y-auto border-r p-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex w-full items-center gap-2 rounded-md p-2 text-sm font-medium transition-colors h-12',
+                  'hover:bg-accent hover:text-accent-foreground',
+                  active && 'bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary',
+                )}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.title}</span>
+              </Link>
+            );
+          })}
+
+          <button
+            disabled
             className={cn(
-              'flex h-12 items-center rounded-lg px-4 font-medium transition-colors',
-              isActive(item.href)
-                ? 'bg-primary text-primary-foreground'
-                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+              'flex w-full items-center gap-2 rounded-md p-2 text-sm font-medium transition-colors h-12',
+              'text-muted-foreground opacity-50',
             )}
           >
-            {item.label}
-          </Link>
-        ))}
-
-        <button
-          disabled
-          className="flex h-12 w-full items-center rounded-lg border border-gray-300 bg-white px-4 font-medium text-gray-700 transition-colors hover:bg-gray-50"
-        >
-          공유
-        </button>
+            <Share2 className="h-4 w-4" />
+            <span>공유</span>
+          </button>
+        </div>
       </div>
     </aside>
   );

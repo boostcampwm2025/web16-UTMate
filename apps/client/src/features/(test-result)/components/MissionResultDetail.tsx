@@ -8,7 +8,7 @@ import { getTestMissionsResultById } from '../apis/client';
 
 interface MissionResultDetailProps {
   testId: string;
-  selectedMissionId: number;
+  selectedMissionId: string;
 }
 
 export function MissionResultDetail({ testId, selectedMissionId }: MissionResultDetailProps) {

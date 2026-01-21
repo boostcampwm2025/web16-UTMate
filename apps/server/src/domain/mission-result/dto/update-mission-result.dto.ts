@@ -1,4 +1,4 @@
-import { IsEnum, IsIn, IsString } from 'class-validator';
+import { IsEnum, IsIn, IsOptional, IsString } from 'class-validator';
 
 import { MissionResultStatus } from '../enums';
 
@@ -7,6 +7,7 @@ export class UpdateMissionResultDto {
   @IsEnum(MissionResultStatus)
   status: MissionResultStatus;
 
+  @IsOptional()
   @IsString()
   feedback?: string;
 }

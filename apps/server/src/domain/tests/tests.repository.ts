@@ -106,4 +106,24 @@ export class TestsRepository {
   async findByPublicId(publicId: string) {
     return this.testsRepository.findOneBy({ publicId });
   }
+
+  findByPublicIdAndOwnerWithParticipants(publicId: string, ownerId: number) {
+    return this.testsRepository
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.participants', 'participants')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .getOne();
+  }
+
+  findByPublicIdAndOwnerWithAllRelations(publicId: string, ownerId: number) {
+    return this.testsRepository
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .leftJoinAndSelect('tests.participants', 'participants')
+      .leftJoinAndSelect('participants.missionResults', 'missionResults')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .getOne();
+  }
 }

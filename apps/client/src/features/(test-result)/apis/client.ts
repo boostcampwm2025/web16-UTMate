@@ -21,7 +21,7 @@ export const getTestMainFeedback = async (testId: string): Promise<MainFeedback[
 };
 
 export const getTestMissionsResultById = async (
-  missionId: number,
+  missionId: string,
 ): Promise<MissionResultWithParticipant[]> => {
   return clientFetcher<MissionResultWithParticipant[]>(`${CLIENT_BASE_URL}/missions/${missionId}/result`);
 };

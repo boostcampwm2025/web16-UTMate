@@ -11,6 +11,7 @@ import {
 
 import { Mission } from './mission.entity';
 
+import { Participant } from '#domain/participants/entities/participant.entity';
 import { User } from '#domain/users/entities/user.entity';
 
 export enum TestStatus {
@@ -52,11 +53,20 @@ export class Test {
   @OneToMany(() => Mission, (mission) => mission.test)
   missions: Mission[];
 
+  @Column({ type: 'timestamp', nullable: true })
+  startDate?: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  endDate?: Date;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @OneToMany(() => Participant, (participant) => participant.test)
+  participants: Participant[];
 
   private constructor() {}
 
@@ -95,6 +105,11 @@ export class Test {
     if (!this.missions || this.missions.length === 0) {
       throw new Error('미션이 확인되지 않아 테스트를 게시할 수 없습니다.');
     }
+
+    if (!this.startDate) {
+      this.startDate = new Date();
+    }
+    this.endDate = undefined;
     this.status = TestStatus.PUBLISHED;
   }
 
@@ -102,6 +117,7 @@ export class Test {
     if (this.status === TestStatus.DRAFT) {
       throw new Error('Draft 상태의 테스트는 Archive 할 수 없습니다.');
     }
+    this.endDate = new Date();
     this.status = TestStatus.ARCHIVED;
   }
 

@@ -5,30 +5,32 @@ import pako from 'pako';
 import { EVENT_SEND_INTERVAL, SERVER_URL } from './constants';
 
 interface IIds {
-  sessionId: string;
+  participantId: string;
   missionId: string;
 }
 
 /**
- * URL에서 session_id, mission_id를 추출하거나 세션 스토리지에서 가져옵니다.
- * @return [sessionId, missionId]
+ * URL에서 participant-id, mission-id를 추출하거나 세션 스토리지에서 가져옵니다.
+ * @return [participantId, missionId]
  */
 function getIdsFromUrl(): IIds | undefined {
   // URLSearchParams를 사용하여 쿼리 파라미터 추출
   const searchParams = new URLSearchParams(window.location.search);
-  const sessionId = searchParams.get('session_id');
-  const missionId = searchParams.get('mission_id');
-  if (sessionId && missionId) {
-    sessionStorage.setItem('session_id', sessionId);
-    sessionStorage.setItem('mission_id', missionId);
-    return { sessionId, missionId };
+  const participantId = searchParams.get('participant-id');
+  const missionId = searchParams.get('mission-id');
+
+  if (participantId && missionId) {
+    sessionStorage.setItem('participant-id', participantId);
+    sessionStorage.setItem('mission-id', missionId);
+    return { participantId, missionId };
   }
 
   // 세션 스토리지에서 추출
-  const sessionIdStored = sessionStorage.getItem('session_id');
-  const missionIdStored = sessionStorage.getItem('mission_id');
-  if (sessionIdStored && missionIdStored) {
-    return { sessionId: sessionIdStored, missionId: missionIdStored };
+  const participantIdStored = sessionStorage.getItem('participant-id');
+  const missionIdStored = sessionStorage.getItem('mission-id');
+
+  if (participantIdStored && missionIdStored) {
+    return { participantId: participantIdStored, missionId: missionIdStored };
   }
 
   // 둘 다 없으면 undefined 반환
@@ -51,7 +53,7 @@ async function sendEventsToServer(ids: IIds, events: eventWithTime[], isUnload =
     keepalive: isUnload,
     headers: {
       'Content-Type': 'application/gzip',
-      'X-Session-Id': ids.sessionId,
+      'X-Participant-Id': ids.participantId,
       'X-Mission-Id': ids.missionId,
       'Content-Encoding': 'gzip',
     },
@@ -120,7 +122,7 @@ async function verifySdkInstallation(testId: string) {
     return;
   }
 
-  // URL 혹은 세션 스토리지에 session_id, mission_id가 없으면 종료
+  // URL 혹은 세션 스토리지에 participant-id, mission-id가 없으면 종료
   const ids = getIdsFromUrl();
   if (!ids) {
     return;

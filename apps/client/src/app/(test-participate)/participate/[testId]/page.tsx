@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { CompleteStep } from '@/features/(test-participate)/components/CompleteStep';
 import { FeedbackStep } from '@/features/(test-participate)/components/FeedbackStep';
@@ -10,66 +11,85 @@ import { ResumeTestStep } from '@/features/(test-participate)/components/ResumeT
 import { TestParticipateLayout } from '@/features/(test-participate)/components/TestParticipateLayout';
 import { TestStartStep } from '@/features/(test-participate)/components/TestStartStep';
 import { useTestParticipateStore } from '@/features/(test-participate)/stores/useTestParticipateStore';
-import type { TestInfo } from '@/features/(test-participate)/types';
-import { CLIENT_BASE_URL } from '@/shared/constants/api';
-import { getTestForParticipation, startTestParticipation } from '@/features/(test-participate)/api';
-
-// TODO: 백엔드 API 준비되면 제거
-const MOCK_TEST: TestInfo = {
-  publicId: '1',
-  title: '사용성 테스트',
-  description: '제품의 주요 기능을 테스트하고 피드백을 제공해주세요.',
-  status: 'ACTIVE',
-  url: 'https://example.com',
-  sdkStatus: true,
-  missions: [
-    {
-      publicId: 'm1',
-      order: 1,
-      name: '홈페이지 탐색',
-      description: '홈페이지에 접속하여\n주요 기능을 확인해보세요.',
-      missionUrl: 'https://ryurain.info',
-      estimatedDuration: 3,
-    },
-    {
-      publicId: 'm2',
-      order: 2,
-      name: '로그인 기능 테스트',
-      description: '로그인 버튼을 찾아\n클릭해주세요.',
-      missionUrl: 'https://ryurain.info/login',
-      estimatedDuration: 5,
-    },
-  ],
-};
+import {
+  completeTestParticipation,
+  getParticipant,
+  getTestForParticipation,
+  startTestParticipation,
+} from '@/features/(test-participate)/api';
+import type { ParticipantResponse } from '@/features/(test-participate)/types';
 
 export default function TestParticipatePage() {
   const params = useParams();
   const testId = params.testId as string;
 
-  // React Query로 테스트 정보 가져오기 (임시로 Mock 데이터 사용)
-  // TODO: 백엔드 API 준비되면 getTestForParticipation(testId)로 변경
+  // 이미 완료된 테스트인지 여부
+  const [isAlreadyCompleted, setIsAlreadyCompleted] = useState(false);
+
+  // 서버에서 가져온 참가자 정보 (이어하기용)
+  const [participantData, setParticipantData] = useState<ParticipantResponse | null>(null);
+
+  // React Query로 테스트 정보 가져오기
   const { data: testInfo } = useQuery({
     queryKey: ['test', testId],
-    queryFn: async () => {
-      return getTestForParticipation(testId);
-    },
+    queryFn: () => getTestForParticipation(testId),
   });
 
-  // Zustand store에서 상태 및 액션 가져오기
-  const currentStep = useTestParticipateStore((state) => state.currentStep);
-  const currentMissionIndex = useTestParticipateStore((state) => state.currentMissionIndex);
-  const needsResume = useTestParticipateStore((state) => state.needsResume);
-  const startTest = useTestParticipateStore((state) => state.startTest);
-  const submitFeedback = useTestParticipateStore((state) => state.submitFeedback);
+  // testId별 Zustand store 인스턴스 가져오기
+  const store = useTestParticipateStore(testId);
+
+  // store에서 상태 및 액션 가져오기
+  const currentStep = store((state) => state.currentStep);
+  const currentMissionIndex = store((state) => state.currentMissionIndex);
+  const needsResume = store((state) => state.needsResume);
+  const isLoadingResume = store((state) => state.isLoadingResume);
+  const participantId = store((state) => state.participantId);
+  const startTest = store((state) => state.startTest);
+  const resumeTest = store((state) => state.resumeTest);
+  const submitFeedback = store((state) => state.submitFeedback);
+  const clearSession = store((state) => state.clearSession);
+  const setLoadingResume = store((state) => state.setLoadingResume);
+
+  // 이어하기 진입 시 참가자 정보 조회 (서버에서 현재 상태 가져오기)
+  useEffect(() => {
+    const fetchParticipantStatus = async () => {
+      if (needsResume && participantId && isLoadingResume) {
+        const participant = await getParticipant(participantId);
+
+        if (!participant) {
+          // 참가자 정보가 없으면 세션 초기화
+          clearSession();
+          return;
+        }
+
+        if (participant.status === 'completed') {
+          // 이미 완료된 테스트
+          setIsAlreadyCompleted(true);
+          clearSession();
+          return;
+        }
+
+        // 참가자 정보 저장 (이어하기 화면에서 사용)
+        setParticipantData(participant);
+        setLoadingResume(false);
+      }
+    };
+
+    fetchParticipantStatus();
+  }, [needsResume, participantId, isLoadingResume, clearSession, setLoadingResume]);
+
+  // 이어하기 확인 핸들러
+  const handleConfirmResume = () => {
+    if (participantData && testInfo) {
+      resumeTest(participantData.missionResults, testInfo.missions.length);
+    }
+  };
 
   // 테스트 시작 mutation
-  // TODO: 백엔드 API 준비되면 startTestParticipation(testId) 사용
   const startTestMutation = useMutation({
-    mutationFn: async () => {
-      return await startTestParticipation(testId);
-    },
+    mutationFn: () => startTestParticipation(testId),
     onSuccess: (data) => {
-      startTest(data.participantId);
+      startTest(data.id, data.missionResults);
     },
     onError: (error) => {
       console.error('Failed to start test:', error);
@@ -78,28 +98,21 @@ export default function TestParticipatePage() {
   });
 
   // 테스트 완료 mutation
-  // TODO: 백엔드 API 준비되면 completeTestParticipation 사용
   const completeTestMutation = useMutation({
-    mutationFn: async (feedback: string) => {
-      // 임시로 성공 반환
-      return Promise.resolve();
+    mutationFn: (feedback: string) => {
+      if (!participantId) throw new Error('참가자 정보가 없습니다.');
+      return completeTestParticipation(participantId, feedback);
     },
     onSuccess: (_, feedback) => {
       submitFeedback(feedback);
+      // 테스트 완료 후 localStorage 정리
+      clearSession();
     },
     onError: (error) => {
       console.error('Failed to complete test:', error);
       alert('테스트 완료 처리에 실패했습니다.');
     },
   });
-
-  const handleStart = () => {
-    startTestMutation.mutate();
-  };
-
-  const handleFeedbackSubmit = (feedback: string) => {
-    completeTestMutation.mutate(feedback);
-  };
 
   // 현재 단계에 따른 프로그레스 계산
   const getCurrentStepNumber = (): number => {
@@ -148,17 +161,56 @@ export default function TestParticipatePage() {
     );
   }
 
+  // 이미 완료된 테스트인 경우
+  if (isAlreadyCompleted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
+        <div className="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-lg">
+          <div className="mb-4 text-4xl">✅</div>
+          <h2 className="mb-2 text-xl font-bold">이미 완료된 테스트입니다</h2>
+          <p className="text-muted-foreground mb-6">
+            이 테스트는 이미 참여를 완료하셨습니다.
+            <br />
+            참여해 주셔서 감사합니다!
+          </p>
+          <a
+            href="/"
+            className="inline-block rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+          >
+            홈으로 돌아가기
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // 이어하기 로딩 중
+  if (needsResume && isLoadingResume) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-muted-foreground">진행 상황을 불러오는 중...</div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* 이어하기 안내 */}
-      {needsResume ? (
+      {needsResume && participantData ? (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-          <ResumeTestStep testInfo={testInfo} />
+          <ResumeTestStep
+            testInfo={testInfo}
+            participantData={participantData}
+            onConfirmResume={handleConfirmResume}
+          />
         </div>
-      ) : /* 시작 단계는 프로그레스 바 없이 */
-      currentStep === 'start' ? (
+      ) : currentStep === 'start' ? (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-          <TestStartStep testInfo={testInfo} onStart={handleStart} />
+          <TestStartStep
+            testInfo={testInfo}
+            onStart={() => startTestMutation.mutate()}
+            isLoading={startTestMutation.isPending}
+          />
         </div>
       ) : currentStep === 'complete' ? (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
@@ -173,13 +225,19 @@ export default function TestParticipatePage() {
           {currentStep === 'mission' && (
             <MissionStep
               key={testInfo.missions[currentMissionIndex].publicId}
+              testId={testId}
               mission={testInfo.missions[currentMissionIndex]}
               missionNumber={currentMissionIndex + 1}
               totalMissions={testInfo.missions.length}
             />
           )}
 
-          {currentStep === 'feedback' && <FeedbackStep onSubmit={handleFeedbackSubmit} />}
+          {currentStep === 'feedback' && (
+            <FeedbackStep
+              onSubmit={(feedback) => completeTestMutation.mutate(feedback)}
+              isLoading={completeTestMutation.isPending}
+            />
+          )}
         </TestParticipateLayout>
       )}
     </>

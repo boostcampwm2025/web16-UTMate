@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
@@ -99,7 +99,7 @@ export function CreateTestButton() {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button size="lg">새 테스트</Button>
+        <Button size="lg"><Plus className="size-4" /> 새 테스트</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
