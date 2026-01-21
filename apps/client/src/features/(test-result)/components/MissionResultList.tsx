@@ -2,6 +2,15 @@
 
 import { useRouter } from 'next/navigation';
 
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/components/ui/table';
 import type { MissionResultWithParticipant } from '../types';
 
 interface MissionResultListProps {
@@ -19,37 +28,45 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
   return (
     <div>
       <h3 className="mb-4 text-lg font-bold text-gray-800">로그 목록</h3>
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-        <table className="w-full text-left">
-          <thead className="border-b border-gray-200 bg-gray-50">
-            <tr>
-              <th className="px-6 py-4 text-sm font-bold text-gray-600">아이디</th>
-              <th className="px-6 py-4 text-center text-sm font-bold text-gray-600">일시</th>
-              <th className="px-6 py-4 text-center text-sm font-bold text-gray-600">성공여부</th>
-              <th className="px-6 py-4 text-sm font-bold text-gray-600">피드백</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
+        <Table className="w-full text-left">
+          <TableCaption className="sr-only">미션 로그 목록</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                아이디
+              </TableHead>
+              <TableHead>
+                일시
+              </TableHead>
+              <TableHead>
+                성공여부
+              </TableHead>
+              <TableHead>
+                피드백
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {missionLogs.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-400">
+              <TableRow>
+                <TableCell colSpan={4} className="text-center">
                   해당 미션에 대한 결과가 없습니다.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               missionLogs.map((log) => (
-                <tr
+                <TableRow
                   key={log.participantId}
                   onClick={() => handleRowClick(log.participantId)}
-                  className="cursor-pointer transition-colors hover:bg-gray-50"
+                  className="cursor-pointer"
                 >
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
+                  <TableCell>
                     {log.participantId}
-                  </td>
-                  <td className="px-6 py-4 text-center text-sm text-gray-500">
+                  </TableCell>
+                  <TableCell className="text-center">
                     {log.createdAt || '-'}
-                  </td>
-                  <td className="px-6 py-4 text-center">
+                  </TableCell>
+                  <TableCell className="text-center">
                     {log.status === 'SUCCESS' ? (
                       <span className="inline-flex items-center font-bold text-green-600">O</span>
                     ) : log.status === 'FAILED' ? (
@@ -59,16 +76,15 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
                     ) : (
                       <span className="text-gray-400">-</span>
                     )}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  </TableCell>
+                  <TableCell>
                     {log.feedback || <span className="text-gray-300 italic">피드백 없음</span>}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
     </div>
   );
 }
