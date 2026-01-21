@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { type Test, TestStatus } from '@/features/(test-manage)/types';
+import { TableCell, TableRow } from '@/shared/components/ui/table';
 
 import { TestStatusBadge } from './TestStatusBadge';
 import { IntegrationButton } from './IntegrationButton';
@@ -30,23 +31,26 @@ export function TestTableRow({ test }: TestTableRowProps) {
   };
 
   return (
-    <tr onClick={handleRowClick} className="cursor-pointer transition-colors hover:bg-gray-50">
-      <td className="px-6 py-4 text-left">
+    <TableRow
+      onClick={handleRowClick}
+      className="cursor-pointer"
+    >
+      <TableCell className="text-left">
         <div className="font-medium text-gray-900">{test.title}</div>
-      </td>
-      <td className="px-6 py-4 text-center">
+      </TableCell>
+      <TableCell className="text-center">
         <TestStatusBadge status={test.status} />
-      </td>
-      <td className="px-6 py-4 text-center">
+      </TableCell>
+      <TableCell className="text-center">
         <IntegrationButton url={test.url} sdkStatus={test.sdkStatus} testId={test.publicId} />
-      </td>
+      </TableCell>
       {/* TODO: 테스트 참여자 수 표시 */}
-      <td className="px-6 py-4 text-center">
-        <span className="cursor-pointer text-sm text-gray-900">-</span>
-      </td>
-      <td className="px-6 py-4 text-center" onClick={handleActionClick}>
+      <TableCell className="text-center">
+        <span className="cursor-pointer text-sm text-gray-900"></span>
+      </TableCell>
+      <TableCell className="text-center" onClick={handleActionClick}>
         <TestActionButton testId={test.publicId} testStatus={test.status} />
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 }
