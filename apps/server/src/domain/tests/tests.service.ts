@@ -8,7 +8,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
+import { MainFeedbackDto, ParticipantResultsDto } from './dto/result.dto';
 import { TestDto } from './dto/test.dto';
+import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
@@ -176,7 +178,7 @@ export class TestsService {
     }
 
     // SDK 설치 여부 검증 로직
-    const isSdkInstalled = await this.verifySdkInstallationLogic(test.url); // 실제 검증 로직으로 대체 필요
+    const isSdkInstalled = await this.verifySdkInstallationLogic(test.url);
     test.sdkStatus = isSdkInstalled;
     await this.testsRepository.save(test);
 
@@ -248,5 +250,62 @@ export class TestsService {
       throw new BadRequestException('Test is not published');
     }
     return this.participantsService.createParticipant(userId, test.id, test.missions);
+  }
+
+  /**
+   * 테스트 결과 요약 정보를 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns 테스트 결과 요약 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
+  async getTestResultSummary(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipants(
+      publicId,
+      userId,
+    );
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return TestResultSummaryDto.fromTest(test);
+  }
+
+  /**
+   * 테스트 참여자들의 미션 결과들을 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns 테스트 참여자들의 미션 결과 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
+  async getTestParticipantsResults(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithAllRelations(
+      publicId,
+      userId,
+    );
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return ParticipantResultsDto.fromEntities(test.participants, test.missions);
+  }
+
+  /**
+   * 테스트의 참가자들의 피드백을 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns 주요 피드백 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
+  async getTestMainFeedback(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipants(
+      publicId,
+      userId,
+    );
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return MainFeedbackDto.fromEntities(test.participants);
   }
 }

@@ -1,6 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
+import { MissionOverviewDto } from './dto/result.dto';
 import { UpdateMissionDto } from './dto/update-mission.dto';
 import { Mission } from './entities/mission.entity';
 import { Test } from './entities/test.entity';
@@ -51,5 +52,24 @@ export class MissionsService {
     if (saveMissions.length > 0) await this.missionRepository.saveAll(saveMissions, manager);
     // 참조되지 않는 미션 삭제
     if (deleteMissions.length > 0) await this.missionRepository.deleteAll(deleteMissions, manager);
+  }
+
+  /**
+   * 미션의 상세 결과를 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param missionId 미션 public id
+   * @returns 미션 상세 결과 DTO
+   * @throws NotFoundException 미션을 찾을 수 없거나 소유자가 아닌 경우
+   */
+  async getMissionResultById(userId: number, missionId: string) {
+    const mission = await this.missionRepository.findByPublicIdWithAllRelations(missionId);
+    if (!mission) {
+      throw new NotFoundException('Mission not found');
+    }
+    if (mission.test.ownerId !== userId) {
+      throw new NotFoundException('Mission not found');
+    }
+    return MissionOverviewDto.fromEntities(mission, mission.missionResults);
   }
 }

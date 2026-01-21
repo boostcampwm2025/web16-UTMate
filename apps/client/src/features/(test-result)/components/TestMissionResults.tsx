@@ -42,7 +42,10 @@ export function TestMissionResults({ testId }: { testId: string }) {
 
       {/* 선택된 미션 상세 섹션 */}
       <QueryBoundary>
-        <MissionResultDetail testId={testId} selectedMissionId={selectedMissionId} />
+        <MissionResultDetail
+          testId={testId}
+          selectedMissionId={testDetail.missions[selectedMissionId - 1].publicId}
+        />
       </QueryBoundary>
     </div>
   );

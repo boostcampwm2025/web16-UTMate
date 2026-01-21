@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
 import { MissionResult } from './entities/mission-result.entity';
-import { MissionResultStatus } from './enums';
 
 @Injectable()
 export class MissionResultsRepository {
@@ -29,13 +28,6 @@ export class MissionResultsRepository {
       .getOne();
   }
 
-  async findByParticipantId(participantId: number) {
-    return this.repository
-      .createQueryBuilder('missionResult')
-      .where('missionResult.participant_id = :participantId', { participantId })
-      .getMany();
-  }
-
   async findByParticipantIdWithMissions(participantId: number, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(MissionResult) : this.repository;
     return repo
@@ -46,11 +38,12 @@ export class MissionResultsRepository {
       .getMany();
   }
 
-  async existsPendingMissionByParticipantId(participantId: number) {
-    return await this.repository
+  findByPublicIdWithAllRelations(publicId: string) {
+    return this.repository
       .createQueryBuilder('missionResult')
-      .where('missionResult.participant_id = :participantId', { participantId })
-      .andWhere('missionResult.status = :status', { status: MissionResultStatus.PENDING })
-      .getExists();
+      .leftJoinAndSelect('missionResult.participant', 'participant')
+      .leftJoinAndSelect('participant.test', 'test')
+      .where('missionResult.publicId = :publicId', { publicId })
+      .getOne();
   }
 }
