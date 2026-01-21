@@ -43,7 +43,7 @@ export function TestParticipantsResults({ testId }: { testId: string }) {
 
         {/* Legend */}
         <div className="mt-16 flex justify-center gap-6 border-t pt-8">
-          {(['SUCCESS', 'FAILURE', 'DROPPED', 'IN_PROGRESS'] as const).map((status) => (
+          {(['SUCCESS', 'FAILED', 'PENDING', 'IN_PROGRESS'] as const).map((status) => (
             <div key={status} className="flex items-center gap-2">
               <div className={cn('h-4 w-4 rounded border', getStatusStyles(status))} />
               <span className="text-xs font-medium text-gray-600">{getStatusText(status)}</span>
@@ -59,9 +59,9 @@ const getStatusText = (status: ParticipantMissionStatus) => {
   switch (status) {
     case 'SUCCESS':
       return '성공';
-    case 'FAILURE':
+    case 'FAILED':
       return '실패';
-    case 'DROPPED':
+    case 'PENDING':
       return '이탈';
     case 'IN_PROGRESS':
       return '진행중';
@@ -72,9 +72,9 @@ const getStatusStyles = (status: ParticipantMissionStatus) => {
   switch (status) {
     case 'SUCCESS':
       return 'bg-[#C1E9C6] border-[#2D5A27]';
-    case 'FAILURE':
+    case 'FAILED':
       return 'bg-[#F9C1C1] border-[#A82B2B]';
-    case 'DROPPED':
+    case 'PENDING':
       return 'bg-[#8E949E] border-[#374151]';
     case 'IN_PROGRESS':
       return 'bg-white border-black';

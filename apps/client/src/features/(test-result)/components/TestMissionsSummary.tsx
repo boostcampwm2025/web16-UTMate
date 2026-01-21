@@ -22,16 +22,18 @@ export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
 
     participantsData.forEach((participant) => {
       participant.missionResults.forEach((result) => {
-        if (!statsMap[result.missionId]) {
-          statsMap[result.missionId] = { successCount: 0, totalCount: 0 };
+        // FIXME
+        const order = result.missionOrder + 1;
+        if (!statsMap[order]) {
+          statsMap[order] = { successCount: 0, totalCount: 0 };
         }
 
         // 해당 미션에 도달한 전체 횟수(성공+실패+이탈 등)를 카운트
-        statsMap[result.missionId].totalCount += 1;
+        statsMap[order].totalCount += 1;
 
         // 성공인 경우만 카운트
         if (result.status === 'SUCCESS') {
-          statsMap[result.missionId].successCount += 1;
+          statsMap[order].successCount += 1;
         }
       });
     });

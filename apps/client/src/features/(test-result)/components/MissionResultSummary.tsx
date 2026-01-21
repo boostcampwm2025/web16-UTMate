@@ -21,8 +21,8 @@ export function MissionResultSummary({ missionLogs }: MissionResultSummaryProps)
     }
 
     const successCount = missionLogs.filter((l) => l.status === 'SUCCESS').length;
-    const failureCount = missionLogs.filter((l) => l.status === 'FAILURE').length;
-    const dropCount = missionLogs.filter((l) => l.status === 'DROPPED').length;
+    const failureCount = missionLogs.filter((l) => l.status === 'FAILED').length;
+    const dropCount = missionLogs.filter((l) => l.status === 'PENDING').length;
     const successLogsWithDuration = missionLogs.filter((l) => l.status === 'SUCCESS' && l.duration);
 
     const avgDurationSeconds =

@@ -52,9 +52,9 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
                   <td className="px-6 py-4 text-center">
                     {log.status === 'SUCCESS' ? (
                       <span className="inline-flex items-center font-bold text-green-600">O</span>
-                    ) : log.status === 'FAILURE' ? (
+                    ) : log.status === 'FAILED' ? (
                       <span className="inline-flex items-center font-bold text-red-600">X</span>
-                    ) : log.status === 'DROPPED' ? (
+                    ) : log.status === 'PENDING' ? (
                       <span className="inline-flex items-center font-bold text-gray-500">이탈</span>
                     ) : (
                       <span className="text-gray-400">-</span>

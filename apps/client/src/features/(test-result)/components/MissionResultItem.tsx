@@ -12,12 +12,12 @@ const statusConfig = {
     border: 'border-[#2D5A27]',
     text: '성공',
   },
-  FAILURE: {
+  FAILED: {
     bg: 'bg-[#F9C1C1]',
     border: 'border-[#A82B2B]',
     text: '실패',
   },
-  DROPPED: {
+  PENDING: {
     bg: 'bg-[#8E949E]',
     border: 'border-[#374151]',
     text: '이탈',
