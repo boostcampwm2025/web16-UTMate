@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
@@ -12,12 +12,19 @@ interface CompleteStepProps {
 }
 
 export function CompleteStep({ testId }: CompleteStepProps) {
+  const router = useRouter();
   const store = useTestParticipateStore(testId);
   const clearSession = store((state) => state.clearSession);
 
   const handleGoHome = () => {
-    clearSession();
+    // 먼저 페이지 이동 후 세션 정리 (깜빡임 방지)
+    router.push('/');
+    // 페이지 이동 후 세션 정리
+    setTimeout(() => {
+      clearSession();
+    }, 100);
   };
+
   return (
     <Card className="w-full max-w-3xl">
       <CardHeader>
@@ -37,11 +44,9 @@ export function CompleteStep({ testId }: CompleteStepProps) {
         </div>
 
         {/* 돌아가기 버튼 */}
-        <Link href="/" onClick={handleGoHome}>
-          <Button className="w-full" size="lg">
-            홈으로 돌아가기
-          </Button>
-        </Link>
+        <Button className="w-full" size="lg" onClick={handleGoHome}>
+          홈으로 돌아가기
+        </Button>
       </CardContent>
     </Card>
   );
