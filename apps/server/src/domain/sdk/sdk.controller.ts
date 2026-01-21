@@ -1,4 +1,4 @@
-import { Controller, Headers, Logger, Param, Post, Req } from '@nestjs/common';
+import { Controller, Headers, Param, Post, Req } from '@nestjs/common';
 import type { Request } from 'express';
 
 import { SdkService } from './sdk.service';

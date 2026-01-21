@@ -7,17 +7,23 @@ import {
   mousePosition,
 } from '@rrweb/types';
 
+import { AnalyzerDto } from './dto/analyzer.dto';
 import {
   ACTIVE_SOURCES,
   IDLE_THRESHOLD,
+  MOUSE_THRASHING_MIN_DISTANCE,
+  MOUSE_THRASHING_MIN_EVENTS,
+  MOUSE_THRASHING_MIN_RATIO,
+  MOUSE_THRASHING_TIMEFRAME,
   RAGE_CLICK_MAX_DISTANCE,
   RAGE_CLICK_MIN_CLICKS,
   RAGE_CLICK_TIMEFRAME,
 } from './const';
+import { Point, PointWithTime } from './interface';
 
 @Injectable()
 export class AnalyzerService {
-  analyze(logs: Buffer): string {
+  analyze(logs: Buffer) {
     // buffer를 문자열로 변환
     const logString = logs.toString('utf-8');
     // jsonl의 각 줄을 파싱하여 rrweb eventWithTime 객체 배열로 변환
@@ -29,7 +35,17 @@ export class AnalyzerService {
     // 예시: duration 분석
     const duration = this.analyzeDuration(logEntries);
     const timeToFirstInteraction = this.analyzeTimeToFirstInteraction(logEntries);
-    return `duration: ${duration}ms, time to first interaction: ${timeToFirstInteraction}ms`;
+    const idleTime = this.analyzeIdleTime(logEntries);
+    const rageClickCount = this.analyzeRageClick(logEntries);
+    const mouseThrashingCount = this.analyzeMouseThrashing(logEntries);
+
+    return new AnalyzerDto(
+      duration,
+      timeToFirstInteraction,
+      idleTime,
+      rageClickCount,
+      mouseThrashingCount,
+    );
   }
 
   /**
@@ -51,7 +67,7 @@ export class AnalyzerService {
    * @param events rrweb eventWithTime 객체 배열
    * @returns 첫번째 클릭까지 걸린 시간 (밀리초 단위) 또는 null (클릭 이벤트가 없는 경우)
    */
-  private analyzeTimeToFirstInteraction(events: eventWithTime[]): number | null {
+  private analyzeTimeToFirstInteraction(events: eventWithTime[]): number | undefined {
     const startTime = events[0].timestamp;
     const firstInteraction = events.find(
       (event) =>
@@ -59,7 +75,7 @@ export class AnalyzerService {
         event.data.source === IncrementalSource.MouseInteraction &&
         event.data.type === MouseInteractions.Click,
     );
-    if (!firstInteraction) return null;
+    if (!firstInteraction) return undefined;
     return firstInteraction.timestamp - startTime;
   }
 
@@ -99,8 +115,7 @@ export class AnalyzerService {
    * @returns 분석된 rage click 횟수
    */
   private analyzeRageClick(events: eventWithTime[]): number {
-    let rageClickCount = 0;
-    const clickDatas: { timestamp: number; x: number; y: number }[] = [];
+    const clickDatas: PointWithTime[] = [];
 
     // 클릭 이벤트 데이터 수집
     for (const event of events) {
@@ -115,6 +130,8 @@ export class AnalyzerService {
       }
     }
 
+    let rageClickCount = 0;
+
     for (let pivot = 0; pivot < clickDatas.length; pivot++) {
       let clusterCount = 1;
       for (let candidate = pivot + 1; candidate < clickDatas.length; candidate++) {
@@ -127,7 +144,8 @@ export class AnalyzerService {
           Math.abs(clickDatas[candidate].x - clickDatas[pivot].x) > RAGE_CLICK_MAX_DISTANCE ||
           Math.abs(clickDatas[candidate].y - clickDatas[pivot].y) > RAGE_CLICK_MAX_DISTANCE
         ) {
-          break;
+          // 너무 멀리 떨어진 클릭은 클러스터에 포함하지 않으나 계속 탐색
+          continue;
         }
         clusterCount++;
       }
@@ -140,5 +158,103 @@ export class AnalyzerService {
     }
 
     return rageClickCount;
+  }
+
+  /**
+   * 사용자의 마우스 스러싱 횟수를 분석합니다.
+   * 마우스 움직임 이벤트 중에서
+   * MOUSE_THRASHING_TIMEFRAME(1초) 이내에
+   * MOUSE_THRASHING_MIN_EVENTS(10회) 이상의 움직임이 발생하고,
+   * 변위 대비 이동 경로 비율이 MOUSE_THRASHING_MIN_RATIO(5) 이상이며,
+   * 총 이동 경로가 MOUSE_THRASHING_MIN_DISTANCE(500px) 이상인 경우를 마우스 스러싱으로 간주합니다.
+   *
+   * @param events rrweb eventWithTime 객체 배열
+   * @returns 분석된 마우스 스러싱 횟수
+   */
+  private analyzeMouseThrashing(events: eventWithTime[]): number {
+    const mouseMoveEvents: PointWithTime[] = [];
+
+    // 마우스 움직임 이벤트 수집
+    for (const event of events) {
+      if (
+        event.type === EventType.IncrementalSnapshot &&
+        event.data.source === IncrementalSource.MouseMove &&
+        event.data.positions
+      ) {
+        event.data.positions.forEach((pos: mousePosition) => {
+          mouseMoveEvents.push({ x: pos.x, y: pos.y, timestamp: event.timestamp + pos.timeOffset });
+        });
+      }
+    }
+
+    let thrashingCount = 0;
+
+    for (let pivot = 0; pivot < mouseMoveEvents.length; pivot++) {
+      let clusterCount = 1;
+      // 1초 이내의 이벤트 카운팅
+      for (let candidate = pivot + 1; candidate < mouseMoveEvents.length; candidate++) {
+        // 처음 움직임과의 시간 차이 확인
+        if (
+          mouseMoveEvents[candidate].timestamp - mouseMoveEvents[pivot].timestamp >
+          MOUSE_THRASHING_TIMEFRAME
+        ) {
+          break;
+        }
+        clusterCount++;
+      }
+      // 데이터가 너무 적으면 분석 스킵 ( 노이즈 가능성 높음 )
+      if (clusterCount < MOUSE_THRASHING_MIN_EVENTS) {
+        continue;
+      }
+
+      const metrics = this.calculateMetrics(mouseMoveEvents.slice(pivot, pivot + clusterCount));
+
+      // 변위 대비 이동 경로 비율 및, 총 이동 경로가 기준 이상인 경우 마우스 스러싱으로 간주
+      if (
+        metrics.ratio >= MOUSE_THRASHING_MIN_RATIO &&
+        metrics.totalPath >= MOUSE_THRASHING_MIN_DISTANCE
+      ) {
+        thrashingCount++;
+        pivot += clusterCount - 1; // 이미 카운트된 움직임들은 건너뜀
+      }
+    }
+
+    return thrashingCount;
+  }
+
+  /**
+   * 마우스 움직임의 총 이동 경로, 변위, 비율을 계산합니다.
+   *
+   * @param points 마우스 움직임 좌표 배열
+   * @returns 총 이동 경로, 변위, 비율을 포함한 객체
+   */
+  private calculateMetrics(points: Point[]) {
+    let totalPath = 0;
+
+    // 총 이동 거리 계산
+    for (let k = 1; k < points.length; k++) {
+      totalPath += this.getDistance(points[k - 1], points[k]);
+    }
+
+    // 변위 계산
+    const start = points[0];
+    const end = points[points.length - 1];
+    const displacement = this.getDistance(start, end);
+
+    // 비율 계산 (변위가 0인 경우 100으로 설정 - ArithmeticException 방지 )
+    const ratio = displacement === 0 ? 100 : totalPath / displacement;
+
+    return { totalPath, ratio };
+  }
+
+  /**
+   * 두 점 사이의 유클리드 거리 계산
+   *
+   * @param p1
+   * @param p2
+   * @returns 두 점 사이의 거리
+   */
+  private getDistance(p1: Point, p2: Point): number {
+    return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
   }
 }

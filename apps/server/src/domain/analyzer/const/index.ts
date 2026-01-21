@@ -15,3 +15,9 @@ export const ACTIVE_SOURCES = [
 export const RAGE_CLICK_TIMEFRAME = 1000;
 export const RAGE_CLICK_MIN_CLICKS = 3;
 export const RAGE_CLICK_MAX_DISTANCE = 100;
+
+// 마우스 스러싱 분석을 위한 상수들
+export const MOUSE_THRASHING_TIMEFRAME = 1000;
+export const MOUSE_THRASHING_MIN_EVENTS = 10;
+export const MOUSE_THRASHING_MIN_DISTANCE = 500;
+export const MOUSE_THRASHING_MIN_RATIO = 5;
