@@ -103,7 +103,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
         {
           missionId: 2,
           missionOrder: 2,
-          status: 'FAILURE',
+          status: 'FAILED',
           createdAt: '2026-03-02',
           feedback: '어디로 가야할지 모르겠어요.',
           duration: 450,
@@ -136,8 +136,8 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           createdAt: '2026-03-02',
           duration: 180,
         },
-        { missionId: 3, missionOrder: 3, status: 'DROPPED', createdAt: '2026-03-02', duration: 50 },
-        { missionId: 4, missionOrder: 4, status: 'DROPPED', createdAt: '2026-03-02', duration: 30 },
+        { missionId: 3, missionOrder: 3, status: 'PENDING', createdAt: '2026-03-02', duration: 50 },
+        { missionId: 4, missionOrder: 4, status: 'PENDING', createdAt: '2026-03-02', duration: 30 },
       ],
     },
     {
@@ -276,7 +276,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
     {
       missionId: 2,
       missionOrder: 2,
-      status: 'FAILURE',
+      status: 'FAILED',
       createdAt: '2026-03-02',
       feedback: '어디로 가야할지 모르겠어요.',
       duration: 450,
@@ -316,7 +316,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
     {
       missionId: 3,
       missionOrder: 3,
-      status: 'DROPPED',
+      status: 'PENDING',
       createdAt: '2026-03-02',
       duration: 50,
       participantId: 'tester-3',
@@ -346,7 +346,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
     {
       missionId: 4,
       missionOrder: 4,
-      status: 'DROPPED',
+      status: 'PENDING',
       createdAt: '2026-03-02',
       duration: 30,
       participantId: 'tester-3',
