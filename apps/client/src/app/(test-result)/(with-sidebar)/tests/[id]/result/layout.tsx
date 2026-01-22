@@ -1,8 +1,10 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { ArrowLeft } from 'lucide-react';
 
 import { TestResultSidebar } from '@/features/(test-result)/components/TestResultSidebar';
 import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
 
 export default async function TestResultLayout({
   children,
@@ -27,7 +29,19 @@ export default async function TestResultLayout({
 
       {/* Sidebar and Content */}
       <div className="flex flex-1 overflow-hidden">
-        <TestResultSidebar />
+        <Suspense
+          fallback={
+            <aside className="bg-background w-64 shrink-0 overflow-y-auto border-r p-2">
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </aside>
+          }
+        >
+          <TestResultSidebar />
+        </Suspense>
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto bg-gray-50 p-4">{children}</main>
       </div>
