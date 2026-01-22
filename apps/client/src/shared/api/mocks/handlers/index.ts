@@ -1,5 +1,4 @@
 import { testsHandlers } from './tests';
-import { resultHandlers } from './result';
 
 /**
  * MSW API 핸들러
@@ -8,9 +7,6 @@ import { resultHandlers } from './result';
 export const handlers = [
   // Tests 핸들러
   ...testsHandlers,
-
-  // Result 핸들러
-  ...resultHandlers,
 
   // 필요한 추가 핸들러를 여기에 작성
 ];
