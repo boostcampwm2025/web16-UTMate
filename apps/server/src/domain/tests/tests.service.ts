@@ -308,4 +308,28 @@ export class TestsService {
     }
     return MainFeedbackDto.fromEntities(test.participants);
   }
+
+  /**
+   * 특정 테스트의 특정 참여자 상세 정보를 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @param participantId 참여자 public id
+   * @returns 참여자 상세 정보 DTO
+   * @throws NotFoundException 테스트 또는 참여자를 찾을 수 없거나 소유자가 아닌 경우
+   */
+  async getTestParticipantDetail(userId: number, publicId: string, participantId: string) {
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipant(
+      publicId,
+      userId,
+      participantId,
+    );
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    if (!test.participants || test.participants.length === 0) {
+      throw new NotFoundException('Participant not found');
+    }
+    return ParticipantResultsDto.fromEntity(test.participants[0], test.missions);
+  }
 }
