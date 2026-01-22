@@ -19,7 +19,7 @@ import {
   RAGE_CLICK_MIN_CLICKS,
   RAGE_CLICK_TIMEFRAME,
 } from './const';
-import { Point, PointWithTime } from './interface';
+import { AnalyzeData, EventCluster, Point, PointWithTime } from './interface';
 
 @Injectable()
 export class AnalyzerService {
@@ -32,15 +32,15 @@ export class AnalyzerService {
       .split('\n')
       .map((line) => JSON.parse(line) as eventWithTime);
 
-    // 예시: duration 분석
-    const duration = this.analyzeDuration(logEntries);
+    const { startTime, endTime } = this.analyzeDuration(logEntries);
     const timeToFirstInteraction = this.analyzeTimeToFirstInteraction(logEntries);
     const idleTime = this.analyzeIdleTime(logEntries);
     const rageClickCount = this.analyzeRageClick(logEntries);
     const mouseThrashingCount = this.analyzeMouseThrashing(logEntries);
 
     return new AnalyzerDto(
-      duration,
+      startTime,
+      endTime,
       timeToFirstInteraction,
       idleTime,
       rageClickCount,
@@ -54,11 +54,11 @@ export class AnalyzerService {
    * @param events rrweb eventWithTime 객체 배열
    * @returns 분석된 세션의 총 지속 시간 (밀리초 단위)
    */
-  private analyzeDuration(events: eventWithTime[]): number {
-    if (events.length === 0) return 0;
+  private analyzeDuration(events: eventWithTime[]) {
+    if (events.length === 0) return { startTime: 0, endTime: 0 };
     const startTime = events[0].timestamp;
     const endTime = events[events.length - 1].timestamp;
-    return endTime - startTime;
+    return { startTime, endTime };
   }
 
   /**
@@ -85,8 +85,8 @@ export class AnalyzerService {
    * @param events rrweb eventWithTime 객체 배열
    * @returns 분석된 idle time (밀리초 단위)
    */
-  private analyzeIdleTime(events: eventWithTime[]): number {
-    let idleTime = 0;
+  private analyzeIdleTime(events: eventWithTime[]): AnalyzeData[] {
+    const idleTimes: AnalyzeData[] = [];
     let lastInteractionTime = events[0].timestamp;
 
     for (const event of events) {
@@ -96,13 +96,13 @@ export class AnalyzerService {
       ) {
         const gap = event.timestamp - lastInteractionTime;
         if (gap >= IDLE_THRESHOLD) {
-          idleTime += gap;
+          idleTimes.push({ timestamp: event.timestamp, duration: gap });
         }
         lastInteractionTime = event.timestamp;
       }
     }
 
-    return idleTime;
+    return idleTimes;
   }
 
   /**
@@ -114,7 +114,7 @@ export class AnalyzerService {
    * @param events rrweb eventWithTime 객체 배열
    * @returns 분석된 rage click 횟수
    */
-  private analyzeRageClick(events: eventWithTime[]): number {
+  private analyzeRageClick(events: eventWithTime[]): AnalyzeData[] {
     const clickDatas: PointWithTime[] = [];
 
     // 클릭 이벤트 데이터 수집
@@ -130,7 +130,7 @@ export class AnalyzerService {
       }
     }
 
-    let rageClickCount = 0;
+    const rageClicks: EventCluster[] = [];
 
     for (let pivot = 0; pivot < clickDatas.length; pivot++) {
       let clusterCount = 1;
@@ -152,12 +152,31 @@ export class AnalyzerService {
 
       // 클러스터 내 클릭 수가 최소 기준 이상인 경우 rage click으로 간주
       if (clusterCount >= RAGE_CLICK_MIN_CLICKS) {
-        rageClickCount++;
+        rageClicks.push({
+          startTime: clickDatas[pivot].timestamp,
+          endTime: clickDatas[pivot + clusterCount - 1].timestamp,
+          count: clusterCount,
+        });
         pivot += clusterCount - 1; // 이미 카운트된 클릭들은 건너뜀
       }
     }
 
-    return rageClickCount;
+    // 3초 이내 중복된 rage click 통합
+    const mergedRageClicks = rageClicks
+      .map((rageClick, index, arr) => {
+        if (index === 0) return rageClick;
+        const prevRageClick = arr[index - 1];
+        if (rageClick.startTime - prevRageClick.endTime <= 3000) {
+          // 이전 rage click과 합침
+          prevRageClick.endTime = rageClick.endTime;
+          prevRageClick.count = prevRageClick.count! + rageClick.count!;
+          return null;
+        }
+        return rageClick;
+      })
+      .filter((rageClick) => rageClick !== null);
+
+    return this.clustersToAnalyzeData(mergedRageClicks);
   }
 
   /**
@@ -171,7 +190,7 @@ export class AnalyzerService {
    * @param events rrweb eventWithTime 객체 배열
    * @returns 분석된 마우스 스러싱 횟수
    */
-  private analyzeMouseThrashing(events: eventWithTime[]): number {
+  private analyzeMouseThrashing(events: eventWithTime[]) {
     const mouseMoveEvents: PointWithTime[] = [];
 
     // 마우스 움직임 이벤트 수집
@@ -187,7 +206,7 @@ export class AnalyzerService {
       }
     }
 
-    let thrashingCount = 0;
+    const trashings: EventCluster[] = [];
 
     for (let pivot = 0; pivot < mouseMoveEvents.length; pivot++) {
       let clusterCount = 1;
@@ -214,12 +233,29 @@ export class AnalyzerService {
         metrics.ratio >= MOUSE_THRASHING_MIN_RATIO &&
         metrics.totalPath >= MOUSE_THRASHING_MIN_DISTANCE
       ) {
-        thrashingCount++;
+        trashings.push({
+          startTime: mouseMoveEvents[pivot].timestamp,
+          endTime: mouseMoveEvents[pivot + clusterCount - 1].timestamp,
+        });
         pivot += clusterCount - 1; // 이미 카운트된 움직임들은 건너뜀
       }
     }
 
-    return thrashingCount;
+    // 3초 이내 중복된 마우스 스러싱 통합
+    const mergedThrashings = trashings
+      .map((thrashing, index, arr) => {
+        if (index === 0) return thrashing;
+        const prevThrashing = arr[index - 1];
+        if (thrashing.startTime - prevThrashing.endTime <= 3000) {
+          // 이전 마우스 스러싱과 합침
+          prevThrashing.endTime = thrashing.endTime;
+          return null;
+        }
+        return thrashing;
+      })
+      .filter((thrashing) => thrashing !== null);
+
+    return this.clustersToAnalyzeData(mergedThrashings);
   }
 
   /**
@@ -256,5 +292,19 @@ export class AnalyzerService {
    */
   private getDistance(p1: Point, p2: Point): number {
     return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+  }
+
+  /**
+   * EventCluster 배열을 AnalyzeData 배열로 변환합니다.
+   *
+   * @param eventClusters EventCluster 배열
+   * @returns AnalyzeData 배열
+   */
+  private clustersToAnalyzeData(eventClusters: EventCluster[]): AnalyzeData[] {
+    return eventClusters.map((data) => ({
+      timestamp: data.startTime,
+      duration: data.endTime - data.startTime,
+      count: data.count,
+    }));
   }
 }

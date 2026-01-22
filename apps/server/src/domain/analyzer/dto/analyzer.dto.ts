@@ -1,18 +1,26 @@
-export class AnalyzerDto {
-  duration: number;
-  timeToFirstInteraction?: number;
-  idleTime: number;
-  rageClickCount: number;
-  mouseThrashingCount: number;
+import { AnalyzeData } from '../interface';
 
+export class AnalyzerDto {
+  startTime: number;
+  endTime: number;
+
+  timeToFirstInteraction?: number;
+
+  idleTime: AnalyzeData[];
+
+  rageClickCount: AnalyzeData[];
+
+  mouseThrashingCount: AnalyzeData[];
   constructor(
-    duration: number,
+    startTime: number,
+    endTime: number,
     timeToFirstInteraction: number | undefined,
-    idleTime: number,
-    rageClickCount: number,
-    mouseThrashingCount: number,
+    idleTime: AnalyzeData[],
+    rageClickCount: AnalyzeData[],
+    mouseThrashingCount: AnalyzeData[],
   ) {
-    this.duration = duration;
+    this.startTime = startTime;
+    this.endTime = endTime;
     this.timeToFirstInteraction = timeToFirstInteraction;
     this.idleTime = idleTime;
     this.rageClickCount = rageClickCount;

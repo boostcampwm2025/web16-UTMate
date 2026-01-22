@@ -29,7 +29,8 @@ describe('SdkService', () => {
       const analysisResult = service.analyze(logsBuffer);
 
       expect(analysisResult).toBeDefined();
-      expect(analysisResult.duration).toBeDefined();
+      expect(analysisResult.startTime).toBeDefined();
+      expect(analysisResult.endTime).toBeDefined();
       expect(analysisResult.timeToFirstInteraction).toBeDefined();
       expect(analysisResult.idleTime).toBeDefined();
       expect(analysisResult.rageClickCount).toBeDefined();
