@@ -4,46 +4,33 @@ import pako from 'pako';
 
 import { EVENT_SEND_INTERVAL, SERVER_URL } from './constants';
 
-interface IIds {
-  participantId: string;
-  missionId: string;
-}
-
 /**
- * URL에서 participant-id, mission-id를 추출하거나 세션 스토리지에서 가져옵니다.
- * @return [participantId, missionId]
+ * URL에서 인증 토큰 ( 미션 결과 publicId )를 추출하거나 세션 스토리지에서 가져옵니다.
+ *
+ * @return 인증 토큰 ( 미션 결과 publicId )
  */
-function getIdsFromUrl(): IIds | undefined {
+function getIdsFromUrl(): string | undefined {
   // URLSearchParams를 사용하여 쿼리 파라미터 추출
   const searchParams = new URLSearchParams(window.location.search);
-  const participantId = searchParams.get('participant-id');
-  const missionId = searchParams.get('mission-id');
+  const auth = searchParams.get('utmate-auth');
 
-  if (participantId && missionId) {
-    sessionStorage.setItem('participant-id', participantId);
-    sessionStorage.setItem('mission-id', missionId);
-    return { participantId, missionId };
+  if (auth) {
+    sessionStorage.setItem('utmate-auth', auth);
   }
 
   // 세션 스토리지에서 추출
-  const participantIdStored = sessionStorage.getItem('participant-id');
-  const missionIdStored = sessionStorage.getItem('mission-id');
-
-  if (participantIdStored && missionIdStored) {
-    return { participantId: participantIdStored, missionId: missionIdStored };
-  }
-
-  // 둘 다 없으면 undefined 반환
-  return undefined;
+  const authStored = sessionStorage.getItem('utmate-auth');
+  return authStored || undefined;
 }
 
 /**
  * 이벤트 큐에 쌓인 이벤트를 서버로 전송합니다.
- * @param ids 미션 및 세션 아이디
+ *
+ * @param auth 인증 토큰 ( 미션 결과 publicId )
  * @param events 전송할 이벤트 배열
  * @param isUnload keepalive 옵션 설정 여부
  */
-async function sendEventsToServer(ids: IIds, events: eventWithTime[], isUnload = false) {
+async function sendEventsToServer(auth: string, events: eventWithTime[], isUnload = false) {
   const jsonl = events.map((e) => JSON.stringify(e)).join('\n') + '\n';
   const compressed = pako.gzip(jsonl);
 
@@ -53,8 +40,7 @@ async function sendEventsToServer(ids: IIds, events: eventWithTime[], isUnload =
     keepalive: isUnload,
     headers: {
       'Content-Type': 'application/gzip',
-      'X-Participant-Id': ids.participantId,
-      'X-Mission-Id': ids.missionId,
+      Authorization: `Bearer ${auth}`,
       'Content-Encoding': 'gzip',
     },
     body: compressed,
@@ -68,19 +54,20 @@ async function sendEventsToServer(ids: IIds, events: eventWithTime[], isUnload =
 /**
  * 큐의 이벤트를 복사해 서버로 전송하고, 성공 시 원본 큐를 비웁니다.
  * 전송 실패 시 복사본을 다시 큐 앞에 되돌립니다.
- * @param ids 미션 및 세션 아이디
+ *
+ * @param auth 인증 토큰 ( 미션 결과 publicId )
  * @param eventQueue 이벤트 큐
  * @param isUnload keepalive 옵션 설정 여부
  * @returns
  */
-async function flushEvents(ids: IIds, eventQueue: eventWithTime[], isUnload = false) {
+async function flushEvents(auth: string, eventQueue: eventWithTime[], isUnload = false) {
   if (eventQueue.length === 0) return;
 
   const events = [...eventQueue];
   eventQueue.length = 0; // 큐 초기화
 
   try {
-    await sendEventsToServer(ids, events, isUnload);
+    await sendEventsToServer(auth, events, isUnload);
   } catch (error) {
     // 실패 시 이벤트를 다시 큐에 넣음
     eventQueue.unshift(...events);
@@ -122,9 +109,9 @@ async function verifySdkInstallation(testId: string) {
     return;
   }
 
-  // URL 혹은 세션 스토리지에 participant-id, mission-id가 없으면 종료
-  const ids = getIdsFromUrl();
-  if (!ids) {
+  // URL 혹은 세션 스토리지에 인증 정보가 없으면 종료
+  const auth = getIdsFromUrl();
+  if (!auth) {
     return;
   }
 
@@ -138,13 +125,13 @@ async function verifySdkInstallation(testId: string) {
 
   // 주기적으로 이벤트 전송
   setInterval(async () => {
-    await flushEvents(ids, eventQueue);
+    await flushEvents(auth, eventQueue);
   }, EVENT_SEND_INTERVAL);
 
   // 화면 이탈 시 남은 이벤트 전송
   document.addEventListener('visibilitychange', async () => {
     if (document.visibilityState === 'hidden') {
-      await flushEvents(ids, eventQueue, true);
+      await flushEvents(auth, eventQueue, true);
     }
   });
 })().catch(() => {});
