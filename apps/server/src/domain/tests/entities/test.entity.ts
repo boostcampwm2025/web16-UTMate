@@ -25,7 +25,7 @@ export class Test {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, length: 21 })
+  @Column({ name: 'public_id', unique: true, length: 11 })
   publicId: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
@@ -124,7 +124,7 @@ export class Test {
   @BeforeInsert()
   generatePublicId() {
     if (!this.publicId) {
-      this.publicId = nanoid();
+      this.publicId = nanoid(11);
     }
   }
 }

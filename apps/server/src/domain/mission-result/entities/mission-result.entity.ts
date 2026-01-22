@@ -19,7 +19,7 @@ export class MissionResult {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, name: 'public_id', length: 21 })
+  @Column({ unique: true, name: 'public_id', length: 11 })
   publicId: string;
 
   @ManyToOne(() => Mission, { onDelete: 'CASCADE' })
@@ -128,7 +128,7 @@ export class MissionResult {
   @BeforeInsert()
   generatePublicId() {
     if (!this.publicId) {
-      this.publicId = nanoid();
+      this.publicId = nanoid(11);
     }
   }
 }
