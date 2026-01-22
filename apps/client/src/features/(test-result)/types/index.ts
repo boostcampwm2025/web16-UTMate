@@ -32,6 +32,7 @@ export interface TestSummary {
 export type ParticipantMissionStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'IN_PROGRESS';
 
 export interface ParticipantMissionResult {
+  missionResultId: string;
   missionId: number;
   missionOrder: number;
   status: ParticipantMissionStatus;
