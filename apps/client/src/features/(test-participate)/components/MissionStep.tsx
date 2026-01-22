@@ -26,7 +26,6 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
   const missionResultId = store((state) => state.currentMissionResultId);
   const setMissionState = store((state) => state.setMissionState);
   const completeMission = store((state) => state.completeMission);
-  const participantId = store((state) => state.participantId);
 
   // 로컬 상태
   const [missionCompleted, setMissionCompleted] = useState<boolean | null>(null);
@@ -49,7 +48,7 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
     },
     onSuccess: () => {
       const newWindow = window.open(
-        `${mission.missionUrl}?participant-id=${participantId}&mission-id=${mission.publicId}`,
+        `${mission.missionUrl}?utmate-auth=${missionResultId}`,
         '_blank',
         'width=1200,height=800',
       );

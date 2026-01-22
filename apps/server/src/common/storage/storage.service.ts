@@ -62,4 +62,18 @@ export class StorageService {
       throw new NotFoundException('파일을 찾을 수 없습니다.');
     }
   }
+
+  /**
+   * 지정된 경로의 파일을 삭제합니다.
+   *
+   * @param fileName 파일 이름
+   */
+  async deleteByFilename(fileName: string) {
+    const filePath = path.join(this.uploadDir, fileName);
+    try {
+      await fs.promises.unlink(filePath);
+    } catch {
+      throw new NotFoundException('파일을 찾을 수 없습니다.');
+    }
+  }
 }
