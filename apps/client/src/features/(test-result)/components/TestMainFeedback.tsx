@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
@@ -27,10 +28,15 @@ export function TestMainFeedback({ testId }: TestMainFeedbackProps) {
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto">
         {feedbacks.length > 0 ? (
-          <ul className="space-y-4">
+          <ul className="space-y-2">
             {feedbacks.map((feedback) => (
-              // 개별 사용자 응답 보기 링크 추가
-              <MainFeedbackItem key={feedback.participantId} feedback={feedback} />
+              <Link
+                key={feedback.participantId}
+                href={`/tests/${testId}/result/participants/${feedback.participantId}`}
+                className="block rounded-lg p-4 transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
+              >
+                <MainFeedbackItem feedback={feedback} />
+              </Link>
             ))}
           </ul>
         ) : (

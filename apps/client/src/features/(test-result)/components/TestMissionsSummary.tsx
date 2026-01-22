@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
@@ -45,10 +46,15 @@ export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
         <CardTitle className="text-xl font-semibold">미션별 성공률</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto">
-        {/* TODO : 개별미션보기 링크 추가 */}
-        <div className="space-y-4">
+        <div className="space-y-2">
           {missionsWithStats.map((mission) => (
-            <MissionSummaryItem key={mission.publicId} mission={mission} />
+            <Link
+              key={mission.publicId}
+              href={`/tests/${testId}/result/missions/${mission.publicId}`}
+              className="block rounded-lg p-4 transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
+            >
+              <MissionSummaryItem mission={mission} />
+            </Link>
           ))}
           {missionsWithStats.length === 0 && (
             <p className="text-muted-foreground py-4 text-center text-sm">
