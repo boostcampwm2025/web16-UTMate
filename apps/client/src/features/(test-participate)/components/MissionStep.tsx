@@ -72,7 +72,7 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
     // recording 상태에서 다시 열기 (창이 닫힌 경우)
     if (currentMissionState === 'recording') {
       const newWindow = window.open(
-        `${mission.missionUrl}?participant-id=${participantId}&mission-id=${mission.publicId}`,
+        `${mission.missionUrl}?utmate-auth=${missionResultId}`,
         '_blank',
         'width=1200,height=800',
       );
