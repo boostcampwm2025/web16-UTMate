@@ -171,17 +171,11 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
 
 const mockMainFeedbacks: Record<number, MainFeedback[]> = {
   1: [
-    { id: 1, content: '메인 페이지의 디자인이 직관적이어서 사용하기 편리했습니다.' },
-    { id: 2, content: '검색 필터 기능이 좀 더 다양했으면 좋겠습니다.' },
-    { id: 3, content: '전반적인 로딩 속도가 조금 느린 것 같아 개선이 필요해 보입니다.' },
+    { participantId: 'tester-1', content: '메인 페이지의 디자인이 직관적이어서 사용하기 편리했습니다.', createdAt: '2023-12-12' },
+    { participantId: 'tester-2', content: '검색 필터 기능이 좀 더 다양했으면 좋겠습니다.', createdAt: '1000-02-22' },
+    { participantId: 'tester-3', content: '전반적인 로딩 속도가 조금 느린 것 같아 개선이 필요해 보입니다.', createdAt: '2018-03-02' },
   ],
   2: [],
-  3: [
-    { id: 1, content: '플래너 기능이 유용했습니다.' },
-    { id: 2, content: 'UI가 깔끔하고 사용하기 편했습니다.' },
-  ],
-  4: [],
-  5: [{ id: 1, content: '테스트 5의 주요 피드백입니다.' }],
 };
 
 // 특정 미션의 결과 데이터 (missionId별로 필터링된 결과)
