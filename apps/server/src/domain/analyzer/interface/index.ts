@@ -7,7 +7,7 @@ export interface PointWithTime extends Point {
   timestamp: number;
 }
 
-export interface AnalyzeData {
+export interface ActivitySegment {
   timestamp: number;
   duration: number;
   count?: number;

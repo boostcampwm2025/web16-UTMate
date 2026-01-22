@@ -7,7 +7,7 @@ import {
   mousePosition,
 } from '@rrweb/types';
 
-import { AnalyzerDto } from './dto/analyzer.dto';
+import { AnalyzerResult } from './dto/analyzer.dto';
 import {
   ACTIVE_SOURCES,
   IDLE_THRESHOLD,
@@ -19,7 +19,7 @@ import {
   RAGE_CLICK_MIN_CLICKS,
   RAGE_CLICK_TIMEFRAME,
 } from './const';
-import { AnalyzeData, EventCluster, Point, PointWithTime } from './interface';
+import { ActivitySegment, EventCluster, Point, PointWithTime } from './interface';
 
 @Injectable()
 export class AnalyzerService {
@@ -38,7 +38,7 @@ export class AnalyzerService {
     const rageClickCount = this.analyzeRageClick(logEntries);
     const mouseThrashingCount = this.analyzeMouseThrashing(logEntries);
 
-    return new AnalyzerDto(
+    return new AnalyzerResult(
       startTime,
       endTime,
       timeToFirstInteraction,
@@ -85,8 +85,8 @@ export class AnalyzerService {
    * @param events rrweb eventWithTime 객체 배열
    * @returns 분석된 idle time (밀리초 단위)
    */
-  private analyzeIdleTime(events: eventWithTime[]): AnalyzeData[] {
-    const idleTimes: AnalyzeData[] = [];
+  private analyzeIdleTime(events: eventWithTime[]): ActivitySegment[] {
+    const idleTimes: ActivitySegment[] = [];
     let lastInteractionTime = events[0].timestamp;
 
     for (const event of events) {
@@ -114,7 +114,7 @@ export class AnalyzerService {
    * @param events rrweb eventWithTime 객체 배열
    * @returns 분석된 rage click 횟수
    */
-  private analyzeRageClick(events: eventWithTime[]): AnalyzeData[] {
+  private analyzeRageClick(events: eventWithTime[]): ActivitySegment[] {
     const clickDatas: PointWithTime[] = [];
 
     // 클릭 이벤트 데이터 수집
@@ -300,7 +300,7 @@ export class AnalyzerService {
    * @param eventClusters EventCluster 배열
    * @returns AnalyzeData 배열
    */
-  private clustersToAnalyzeData(eventClusters: EventCluster[]): AnalyzeData[] {
+  private clustersToAnalyzeData(eventClusters: EventCluster[]): ActivitySegment[] {
     return eventClusters.map((data) => ({
       timestamp: data.startTime,
       duration: data.endTime - data.startTime,

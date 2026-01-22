@@ -10,6 +10,7 @@ import {
 
 import { MissionResultStatus } from '../enums';
 
+import { AnalyzerResult } from '#domain/analyzer/dto/analyzer.dto';
 import { Participant } from '#domain/participants/entities/participant.entity';
 import { Mission } from '#domain/tests/entities/mission.entity';
 
@@ -38,9 +39,6 @@ export class MissionResult {
   @Column({ type: 'enum', enum: MissionResultStatus, default: MissionResultStatus.PENDING })
   status: MissionResultStatus;
 
-  @Column({ type: 'int', nullable: true })
-  duration?: number;
-
   @Column({ type: 'text', nullable: true })
   feedback?: string;
 
@@ -55,17 +53,28 @@ export class MissionResult {
   })
   updatedAt: Date;
 
-  // TODO 추가적으로 로그 분석하여 저장할 필드 정의
   @Column({ nullable: true })
   filename?: string;
+
+  @Column({ type: 'int', nullable: true })
+  duration?: number;
+
+  @Column({ type: 'int', nullable: true })
+  totalIdleTime?: number;
+
+  @Column({ type: 'int', nullable: true })
+  rageClickCount?: number;
+
+  @Column({ type: 'int', nullable: true })
+  mouseThrashingCount?: number;
+
+  @Column({ type: 'json', nullable: true })
+  analysisData?: AnalyzerResult;
 
   private constructor(missionId: number, participantId: number) {
     this.missionId = missionId;
     this.participantId = participantId;
     this.status = MissionResultStatus.PENDING;
-    this.duration = 0;
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
   }
 
   static create(missionId: number, participantId: number): MissionResult {
@@ -87,16 +96,10 @@ export class MissionResult {
   }
 
   private start() {
-    // 수정 함
     if (this.status === MissionResultStatus.FAILED || this.status === MissionResultStatus.SUCCESS) {
       throw new Error('이미 완료된 미션입니다. 진행 중 상태로 변경할 수 없습니다.');
     }
     this.status = MissionResultStatus.IN_PROGRESS;
-
-    // if (this.status !== MissionResultStatus.PENDING) {
-    //   throw new Error('미션 결과는 대기 상태에서만 시작할 수 있습니다.');
-    // }
-    // this.status = MissionResultStatus.IN_PROGRESS;
   }
 
   private complete(status: MissionResultStatus, feedback?: string) {
@@ -112,6 +115,14 @@ export class MissionResult {
 
   recordUploadedFile(filename: string) {
     this.filename = filename;
+  }
+
+  analyzeResults(results: AnalyzerResult) {
+    this.duration = results.endTime - results.startTime;
+    this.totalIdleTime = results.idleTime.reduce((sum, segment) => sum + segment.duration, 0);
+    this.rageClickCount = results.rageClickCount.length;
+    this.mouseThrashingCount = results.mouseThrashingCount.length;
+    this.analysisData = results;
   }
 
   @BeforeInsert()

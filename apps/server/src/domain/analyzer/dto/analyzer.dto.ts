@@ -1,23 +1,24 @@
-import { AnalyzeData } from '../interface';
+import { ActivitySegment } from '../interface';
 
-export class AnalyzerDto {
+export class AnalyzerResult {
   startTime: number;
   endTime: number;
 
   timeToFirstInteraction?: number;
 
-  idleTime: AnalyzeData[];
+  idleTime: ActivitySegment[];
 
-  rageClickCount: AnalyzeData[];
+  rageClickCount: ActivitySegment[];
 
-  mouseThrashingCount: AnalyzeData[];
+  mouseThrashingCount: ActivitySegment[];
+
   constructor(
     startTime: number,
     endTime: number,
     timeToFirstInteraction: number | undefined,
-    idleTime: AnalyzeData[],
-    rageClickCount: AnalyzeData[],
-    mouseThrashingCount: AnalyzeData[],
+    idleTime: ActivitySegment[],
+    rageClickCount: ActivitySegment[],
+    mouseThrashingCount: ActivitySegment[],
   ) {
     this.startTime = startTime;
     this.endTime = endTime;
