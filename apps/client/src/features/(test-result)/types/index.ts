@@ -18,13 +18,13 @@ export interface SimpleMissionResult extends Pick<
   'id' | 'participantId' | 'missionId'
 > {}
 
-export interface TestSummary {
+export interface TestResultSummary {
   id: number;
   title: string;
   status: TestStatus;
   description: string;
-  startDate: string;
-  endDate: string;
+  startDate?: string;
+  endDate?: string;
   totalParticipants: number;
 }
 
