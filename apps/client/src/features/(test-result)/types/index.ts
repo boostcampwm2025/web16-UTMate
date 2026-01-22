@@ -32,6 +32,7 @@ export interface TestResultSummary {
 export type ParticipantMissionStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'IN_PROGRESS';
 
 export interface ParticipantMissionResult {
+  missionResultId: string;
   missionId: number;
   missionOrder: number;
   status: ParticipantMissionStatus;
@@ -65,4 +66,7 @@ export type MissionResultDetail = {
   feedback: string | null;
   missionId: string;
   presignedUrl: string;
-}
+};
+
+// 참여자 상세 조회는 ParticipantResult와 동일한 구조
+export type ParticipantDetail = ParticipantResult;

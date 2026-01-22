@@ -7,6 +7,7 @@ import { MissionResultStatus } from '#domain/mission-result/enums';
 import { Participant } from '#domain/participants/entities/participant.entity';
 
 export class ParticipantMissionResultDto {
+  missionResultId: string;
   missionId: string;
   missionOrder: number;
   status: MissionResultStatus;
@@ -23,6 +24,7 @@ export class ParticipantMissionResultDto {
       );
       throw new InternalServerErrorException(`미션 정보를 불러오는 중 오류가 발생했습니다.`);
     }
+    dto.missionResultId = missionResult.publicId;
     dto.missionId = mission.publicId;
     dto.missionOrder = mission.order;
     dto.status = missionResult.status;
