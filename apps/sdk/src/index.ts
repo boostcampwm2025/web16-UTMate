@@ -147,4 +147,26 @@ async function verifySdkInstallation(testId: string) {
       await flushEvents(ids, eventQueue, true);
     }
   });
+
+  // 페이지 언로드 시 남은 이벤트 전송 (창 닫기, 탭 닫기 등)
+  window.addEventListener('pagehide', () => {
+    flushEvents(ids, eventQueue, true).catch(() => {});
+  });
+
+  // 부모 창에서 flush 요청을 받으면 이벤트 전송 후 완료 메시지 반환
+  window.addEventListener('message', async (event) => {
+    if (event.data?.type === 'UTM_SDK_FLUSH_REQUEST') {
+      try {
+        await flushEvents(ids, eventQueue, false);
+        // 부모 창에 완료 메시지 전송
+        if (window.opener) {
+          window.opener.postMessage({ type: 'UTM_SDK_FLUSH_COMPLETE', success: true }, '*');
+        }
+      } catch {
+        if (window.opener) {
+          window.opener.postMessage({ type: 'UTM_SDK_FLUSH_COMPLETE', success: false }, '*');
+        }
+      }
+    }
+  });
 })().catch(() => {});
