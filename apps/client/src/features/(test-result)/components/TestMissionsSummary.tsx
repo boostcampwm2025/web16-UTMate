@@ -4,7 +4,11 @@ import { useMemo } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Progress } from '@/shared/components/ui/progress';
+import { getTestById } from '@/features/(test-detail)/api/client';
 import { testParticipantsResultsQuery } from '../queries';
+import { calculateMissionStats } from '../utils/stats';
+import type { Mission } from '@/features/(test-participate)/types';
 
 interface TestMissionsSummaryProps {
   testId: string;
@@ -15,67 +19,85 @@ export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
     ...testParticipantsResultsQuery(testId),
   });
 
-  // 미션별 성공률을 계산
-  // TODO : 통계 계산로직 분리
-  const missionStats = useMemo(() => {
-    const statsMap: Record<number, { successCount: number; totalCount: number }> = {};
+  const { data: testDetail } = useSuspenseQuery({
+    queryKey: ['testDetail', testId],
+    queryFn: () => getTestById(testId),
+  });
 
-    participantsData.forEach((participant) => {
-      participant.missionResults.forEach((result) => {
-        // FIXME
-        const order = result.missionOrder + 1;
-        if (!statsMap[order]) {
-          statsMap[order] = { successCount: 0, totalCount: 0 };
-        }
-
-        // 해당 미션에 도달한 전체 횟수(성공+실패+이탈 등)를 카운트
-        statsMap[order].totalCount += 1;
-
-        // 성공인 경우만 카운트
-        if (result.status === 'SUCCESS') {
-          statsMap[order].successCount += 1;
-        }
-      });
+  // 미션별 성공률 계산 && 미션 정보 결합
+  const missionsWithStats = useMemo(() => {
+     const missionStats = calculateMissionStats(participantsData);
+     const missions = testDetail.missions || [];
+     return missions.map((mission) => {
+      const stats = missionStats.find((s) => s.id === mission.order + 1);
+      return {
+        ...mission,
+        order: mission.order + 1,
+        successRate: stats?.successRate ?? 0,
+        hasData: !!stats,
+      };
     });
-
-    // 가공된 맵을 배열로 변환하고 미션 번호 순으로 정렬합니다.
-    return Object.entries(statsMap)
-      .map(([id, stats]) => ({
-        id: Number(id),
-        successRate:
-          stats.totalCount > 0 ? Math.round((stats.successCount / stats.totalCount) * 100) : 0,
-      }))
-      .sort((a, b) => a.id - b.id);
-  }, [participantsData]);
+  }, [participantsData, testDetail.missions]);
 
   return (
-    <Card>
+    <Card className="flex flex-col h-full">
       <CardHeader>
-        <CardTitle>미션별 성공률</CardTitle>
+        <CardTitle className="text-xl font-bold">미션별 성공률</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 overflow-y-auto">
+        {/* TODO : 개별미션보기 링크 추가 */}
         <div className="space-y-4">
-          {missionStats.map((mission) => (
-            <div key={mission.id} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">{mission.id}번 미션</span>
-                <span className="text-sm font-bold">{mission.successRate}%</span>
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                <div
-                  className="h-full bg-green-500 transition-all duration-500"
-                  style={{ width: `${mission.successRate}%` }}
-                />
-              </div>
-            </div>
+          {missionsWithStats.map((mission) => (
+            <MissionSummaryItem key={mission.publicId} mission={mission} />
           ))}
-          {missionStats.length === 0 && (
+          {missionsWithStats.length === 0 && (
             <p className="text-muted-foreground py-4 text-center text-sm">
-              분석할 미션 결과 데이터가 없습니다.
+              아직 미션 결과가 없습니다.
             </p>
           )}
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+interface MissionWithStats extends Mission {
+  order: number;
+  successRate: number;
+  hasData: boolean;
+}
+
+interface MissionSummaryItemProps {
+  mission: MissionWithStats;
+}
+
+export function MissionSummaryItem({ mission }: MissionSummaryItemProps) {
+  return (
+    <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-center">
+      {/* 왼쪽: 미션 정보 */}
+      <div className="space-y-1">
+        <div className="flex items-center">
+          <span className="text-lg font-bold">{mission.order}번 미션</span>
+        </div>
+        {mission.description && (
+          <p className="text-sm text-muted-foreground">{mission.description}</p>
+        )}
+      </div>
+      
+      {/* 오른쪽: Progress 바 */}
+      <div className="flex flex-col gap-2 lg:items-end">
+        {mission.hasData ? (
+          <>
+            <span className="text-sm font-bold lg:text-right">{mission.successRate}%</span>
+            <Progress value={mission.successRate} className="h-2 w-full lg:min-w-[200px]" />
+          </>
+        ) : (
+          <>
+            <span className="text-sm font-bold lg:text-right text-muted-foreground">데이터 없음</span>
+            <div className="h-2 w-full rounded-full bg-gray-100 lg:min-w-[200px]" />
+          </>
+        )}
+      </div>
+    </div>
   );
 }
