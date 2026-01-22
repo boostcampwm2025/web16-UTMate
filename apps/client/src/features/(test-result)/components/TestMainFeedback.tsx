@@ -33,7 +33,7 @@ export function TestMainFeedback({ testId }: TestMainFeedbackProps) {
               <Link
                 key={feedback.participantId}
                 href={`/tests/${testId}/result/participants/${feedback.participantId}`}
-                className="block rounded-lg p-4 transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
+                className="block rounded-lg p-2 transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
               >
                 <MainFeedbackItem feedback={feedback} />
               </Link>
