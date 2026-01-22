@@ -64,4 +64,7 @@ export type MissionResultDetail = {
   feedback: string | null;
   missionId: string;
   presignedUrl: string;
-}
+};
+
+// 참여자 상세 조회는 ParticipantResult와 동일한 구조
+export type ParticipantDetail = ParticipantResult;
