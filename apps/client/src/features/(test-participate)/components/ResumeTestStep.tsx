@@ -3,73 +3,79 @@
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 
-import { useTestParticipateStore } from '../stores/useTestParticipateStore';
-import type { TestInfo } from '../types';
+import type { ParticipantResponse, TestInfo } from '../types';
 
 interface ResumeTestStepProps {
   testInfo: TestInfo;
+  participantData: ParticipantResponse;
+  onConfirmResume: () => void;
 }
 
-export function ResumeTestStep({ testInfo }: ResumeTestStepProps) {
-  const currentStep = useTestParticipateStore((state) => state.currentStep);
-  const currentMissionIndex = useTestParticipateStore((state) => state.currentMissionIndex);
-  const currentMissionState = useTestParticipateStore((state) => state.currentMissionState);
-  const confirmResume = useTestParticipateStore((state) => state.confirmResume);
+export function ResumeTestStep({ testInfo, participantData, onConfirmResume }: ResumeTestStepProps) {
+  // 서버 데이터에서 진행 상황 계산
+  const missionResults = participantData.missionResults;
+  const completedCount = missionResults.filter(
+    (mr) => mr.status === 'SUCCESS' || mr.status === 'FAILED'
+  ).length;
+
+  // 첫 번째 진행 중이거나 대기 중인 미션 찾기
+  const inProgressMission = missionResults.find((mr) => mr.status === 'IN_PROGRESS');
+  const pendingMission = missionResults.find((mr) => mr.status === 'PENDING');
+  const currentMission = inProgressMission || pendingMission;
+
+  // 현재 미션 인덱스 계산
+  const currentMissionIndex = currentMission
+    ? missionResults.findIndex((mr) => mr.id === currentMission.id)
+    : completedCount;
+
+  // 모든 미션 완료 여부
+  const allMissionsCompleted = completedCount === testInfo.missions.length;
 
   const getProgressMessage = () => {
-    if (currentStep === 'mission') {
-      const mission = testInfo.missions[currentMissionIndex];
-      const missionNumber = currentMissionIndex + 1;
-
-      // 미션 진행 상황에 따른 메시지
-      if (currentMissionState === 'ready') {
-        return `미션 ${missionNumber}을 시작하려던 중`;
-      } else if (currentMissionState === 'recording') {
-        return `미션 ${missionNumber} 수행 중`;
-      } else if (currentMissionState === 'completed' || currentMissionState === 'feedback') {
-        return `미션 ${missionNumber} 완료 직전`;
-      }
-    } else if (currentStep === 'feedback') {
-      return '전체 피드백 작성 중';
+    if (allMissionsCompleted) {
+      return '모든 미션 완료, 피드백 작성 중';
     }
 
-    return '진행 중';
-  };
+    const missionNumber = currentMissionIndex + 1;
 
-  const getCurrentMission = () => {
-    if (currentStep === 'mission') {
-      return testInfo.missions[currentMissionIndex];
+    if (inProgressMission) {
+      return `미션 ${missionNumber} 수행 중`;
     }
-    return null;
+
+    return `미션 ${missionNumber}을 시작하려던 중`;
   };
 
-  const mission = getCurrentMission();
+  const getCurrentMissionInfo = () => {
+    if (allMissionsCompleted) {
+      return null;
+    }
+    return testInfo.missions[currentMissionIndex];
+  };
+
+  const mission = getCurrentMissionInfo();
 
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader>
         <CardTitle className="text-2xl">이어서 하시겠습니까?</CardTitle>
-        <CardDescription>
-          이전에 진행하던 테스트가 있습니다
-        </CardDescription>
+        <CardDescription>이전에 진행하던 테스트가 있습니다</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* 진행 상황 표시 */}
-        <div className="bg-muted rounded-lg p-6 space-y-3">
+        <div className="bg-muted space-y-3 rounded-lg p-6">
           <div className="flex items-center gap-2">
-            <div className="bg-primary rounded-full w-2 h-2" />
+            <div className="bg-primary h-2 w-2 rounded-full" />
             <p className="font-medium">진행 상황</p>
           </div>
-          <p className="text-muted-foreground text-sm pl-4">
+          <p className="text-muted-foreground pl-4 text-sm">
+            {completedCount > 0 && `${completedCount}개 미션 완료, `}
             {getProgressMessage()}이었습니다
           </p>
 
           {mission && (
             <div className="pl-4 pt-2">
               <p className="text-sm font-medium">{mission.name}</p>
-              <p className="text-muted-foreground text-xs mt-1">
-                {mission.description.split('\n')[0]}
-              </p>
+              <p className="text-muted-foreground mt-1 text-xs">{mission.description.split('\n')[0]}</p>
             </div>
           )}
         </div>
@@ -82,11 +88,7 @@ export function ResumeTestStep({ testInfo }: ResumeTestStepProps) {
         </div>
 
         {/* 이어하기 버튼 */}
-        <Button
-          onClick={confirmResume}
-          className="w-full"
-          size="lg"
-        >
+        <Button onClick={onConfirmResume} className="w-full" size="lg">
           이어서 진행하기
         </Button>
       </CardContent>

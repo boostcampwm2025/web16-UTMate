@@ -7,23 +7,25 @@ import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Textarea } from '@/shared/components/ui/textarea';
 
+import { startMission, submitMissionResult, uploadMissionRecording } from '../api';
 import { useTestParticipateStore } from '../stores/useTestParticipateStore';
 import type { Mission } from '../types';
 
 interface MissionStepProps {
+  testId: string;
   mission: Mission;
   missionNumber: number;
   totalMissions: number;
 }
 
-export function MissionStep({ mission, missionNumber, totalMissions }: MissionStepProps) {
-  // Zustand store에서 상태 및 액션 가져오기
-  const currentMissionState = useTestParticipateStore((state) => state.currentMissionState);
-  const participantId = useTestParticipateStore((state) => state.participantId);
-  const missionResultId = useTestParticipateStore((state) => state.currentMissionResultId);
-  const setMissionState = useTestParticipateStore((state) => state.setMissionState);
-  const setMissionResultId = useTestParticipateStore((state) => state.setMissionResultId);
-  const completeMission = useTestParticipateStore((state) => state.completeMission);
+export function MissionStep({ testId, mission, missionNumber, totalMissions }: MissionStepProps) {
+  const store = useTestParticipateStore(testId);
+
+  // store에서 상태 및 액션 가져오기
+  const currentMissionState = store((state) => state.currentMissionState);
+  const missionResultId = store((state) => state.currentMissionResultId);
+  const setMissionState = store((state) => state.setMissionState);
+  const completeMission = store((state) => state.completeMission);
 
   // 로컬 상태
   const [missionCompleted, setMissionCompleted] = useState<boolean | null>(null);
@@ -36,32 +38,20 @@ export function MissionStep({ mission, missionNumber, totalMissions }: MissionSt
     setMissionCompleted(null);
     setFeedback('');
     setMissionWindow(null);
-  }, [mission.publicId]); // 미션이 변경될 때마다 초기화
+  }, [mission.publicId]);
 
-  // TODO: 창 닫힘 자동 감지 기능 활성화 (필요시 주석 해제)
-  // useEffect(() => {
-  //   if (!missionWindow || currentMissionState !== 'recording') return;
-  //
-  //   const interval = setInterval(() => {
-  //     if (missionWindow.closed) {
-  //       clearInterval(interval);
-  //       finishRecordingMutation.mutate();
-  //     }
-  //   }, 1000);
-  //
-  //   return () => clearInterval(interval);
-  // }, [missionWindow, currentMissionState]);
-
-  // 미션 시작 mutation
-  // TODO: 백엔드 API 준비되면 startMission 사용
+  // 미션 시작 mutation (PENDING → IN_PROGRESS)
   const startMissionMutation = useMutation({
     mutationFn: async () => {
-      // 임시로 Mock 데이터 반환
-      return { id: `mission-result-${Date.now()}` };
+      if (!missionResultId) throw new Error('미션 결과 ID가 없습니다.');
+      await startMission(missionResultId);
     },
-    onSuccess: (data) => {
-      setMissionResultId(data.id);
-      const newWindow = window.open(mission.missionUrl, '_blank', 'width=1200,height=800');
+    onSuccess: () => {
+      const newWindow = window.open(
+        `${mission.missionUrl}?utmate-auth=${missionResultId}`,
+        '_blank',
+        'width=1200,height=800',
+      );
       setMissionWindow(newWindow);
       setMissionState('recording');
     },
@@ -71,17 +61,73 @@ export function MissionStep({ mission, missionNumber, totalMissions }: MissionSt
     },
   });
 
+  // 미션 수행 페이지 열기 (녹화 시작)
+  const handleOpenMission = () => {
+    // 이미 창이 열려있고 닫히지 않았다면 포커스만 주기
+    if (missionWindow && !missionWindow.closed) {
+      missionWindow.focus();
+      return;
+    }
+
+    // recording 상태에서 다시 열기 (창이 닫힌 경우)
+    if (currentMissionState === 'recording') {
+      const newWindow = window.open(
+        `${mission.missionUrl}?utmate-auth=${missionResultId}`,
+        '_blank',
+        'width=1200,height=800',
+      );
+      setMissionWindow(newWindow);
+      return;
+    }
+
+    startMissionMutation.mutate();
+  };
+
+  // SDK에 flush 요청을 보내고 완료를 기다리는 함수
+  const requestSdkFlush = (targetWindow: Window): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        window.removeEventListener('message', handleMessage);
+        // 타임아웃 시에도 진행 (SDK가 응답하지 않아도 계속 진행)
+        resolve();
+      }, 5000);
+
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data?.type === 'UTM_SDK_FLUSH_COMPLETE') {
+          clearTimeout(timeout);
+          window.removeEventListener('message', handleMessage);
+          if (event.data.success) {
+            resolve();
+          } else {
+            // 실패해도 진행
+            resolve();
+          }
+        }
+      };
+
+      window.addEventListener('message', handleMessage);
+
+      // SDK에 flush 요청 전송
+      targetWindow.postMessage({ type: 'UTM_SDK_FLUSH_REQUEST' }, '*');
+    });
+  };
+
   // 녹화 종료 mutation
-  // TODO: 백엔드 API 준비되면 finishMissionRecording 사용
   const finishRecordingMutation = useMutation({
     mutationFn: async () => {
-      // 임시로 성공 반환
-      return Promise.resolve();
-    },
-    onSuccess: () => {
+      // SDK에 flush 요청을 보내고 완료를 기다림
       if (missionWindow && !missionWindow.closed) {
+        await requestSdkFlush(missionWindow);
         missionWindow.close();
       }
+      setMissionWindow(null);
+
+      // SDK flush 완료 후 서버에 녹화 업로드 요청
+      if (missionResultId) {
+        await uploadMissionRecording(missionResultId);
+      }
+    },
+    onSuccess: () => {
       setMissionState('completed');
     },
     onError: (error) => {
@@ -90,14 +136,25 @@ export function MissionStep({ mission, missionNumber, totalMissions }: MissionSt
     },
   });
 
-  const handleOpenMission = () => {
-    // 이미 창이 열려있고 닫히지 않았다면 포커스만 주기
-    if (missionWindow && !missionWindow.closed) {
-      missionWindow.focus();
-      return;
-    }
-    startMissionMutation.mutate();
-  };
+  // 미션 결과 제출 mutation (다음 버튼 클릭 시)
+  const submitMissionMutation = useMutation({
+    mutationFn: async () => {
+      if (!missionResultId) throw new Error('미션 결과 ID가 없습니다.');
+      const status = missionCompleted ? 'SUCCESS' : 'FAILED';
+      await submitMissionResult(missionResultId, status, feedback || undefined);
+    },
+    onSuccess: () => {
+      completeMission({
+        missionPublicId: mission.publicId,
+        completed: missionCompleted!,
+        feedback: feedback || undefined,
+      });
+    },
+    onError: (error) => {
+      console.error('Failed to submit mission result:', error);
+      alert('미션 결과 제출에 실패했습니다.');
+    },
+  });
 
   const handleStopRecording = () => {
     finishRecordingMutation.mutate();
@@ -110,20 +167,12 @@ export function MissionStep({ mission, missionNumber, totalMissions }: MissionSt
 
   const handleNext = () => {
     if (missionCompleted === null) return;
-
-    // Store에 미션 결과 저장 및 다음 미션으로 이동
-    completeMission({
-      missionPublicId: mission.publicId,
-      completed: missionCompleted,
-      feedback: feedback || undefined,
-    });
+    submitMissionMutation.mutate();
   };
 
   const isStateReached = (targetState: typeof currentMissionState) => {
     const stateOrder = ['ready', 'recording', 'completed', 'feedback'];
-    return (
-      stateOrder.indexOf(currentMissionState) >= stateOrder.indexOf(targetState)
-    );
+    return stateOrder.indexOf(currentMissionState) >= stateOrder.indexOf(targetState);
   };
 
   const isStateActive = (targetState: typeof currentMissionState) => {
@@ -144,18 +193,22 @@ export function MissionStep({ mission, missionNumber, totalMissions }: MissionSt
         {/* 미션 설명 */}
         <div className="space-y-2">
           <h3 className="font-semibold">미션 설명</h3>
-          <p className="text-muted-foreground whitespace-pre-wrap text-sm">{mission.description}</p>
+          <p className="text-muted-foreground text-sm whitespace-pre-wrap">{mission.description}</p>
         </div>
 
         {/* 1. 미션 수행 페이지 열기 */}
-        <div className={!isStateActive('ready') ? 'opacity-50' : ''}>
+        <div className={!isStateActive('ready') && !isStateActive('recording') ? 'opacity-50' : ''}>
           <Button
             onClick={handleOpenMission}
-            disabled={!isStateActive('ready')}
+            disabled={(!isStateActive('ready') && !isStateActive('recording')) || startMissionMutation.isPending}
             className="w-full"
             size="lg"
           >
-            미션 수행 페이지 열기 (새 창)
+            {startMissionMutation.isPending
+              ? '시작 중...'
+              : currentMissionState === 'recording'
+                ? '미션 수행 페이지 다시 열기'
+                : '미션 수행 페이지 열기 (새 창)'}
           </Button>
         </div>
 
@@ -171,12 +224,12 @@ export function MissionStep({ mission, missionNumber, totalMissions }: MissionSt
               </div>
               <Button
                 onClick={handleStopRecording}
-                disabled={!isStateActive('recording')}
+                disabled={!isStateActive('recording') || finishRecordingMutation.isPending}
                 variant="destructive"
                 className="w-full"
                 size="lg"
               >
-                녹화 종료
+                {finishRecordingMutation.isPending ? '데이터 전송 중...' : '녹화 종료'}
               </Button>
             </div>
           </div>
@@ -218,9 +271,7 @@ export function MissionStep({ mission, missionNumber, totalMissions }: MissionSt
         {isStateReached('feedback') && (
           <div className="space-y-4">
             <div className="bg-muted rounded-lg p-4">
-              <p className="text-sm">
-                {missionCompleted ? '✅ 미션 성공' : '❌ 미션 실패'}
-              </p>
+              <p className="text-sm">{missionCompleted ? '미션 성공' : '미션 실패'}</p>
             </div>
 
             <div className="space-y-2">
@@ -236,8 +287,13 @@ export function MissionStep({ mission, missionNumber, totalMissions }: MissionSt
               />
             </div>
 
-            <Button onClick={handleNext} className="w-full" size="lg">
-              다음
+            <Button
+              onClick={handleNext}
+              disabled={submitMissionMutation.isPending}
+              className="w-full"
+              size="lg"
+            >
+              {submitMissionMutation.isPending ? '제출 중...' : '다음'}
             </Button>
           </div>
         )}

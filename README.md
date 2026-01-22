@@ -55,17 +55,17 @@
 
 자세한 기술 스택 정보는 [기술 스택 문서](https://github.com/boostcampwm2025/web16-UTMate/wiki/TechStack-Overview)를 참고해주세요.
 
+## 서비스 3요소
+
+![서비스 3요소](https://github.com/boostcampwm2025/web16-UTMate/wiki/images/trinity.png)
+
 ## 서비스 아키텍쳐
 
-![서비스 아키텍쳐](https://github.com/boostcampwm2025/web16-UTMate/wiki/images/trinity.png)
-
-## 배포 아키텍쳐
-
-![배포 아키텍쳐](https://github.com/boostcampwm2025/web16-UTMate/wiki/images/infra.png)
+![서비스 아키텍쳐](https://github.com/boostcampwm2025/web16-UTMate/wiki/images-arch.png)
 
 ## CI/CD
 
-![CI/CD](https://github.com/boostcampwm2025/web16-UTMate/wiki/images/cicd.png)
+![CI/CD](https://github.com/boostcampwm2025/web16-UTMate/wiki/image-cicd.png)
 
 ---
 

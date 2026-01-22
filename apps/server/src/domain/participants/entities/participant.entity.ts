@@ -20,7 +20,7 @@ export class Participant {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'public_id', unique: true })
+  @Column({ name: 'public_id', unique: true, length: 11 })
   publicId: string;
 
   @ManyToOne(() => Test, { onDelete: 'CASCADE' })
@@ -43,7 +43,7 @@ export class Participant {
   @OneToMany(() => MissionResult, (missionResult) => missionResult.participant)
   missionResults: MissionResult[];
 
-  @Column({ type: 'enum', enum: ParticipantStatus, default: ParticipantStatus.ONGOING })
+  @Column({ type: 'enum', enum: ParticipantStatus, default: ParticipantStatus.IN_PROGRESS })
   status: ParticipantStatus;
 
   @Column({ type: 'text', nullable: true })
@@ -79,7 +79,7 @@ export class Participant {
   @BeforeInsert()
   generatePublicId() {
     if (!this.publicId) {
-      this.publicId = nanoid();
+      this.publicId = nanoid(11);
     }
   }
 }

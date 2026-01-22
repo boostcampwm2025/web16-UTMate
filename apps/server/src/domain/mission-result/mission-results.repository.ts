@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 import { MissionResult } from './entities/mission-result.entity';
-import { MissionResultStatus } from './enums';
 
 @Injectable()
 export class MissionResultsRepository {
@@ -15,6 +14,11 @@ export class MissionResultsRepository {
     return this.repository.save(missionResult);
   }
 
+  async saveAll(missionResults: MissionResult[], manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(MissionResult) : this.repository;
+    return repo.save(missionResults);
+  }
+
   async findByPublicId(publicId: string) {
     return this.repository
       .createQueryBuilder('missionResult')
@@ -22,18 +26,23 @@ export class MissionResultsRepository {
       .getOne();
   }
 
-  async findByParticipantId(participantId: number) {
-    return this.repository
+  async findByParticipantIdWithMissions(participantId: number, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(MissionResult) : this.repository;
+    return repo
       .createQueryBuilder('missionResult')
       .where('missionResult.participant_id = :participantId', { participantId })
+      .leftJoinAndSelect('missionResult.mission', 'mission')
+      .orderBy('mission.order', 'ASC')
       .getMany();
   }
 
-  async existsPendingMissionByParticipantId(participantId: number) {
-    return await this.repository
+  findByPublicIdWithAllRelations(publicId: string) {
+    return this.repository
       .createQueryBuilder('missionResult')
-      .where('missionResult.participant_id = :participantId', { participantId })
-      .andWhere('missionResult.status = :status', { status: MissionResultStatus.PENDING })
-      .getExists();
+      .leftJoinAndSelect('missionResult.participant', 'participant')
+      .leftJoinAndSelect('missionResult.mission', 'mission')
+      .leftJoinAndSelect('participant.test', 'test')
+      .where('missionResult.publicId = :publicId', { publicId })
+      .getOne();
   }
 }

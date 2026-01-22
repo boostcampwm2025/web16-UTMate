@@ -1,15 +1,19 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 
-import { UpdateMissionResultDto } from './dtos/update-mission-result.dto';
+import { UpdateMissionResultDto } from './dto/update-mission-result.dto';
 import { MissionResultsService } from './misson-results.service';
+
+import { UserId } from '#domain/auth/decorator/param.decorator';
+import { JwtAuthGuard } from '#domain/auth/guards/jwt-auth.guard';
 
 @Controller('/mission-results')
 export class MissionResultsController {
   constructor(private readonly missionResultsService: MissionResultsService) {}
 
   @Get('/:id')
-  async getMissionResult(@Param('id') _publicId: string) {
-    // todo 대시 보드용 미션 결과 상세 조회
+  @UseGuards(JwtAuthGuard)
+  async getMissionResult(@UserId() userId: number, @Param('id') publicId: string) {
+    return this.missionResultsService.getMissionResultsDetail(userId, publicId);
   }
 
   @Post('/:id/record')

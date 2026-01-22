@@ -22,6 +22,20 @@ export class TestsRepository {
       .getOne();
   }
 
+  async findByPublicIdAndOwnerWithMissions(
+    publicId: string,
+    ownerId: number,
+    manager?: EntityManager,
+  ) {
+    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
+    return repo
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .getOne();
+  }
+
   async findSummariesByOwner(ownerId: number, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo
@@ -59,7 +73,7 @@ export class TestsRepository {
     const repo = manager ? manager.getRepository(Test) : this.testsRepository;
     return repo
       .createQueryBuilder('tests')
-      .leftJoinAndSelect('tests.missions', 'mission')
+      .leftJoinAndSelect('tests.missions', 'missions')
       .where('tests.publicId = :publicId', { publicId })
       .getOne();
   }
@@ -91,5 +105,41 @@ export class TestsRepository {
 
   async findByPublicId(publicId: string) {
     return this.testsRepository.findOneBy({ publicId });
+  }
+
+  findByPublicIdAndOwnerWithParticipants(publicId: string, ownerId: number) {
+    return this.testsRepository
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.participants', 'participants')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .getOne();
+  }
+
+  findByPublicIdAndOwnerWithAllRelations(publicId: string, ownerId: number) {
+    return this.testsRepository
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .leftJoinAndSelect('tests.participants', 'participants')
+      .leftJoinAndSelect('participants.missionResults', 'missionResults')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .getOne();
+  }
+
+  findByPublicIdAndOwnerWithParticipant(
+    testPublicId: string,
+    ownerId: number,
+    participantPublicId: string,
+  ) {
+    return this.testsRepository
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .leftJoinAndSelect('tests.participants', 'participants')
+      .leftJoinAndSelect('participants.missionResults', 'missionResults')
+      .where('tests.publicId = :testPublicId', { testPublicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .andWhere('participants.publicId = :participantPublicId', { participantPublicId })
+      .getOne();
   }
 }

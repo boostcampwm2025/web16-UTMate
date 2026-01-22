@@ -12,9 +12,10 @@ import type { TestInfo } from '../types';
 interface TestStartStepProps {
   testInfo: TestInfo;
   onStart: () => void;
+  isLoading?: boolean;
 }
 
-export function TestStartStep({ testInfo, onStart }: TestStartStepProps) {
+export function TestStartStep({ testInfo, onStart, isLoading }: TestStartStepProps) {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const handleStart = () => {
@@ -26,10 +27,7 @@ export function TestStartStep({ testInfo, onStart }: TestStartStepProps) {
   };
 
   // 총 예상 소요시간 계산 (분)
-  const totalEstimatedMinutes = testInfo.missions.reduce(
-    (sum, mission) => sum + mission.estimatedDuration,
-    0
-  );
+  const totalEstimatedMinutes = testInfo.missions.reduce((sum, mission) => sum + mission.estimatedDuration, 0);
 
   return (
     <Card className="w-full max-w-3xl">
@@ -63,27 +61,21 @@ export function TestStartStep({ testInfo, onStart }: TestStartStepProps) {
             <li>• 수집된 데이터는 테스트 분석 목적으로만 사용됩니다.</li>
             <li>• 개인을 식별할 수 있는 정보는 수집되지 않습니다.</li>
             <li>• 언제든지 테스트를 중단할 수 있습니다.</li>
-            <li className="text-orange-600 font-medium">
-              • 테스트 시작 후 이전 단계로 되돌릴 수 없습니다.
-            </li>
+            <li className="font-medium text-orange-600">• 테스트 시작 후 이전 단계로 되돌릴 수 없습니다.</li>
           </ul>
         </div>
 
         {/* 동의 체크박스 */}
         <div className="flex items-center space-x-2">
-          <Checkbox
-            id="terms"
-            checked={agreedToTerms}
-            onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
-          />
+          <Checkbox id="terms" checked={agreedToTerms} onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} />
           <Label htmlFor="terms" className="cursor-pointer text-sm font-medium leading-none">
             위 내용을 확인했으며, 테스트 참여에 동의합니다.
           </Label>
         </div>
 
         {/* 시작 버튼 */}
-        <Button onClick={handleStart} disabled={!agreedToTerms} className="w-full" size="lg">
-          테스트 시작하기
+        <Button onClick={handleStart} disabled={!agreedToTerms || isLoading} className="w-full" size="lg">
+          {isLoading ? '시작 중...' : '테스트 시작하기'}
         </Button>
       </CardContent>
     </Card>

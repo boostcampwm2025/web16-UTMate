@@ -17,6 +17,7 @@ export class RefreshTokenService {
 
   /**
    * Refresh Token을 Redis에 저장합니다.
+   *
    * @param userPublicId redis key의 일부로 사용됩니다.
    * @param familyId redis key의 일부로 사용됩니다.
    * @param refreshToken redis value로 사용됩니다.
@@ -36,6 +37,7 @@ export class RefreshTokenService {
   /**
    * Refresh Token을 재발급 합니다.
    * 기존의 refresh token과 일치하는지 검증 후 실패 시 탈취로 판단, 동일 familyId의 토큰을 모두 무효화합니다.
+   *
    * @param userPublicId redis key의 일부로 사용됩니다.
    * @param familyId redis key의 일부로 사용됩니다.
    * @param refreshToken 기존의 refresh token입니다.
@@ -65,6 +67,7 @@ export class RefreshTokenService {
 
   /**
    * Refresh Token을 삭제합니다.
+   *
    * @param userPublicId Redis key의 일부로 사용됩니다.
    * @param familyId Redis key의 일부로 사용됩니다.
    */

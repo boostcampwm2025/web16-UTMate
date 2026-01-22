@@ -31,7 +31,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
-import { getCurrentUser, deleteUser } from '@/features/(auth)/apis';
+import { getCurrentUser, deleteUser } from '@/features/(auth)/apis/client';
 import type { User } from '@/features/(auth)/types';
 
 /**

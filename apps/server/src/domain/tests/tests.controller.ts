@@ -83,18 +83,37 @@ export class TestsController {
     return await this.testsService.deleteTest(userId, publicId);
   }
 
-  @Get('/:id/participants/:participantId')
+  @Post('/:id/participants')
+  @UseGuards(OptionalJwtAuthGuard)
+  async participateTest(@UserId() userId: number | undefined, @Param('id') publicId: string) {
+    return this.testsService.participateTest(userId, publicId);
+  }
+
+  @Get('/:id/result')
   @UseGuards(JwtAuthGuard)
-  async getTestWithParticipantInfo(
+  async getTestResultSummary(@UserId() userId: number, @Param('id') publicId: string) {
+    return this.testsService.getTestResultSummary(userId, publicId);
+  }
+
+  @Get('/:id/result/participants')
+  @UseGuards(JwtAuthGuard)
+  async getTestParticipantsResults(@UserId() userId: number, @Param('id') publicId: string) {
+    return this.testsService.getTestParticipantsResults(userId, publicId);
+  }
+
+  @Get('/:id/result/mainfeedback')
+  @UseGuards(JwtAuthGuard)
+  async getTestMainFeedback(@UserId() userId: number, @Param('id') publicId: string) {
+    return this.testsService.getTestMainFeedback(userId, publicId);
+  }
+
+  @Get('/:id/result/participants/:participantId')
+  @UseGuards(JwtAuthGuard)
+  async getTestParticipantDetail(
+    @UserId() userId: number,
     @Param('id') publicId: string,
     @Param('participantId') participantId: string,
   ) {
-    return this.testsService.getTestWithParticipantInfo(publicId, participantId);
-  }
-
-  @Post('/:id/participants')
-  @UseGuards(OptionalJwtAuthGuard)
-  async createParticipant(@UserId() userId: number | undefined, @Param('id') publicId: string) {
-    return this.testsService.createParticipant(userId, publicId);
+    return this.testsService.getTestParticipantDetail(userId, publicId, participantId);
   }
 }

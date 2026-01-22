@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, AlertTriangle, FileText } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
-import { getMyTestList } from '@/features/(test-manage)/api';
+import { getMyTestList } from '@/features/(test-manage)/api/client';
 import { TestTable } from './TestTable';
 import { CreateTestButton } from './CreateTestButton';
 
@@ -66,9 +66,6 @@ export function RecentTestSection() {
             <FileText className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-4 text-sm font-medium text-gray-900">테스트가 없습니다</h3>
             <p className="mt-2 text-sm text-gray-500">새로운 테스트를 생성하여 시작해보세요.</p>
-            <Button size="lg" className="mt-4">
-              새 테스트 만들기
-            </Button>
           </div>
         </div>
       )}

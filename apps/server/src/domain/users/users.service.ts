@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { UserSummaryDto } from './dto/user-summary.dto';
-import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 
 import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
@@ -12,10 +11,11 @@ export class UsersService {
 
   /**
    * OAuthUserDto를 기반으로 사용자를 등록하거나 업데이트합니다.
-   * @param oauthUser
-   * @returns publicId : jwt 생성 payload에 사용됩니다.
+   *
+   * @param oauthUser OAuth 인증 후 반환된 사용자 정보
+   * @returns 사용자의 publicId (jwt 생성 payload에 사용)
    */
-  async registerOrUpdateUser(oauthUser: OAuthUserDto): Promise<string> {
+  async registerOrUpdateUser(oauthUser: OAuthUserDto) {
     // 기존 사용자 조회
     const findUser = await this.usersRepository.findByOAuth(
       oauthUser.providerId,
@@ -39,9 +39,10 @@ export class UsersService {
   }
 
   /**
-   * JWT 검증 후 받은 id 기반으로 사용자 요약 정보를 반환합니다.
-   * @param id 토큰을 파싱하여 나온 id
-   * @returns UserSummaryDto - 사용자 요약 정보
+   * 사용자 요약 정보를 반환합니다.
+   *
+   * @param id 사용자 id
+   * @returns 사용자 요약 정보
    */
   async getUserSummary(id: number) {
     const user = await this.usersRepository.findSummary(id);
@@ -52,24 +53,26 @@ export class UsersService {
   }
 
   /**
-   * JWT 검증 후 받은 id를 기반으로 사용자를 삭제합니다.
-   * @param id 토큰을 파싱하여 나온 id
+   * 사용자를 삭제합니다.
+   *
+   * @param id 사용자 id
    */
   async deleteUser(id: number) {
     this.usersRepository.delete(id);
   }
 
   /**
-   * 토큰 파싱 후 나온 publicId를 기반으로 사용자의 id를 반환합니다.
+   * publicId를 기반으로 사용자의 id를 반환합니다.
    * 커버링 인덱스를 사용하여 id만 조회합니다.
-   * @param publicId 토큰을 파싱하여 나온 publicId
-   * @returns User - id만 가진 User 엔티티
+   *
+   * @param publicId 사용자 publicId
+   * @returns 사용자 id
    */
-  async getIdByPublicId(publicId: string): Promise<User> {
+  async getIdByPublicId(publicId: string) {
     const user = await this.usersRepository.findIdByPublicId(publicId);
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    return user;
+    return user.id;
   }
 }

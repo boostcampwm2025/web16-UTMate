@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { Rocket } from 'lucide-react';
+
 import { Button } from '@/shared/components/ui/button';
 
 /**
@@ -45,7 +47,8 @@ export function Hero() {
           {/* CTA 버튼 */}
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button asChild size="lg" className="w-full sm:w-auto">
-              <Link href="/login">
+              <Link href="/workspace">
+                <Rocket className="size-4 mr-2" />
                 지금 시작하기
               </Link>
             </Button>

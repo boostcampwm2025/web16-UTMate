@@ -34,7 +34,7 @@ export default function LoginPage() {
             <LoginForm />
             {/* 서비스 약관 및 개인정보 처리방침 */}
             {/* TODO : 서비스 약관 및 개인정보 처리방침 링크 추가 & 문구를 더 부드럽게? */}
-            <div className="text-center">
+            {/* <div className="text-center">
               <p className="text-muted-foreground text-center text-xs lg:text-left">
                 로그인하면{' '}
                 <a href="#" className="text-primary hover:underline">
@@ -46,7 +46,7 @@ export default function LoginPage() {
                 </a>
                 에 동의하는 것으로 간주됩니다.
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
