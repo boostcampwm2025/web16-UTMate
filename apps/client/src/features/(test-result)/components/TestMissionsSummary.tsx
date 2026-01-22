@@ -42,7 +42,7 @@ export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
   return (
     <Card className="flex flex-col h-full">
       <CardHeader>
-        <CardTitle className="text-xl font-bold">미션별 성공률</CardTitle>
+        <CardTitle className="text-xl font-semibold">미션별 성공률</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto">
         {/* TODO : 개별미션보기 링크 추가 */}
@@ -77,7 +77,7 @@ export function MissionSummaryItem({ mission }: MissionSummaryItemProps) {
       {/* 왼쪽: 미션 정보 */}
       <div className="space-y-1">
         <div className="flex items-center">
-          <span className="text-lg font-bold">{mission.order}번 미션</span>
+          <span className="text-base font-medium">{mission.order}번 미션</span>
         </div>
         {mission.description && (
           <p className="text-sm text-muted-foreground">{mission.description}</p>
@@ -88,12 +88,12 @@ export function MissionSummaryItem({ mission }: MissionSummaryItemProps) {
       <div className="flex flex-col gap-2 lg:items-end">
         {mission.hasData ? (
           <>
-            <span className="text-sm font-bold lg:text-right">{mission.successRate}%</span>
+            <span className="text-base font-semibold lg:text-right">{mission.successRate}%</span>
             <Progress value={mission.successRate} className="h-2 w-full lg:min-w-[200px]" />
           </>
         ) : (
           <>
-            <span className="text-sm font-bold lg:text-right text-muted-foreground">데이터 없음</span>
+            <span className="text-base font-semibold lg:text-right text-muted-foreground">데이터 없음</span>
             <div className="h-2 w-full rounded-full bg-gray-100 lg:min-w-[200px]" />
           </>
         )}
