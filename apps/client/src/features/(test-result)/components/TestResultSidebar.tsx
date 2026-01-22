@@ -1,19 +1,15 @@
 'use client';
 
-import { useParams, usePathname } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { LayoutDashboard, Target, Users, ChevronDown } from 'lucide-react';
 
 import { cn } from '@/shared/utils';
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import { clientFetcher } from '@/shared/utils/fetcher/clientFetcher';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/shared/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/shared/components/ui/collapsible';
 
 import { getTestParticipantsResults } from '../apis/client';
 import type { TestDetail } from '@/features/(test-manage)/types';
@@ -38,11 +34,41 @@ function formatRelativeTime(dateString: string): string {
 export function TestResultSidebar() {
   const params = useParams();
   const pathname = usePathname();
+  const router = useRouter();
   const testId = params.id as string;
 
-  // 아코디언 열림 상태
-  const [isMissionsOpen, setIsMissionsOpen] = useState(false);
-  const [isParticipantsOpen, setIsParticipantsOpen] = useState(false);
+  const isMissionsActive = pathname.startsWith(`/tests/${testId}/result/missions`);
+  const isParticipantsActive = pathname.startsWith(`/tests/${testId}/result/participants`);
+
+  // 아코디언 열림 상태 - 해당 경로에 있으면 자동으로 열림
+  const [isMissionsOpen, setIsMissionsOpen] = useState(isMissionsActive);
+  const [isParticipantsOpen, setIsParticipantsOpen] = useState(isParticipantsActive);
+
+  // pathname이 변경될 때 아코디언 상태 동기화
+  useEffect(() => {
+    if (isMissionsActive) setIsMissionsOpen(true);
+    if (isParticipantsActive) setIsParticipantsOpen(true);
+  }, [isMissionsActive, isParticipantsActive]);
+
+  // 미션별 보기 헤더 클릭 핸들러
+  const handleMissionsHeaderClick = () => {
+    if (!isMissionsOpen) {
+      setIsMissionsOpen(true);
+      router.push(`/tests/${testId}/result/missions`);
+    } else {
+      setIsMissionsOpen(false);
+    }
+  };
+
+  // 참여자별 보기 헤더 클릭 핸들러
+  const handleParticipantsHeaderClick = () => {
+    if (!isParticipantsOpen) {
+      setIsParticipantsOpen(true);
+      router.push(`/tests/${testId}/result/participants`);
+    } else {
+      setIsParticipantsOpen(false);
+    }
+  };
 
   // 테스트 상세 정보 (미션 목록)
   const { data: testDetail } = useSuspenseQuery({
@@ -57,8 +83,6 @@ export function TestResultSidebar() {
   });
 
   const isSummaryActive = pathname === `/tests/${testId}/result`;
-  const isMissionsActive = pathname.startsWith(`/tests/${testId}/result/missions`);
-  const isParticipantsActive = pathname.startsWith(`/tests/${testId}/result/participants`);
 
   return (
     <aside className="bg-background w-64 shrink-0 overflow-y-auto border-r p-2">
@@ -77,8 +101,10 @@ export function TestResultSidebar() {
         </Link>
 
         {/* 미션별 보기 (Collapsible) */}
-        <Collapsible open={isMissionsOpen} onOpenChange={setIsMissionsOpen}>
-          <CollapsibleTrigger
+        <Collapsible open={isMissionsOpen}>
+          <button
+            type="button"
+            onClick={handleMissionsHeaderClick}
             className={cn(
               'flex w-full items-center justify-between rounded-md p-3 text-sm font-medium transition-colors',
               'hover:bg-accent hover:text-accent-foreground',
@@ -92,7 +118,7 @@ export function TestResultSidebar() {
             <ChevronDown
               className={cn('h-4 w-4 transition-transform', isMissionsOpen && 'rotate-180')}
             />
-          </CollapsibleTrigger>
+          </button>
 
           <CollapsibleContent>
             <div className="ml-4 mt-1 flex flex-col gap-1">
@@ -115,8 +141,10 @@ export function TestResultSidebar() {
         </Collapsible>
 
         {/* 참여자별 보기 (Collapsible) */}
-        <Collapsible open={isParticipantsOpen} onOpenChange={setIsParticipantsOpen}>
-          <CollapsibleTrigger
+        <Collapsible open={isParticipantsOpen}>
+          <button
+            type="button"
+            onClick={handleParticipantsHeaderClick}
             className={cn(
               'flex w-full items-center justify-between rounded-md p-3 text-sm font-medium transition-colors',
               'hover:bg-accent hover:text-accent-foreground',
@@ -131,7 +159,7 @@ export function TestResultSidebar() {
             <ChevronDown
               className={cn('h-4 w-4 transition-transform', isParticipantsOpen && 'rotate-180')}
             />
-          </CollapsibleTrigger>
+          </button>
 
           <CollapsibleContent>
             <div className="ml-4 mt-1 flex flex-col gap-1">
