@@ -105,8 +105,7 @@ export default function TestParticipatePage() {
     },
     onSuccess: (_, feedback) => {
       submitFeedback(feedback);
-      // 테스트 완료 후 localStorage 정리
-      clearSession();
+      // clearSession()은 CompleteStep에서 홈으로 이동할 때 호출
     },
     onError: (error) => {
       console.error('Failed to complete test:', error);
@@ -214,7 +213,7 @@ export default function TestParticipatePage() {
         </div>
       ) : currentStep === 'complete' ? (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-          <CompleteStep />
+          <CompleteStep testId={testId} />
         </div>
       ) : (
         <TestParticipateLayout

@@ -70,20 +70,65 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
       return;
     }
 
+    // recording 상태에서 다시 열기 (창이 닫힌 경우)
+    if (currentMissionState === 'recording') {
+      const newWindow = window.open(
+        `${mission.missionUrl}?participant-id=${participantId}&mission-id=${mission.publicId}`,
+        '_blank',
+        'width=1200,height=800',
+      );
+      setMissionWindow(newWindow);
+      return;
+    }
+
     startMissionMutation.mutate();
+  };
+
+  // SDK에 flush 요청을 보내고 완료를 기다리는 함수
+  const requestSdkFlush = (targetWindow: Window): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        window.removeEventListener('message', handleMessage);
+        // 타임아웃 시에도 진행 (SDK가 응답하지 않아도 계속 진행)
+        resolve();
+      }, 5000);
+
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data?.type === 'UTM_SDK_FLUSH_COMPLETE') {
+          clearTimeout(timeout);
+          window.removeEventListener('message', handleMessage);
+          if (event.data.success) {
+            resolve();
+          } else {
+            // 실패해도 진행
+            resolve();
+          }
+        }
+      };
+
+      window.addEventListener('message', handleMessage);
+
+      // SDK에 flush 요청 전송
+      targetWindow.postMessage({ type: 'UTM_SDK_FLUSH_REQUEST' }, '*');
+    });
   };
 
   // 녹화 종료 mutation
   const finishRecordingMutation = useMutation({
     mutationFn: async () => {
+      // SDK에 flush 요청을 보내고 완료를 기다림
+      if (missionWindow && !missionWindow.closed) {
+        await requestSdkFlush(missionWindow);
+        missionWindow.close();
+      }
+      setMissionWindow(null);
+
+      // SDK flush 완료 후 서버에 녹화 업로드 요청
       if (missionResultId) {
         await uploadMissionRecording(missionResultId);
       }
     },
     onSuccess: () => {
-      if (missionWindow && !missionWindow.closed) {
-        missionWindow.close();
-      }
       setMissionState('completed');
     },
     onError: (error) => {
@@ -153,14 +198,18 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
         </div>
 
         {/* 1. 미션 수행 페이지 열기 */}
-        <div className={!isStateActive('ready') ? 'opacity-50' : ''}>
+        <div className={!isStateActive('ready') && !isStateActive('recording') ? 'opacity-50' : ''}>
           <Button
             onClick={handleOpenMission}
-            disabled={!isStateActive('ready') || startMissionMutation.isPending}
+            disabled={(!isStateActive('ready') && !isStateActive('recording')) || startMissionMutation.isPending}
             className="w-full"
             size="lg"
           >
-            {startMissionMutation.isPending ? '시작 중...' : '미션 수행 페이지 열기 (새 창)'}
+            {startMissionMutation.isPending
+              ? '시작 중...'
+              : currentMissionState === 'recording'
+                ? '미션 수행 페이지 다시 열기'
+                : '미션 수행 페이지 열기 (새 창)'}
           </Button>
         </div>
 
@@ -181,7 +230,7 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
                 className="w-full"
                 size="lg"
               >
-                {finishRecordingMutation.isPending ? '종료 중...' : '녹화 종료'}
+                {finishRecordingMutation.isPending ? '데이터 전송 중...' : '녹화 종료'}
               </Button>
             </div>
           </div>
