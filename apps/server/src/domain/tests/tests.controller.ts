@@ -106,4 +106,14 @@ export class TestsController {
   async getTestMainFeedback(@UserId() userId: number, @Param('id') publicId: string) {
     return this.testsService.getTestMainFeedback(userId, publicId);
   }
+
+  @Get('/:id/result/participants/:participantId')
+  @UseGuards(JwtAuthGuard)
+  async getTestParticipantDetail(
+    @UserId() userId: number,
+    @Param('id') publicId: string,
+    @Param('participantId') participantId: string,
+  ) {
+    return this.testsService.getTestParticipantDetail(userId, publicId, participantId);
+  }
 }

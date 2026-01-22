@@ -18,13 +18,13 @@ export interface SimpleMissionResult extends Pick<
   'id' | 'participantId' | 'missionId'
 > {}
 
-export interface TestSummary {
+export interface TestResultSummary {
   id: number;
   title: string;
   status: TestStatus;
   description: string;
-  startDate: string;
-  endDate: string;
+  startDate?: string;
+  endDate?: string;
   totalParticipants: number;
 }
 
@@ -32,6 +32,7 @@ export interface TestSummary {
 export type ParticipantMissionStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'IN_PROGRESS';
 
 export interface ParticipantMissionResult {
+  missionResultId: string;
   missionId: number;
   missionOrder: number;
   status: ParticipantMissionStatus;
@@ -48,8 +49,9 @@ export interface ParticipantResult {
 
 // 주요 피드백 관련 타입 추가
 export interface MainFeedback {
-  id: number;
+  participantId: string;
   content: string;
+  createdAt: string;
 }
 
 // 특정 미션의 결과 (participant 정보 포함)
@@ -88,3 +90,5 @@ export type MissionResults = {
   participantId: string;
   persona: string;
 };
+// 참여자 상세 조회는 ParticipantResult와 동일한 구조
+export type ParticipantDetail = ParticipantResult;

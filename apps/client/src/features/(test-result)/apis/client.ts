@@ -4,14 +4,15 @@ import { clientFetcher } from '@/shared/utils/fetcher/clientFetcher';
 import type {
   MainFeedback,
   MissionResultWithParticipant,
-  TestSummary,
+  TestResultSummary,
   ParticipantResult,
   MissionResultDetail,
   MissionDetail,
+  ParticipantDetail,
 } from '../types';
 
-export const getTestSummary = async (testId: string): Promise<TestSummary> => {
-  return clientFetcher<TestSummary>(`${CLIENT_BASE_URL}/tests/${testId}/result`);
+export const getTestResultSummary = async (testId: string): Promise<TestResultSummary> => {
+  return clientFetcher<TestResultSummary>(`${CLIENT_BASE_URL}/tests/${testId}/result`);
 };
 
 export const getTestParticipantsResults = async (testId: string): Promise<ParticipantResult[]> => {
@@ -33,6 +34,15 @@ export const getMissionResultById = async (
 ): Promise<MissionResultDetail> => {
   return clientFetcher<MissionResultDetail>(
     `${CLIENT_BASE_URL}/mission-results/${missionResultId}`,
+  );
+};
+
+export const getParticipantDetail = async (
+  testId: string,
+  participantId: string,
+): Promise<ParticipantDetail> => {
+  return clientFetcher<ParticipantDetail>(
+    `${CLIENT_BASE_URL}/tests/${testId}/result/participants/${participantId}`,
   );
 };
 

@@ -3,10 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { type Test, TestStatus } from '@/features/(test-manage)/types';
 import { TableCell, TableRow } from '@/shared/components/ui/table';
+import { TestStatusBadge } from '@/shared/components/TestStatusBadge';
 
-import { TestStatusBadge } from './TestStatusBadge';
 import { IntegrationButton } from './IntegrationButton';
-
 import { TestActionButton } from './TestActionButton';
 
 interface TestTableRowProps {
