@@ -21,8 +21,8 @@ interface MissionResultListProps {
 export function MissionResultList({ testId, missionLogs }: MissionResultListProps) {
   const router = useRouter();
 
-  const handleRowClick = (participantId: string) => {
-    router.push(`/tests/${testId}/result/mission-result/${participantId}`);
+  const handleRowClick = (missionResultId: string) => {
+    router.push(`/tests/${testId}/result/mission-result/${missionResultId}`);
   };
 
   return (
@@ -46,27 +46,29 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
               </TableCell>
             </TableRow>
           ) : (
-            missionLogs.missionResults.map((log) => (
+            missionLogs.missionResults.map((missionResult) => (
               <TableRow
-                key={log.participantId}
-                onClick={() => handleRowClick(log.participantId)}
+                key={missionResult.id}
+                onClick={() => handleRowClick(missionResult.id)}
                 className="cursor-pointer"
               >
-                <TableCell>{log.participantId}</TableCell>
-                <TableCell className="text-center">{log.createdAt || '-'}</TableCell>
+                <TableCell>{missionResult.id}</TableCell>
+                <TableCell className="text-center">{new Date().toLocaleString() || '-'}</TableCell>
                 <TableCell className="text-center">
-                  {log.status === 'SUCCESS' ? (
+                  {missionResult.status === 'SUCCESS' ? (
                     <span className="inline-flex items-center font-bold text-green-600">O</span>
-                  ) : log.status === 'FAILED' ? (
+                  ) : missionResult.status === 'FAILED' ? (
                     <span className="inline-flex items-center font-bold text-red-600">X</span>
-                  ) : log.status === 'PENDING' ? (
+                  ) : missionResult.status === 'PENDING' ? (
                     <span className="inline-flex items-center font-bold text-gray-500">이탈</span>
                   ) : (
                     <span className="text-gray-400">-</span>
                   )}
                 </TableCell>
                 <TableCell>
-                  {log.feedback || <span className="text-gray-300 italic">피드백 없음</span>}
+                  {missionResult.feedback || (
+                    <span className="text-gray-300 italic">피드백 없음</span>
+                  )}
                 </TableCell>
               </TableRow>
             ))

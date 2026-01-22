@@ -79,12 +79,12 @@ export type MissionDetail = {
   averageIdleTime: number;
   averageRageClickCount: number;
   averageMouseThrashingCount: number;
-  missionResults: MissionResultWithParticipant[];
+  missionResults: MissionResults[];
 };
 
 export type MissionResults = {
   id: string;
-  status: MissionResultStatus;
+  status: ParticipantMissionStatus;
   duration?: number;
   feedback?: string;
   participantId: string;
