@@ -44,7 +44,7 @@ export function TestMissionResults({ testId }: { testId: string }) {
       <QueryBoundary>
         <MissionResultDetail
           testId={testId}
-          selectedMissionId={testDetail.missions[selectedMissionId - 1].publicId}
+          mId={testDetail.missions[selectedMissionId - 1].publicId}
         />
       </QueryBoundary>
     </div>

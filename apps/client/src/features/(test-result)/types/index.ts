@@ -68,5 +68,27 @@ export type MissionResultDetail = {
   presignedUrl: string;
 };
 
+export type MissionDetail = {
+  id: string;
+  missionOrder: number;
+  name: string;
+  description: string;
+  missionUrl: string;
+  estimatedDuration: number;
+  averageDuration: number;
+  averageIdleTime: number;
+  averageRageClickCount: number;
+  averageMouseThrashingCount: number;
+  missionResults: MissionResultWithParticipant[];
+};
+
+export type MissionResults = {
+  id: string;
+  status: MissionResultStatus;
+  duration?: number;
+  feedback?: string;
+  participantId: string;
+  persona: string;
+};
 // 참여자 상세 조회는 ParticipantResult와 동일한 구조
 export type ParticipantDetail = ParticipantResult;

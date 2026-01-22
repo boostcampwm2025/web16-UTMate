@@ -7,6 +7,7 @@ import type {
   TestResultSummary,
   ParticipantResult,
   MissionResultDetail,
+  MissionDetail,
   ParticipantDetail,
 } from '../types';
 
@@ -15,23 +16,25 @@ export const getTestResultSummary = async (testId: string): Promise<TestResultSu
 };
 
 export const getTestParticipantsResults = async (testId: string): Promise<ParticipantResult[]> => {
-  return clientFetcher<ParticipantResult[]>(`${CLIENT_BASE_URL}/tests/${testId}/result/participants`);
+  return clientFetcher<ParticipantResult[]>(
+    `${CLIENT_BASE_URL}/tests/${testId}/result/participants`,
+  );
 };
 
 export const getTestMainFeedback = async (testId: string): Promise<MainFeedback[]> => {
   return clientFetcher<MainFeedback[]>(`${CLIENT_BASE_URL}/tests/${testId}/result/mainfeedback`);
 };
 
-export const getTestMissionsResultById = async (
-  missionId: string,
-): Promise<MissionResultWithParticipant[]> => {
-  return clientFetcher<MissionResultWithParticipant[]>(`${CLIENT_BASE_URL}/missions/${missionId}/result`);
+export const getTestMissionsResultById = async (missionId: string): Promise<MissionDetail> => {
+  return clientFetcher<MissionDetail>(`${CLIENT_BASE_URL}/missions/${missionId}/result`);
 };
 
 export const getMissionResultById = async (
   missionResultId: string,
 ): Promise<MissionResultDetail> => {
-  return clientFetcher<MissionResultDetail>(`${CLIENT_BASE_URL}/mission-results/${missionResultId}`);
+  return clientFetcher<MissionResultDetail>(
+    `${CLIENT_BASE_URL}/mission-results/${missionResultId}`,
+  );
 };
 
 export const getParticipantDetail = async (
@@ -47,10 +50,7 @@ export const getParticipantDetail = async (
  * URL에서 JSONL 파일의 텍스트를 가져옴
  * 브라우저가 Content-Encoding: gzip 헤더를 자동으로 처리하므로 단순히 텍스트만 반환
  */
-export const getMissionResultLogsByUrl = async (
-  url: string,
-): Promise<string> => {
-
+export const getMissionResultLogsByUrl = async (url: string): Promise<string> => {
   const response = await fetch(url, {
     method: 'GET',
   });
@@ -61,4 +61,3 @@ export const getMissionResultLogsByUrl = async (
 
   return await response.text();
 };
-
