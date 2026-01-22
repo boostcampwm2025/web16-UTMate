@@ -81,33 +81,92 @@ export class MainFeedbackDto {
   }
 }
 
-export class MissionOverviewDto {
-  missionId: string;
-  missionOrder: number;
+export class MissionResultOverviewDto {
+  id: string;
   status: MissionResultStatus;
   duration?: number;
   feedback?: string;
-  createdAt?: Date;
 
+  // 참가자 정보
   participantId: string;
   persona: string;
 
-  static fromEntity(missions: Mission, missionResult: MissionResult) {
-    const dto = new MissionOverviewDto();
-    dto.missionId = missions.publicId;
-    dto.missionOrder = missions.order;
+  static fromEntity(missionResult: MissionResult) {
+    const dto = new MissionResultOverviewDto();
+    dto.id = missionResult.publicId;
     dto.status = missionResult.status;
     dto.duration = missionResult.duration;
     dto.feedback = missionResult.feedback;
-    dto.createdAt = missionResult.createdAt;
 
     dto.participantId = missionResult.participant.publicId;
-    // TODO : 참가자 페르소나 기능 구현 시 수정 필요
-    dto.persona = 'GUEST';
+    dto.persona = 'GUEST'; // TODO: 참가자 페르소나 기능 구현 시 수정 필요
     return dto;
   }
 
-  static fromEntities(mission: Mission, missionResults: MissionResult[]) {
-    return missionResults.map((mr) => this.fromEntity(mission, mr));
+  static fromEntities(missionResults: MissionResult[]) {
+    return missionResults.map((mr) => this.fromEntity(mr));
+  }
+}
+
+export class MissionOverviewDto {
+  id: string;
+  missionOrder: number;
+  name: string;
+  description: string;
+  missionUrl: string;
+  estimatedDuration: number;
+
+  averageDuration: number;
+  averageIdleTime: number;
+  averageRageClickCount: number;
+  averageMouseThrashingCount: number;
+
+  missionResults: MissionResultOverviewDto[];
+
+  static fromEntity(missions: Mission) {
+    const dto = new MissionOverviewDto();
+    dto.id = missions.publicId;
+    dto.missionOrder = missions.order;
+    dto.name = missions.name;
+    dto.description = missions.description;
+    dto.missionUrl = missions.missionUrl;
+    dto.estimatedDuration = missions.estimatedDuration;
+
+    dto.averageDuration =
+      missions.missionResults.filter((mr) => mr.duration !== null).length > 0
+        ? Math.round(
+            missions.missionResults.reduce((acc, curr) => acc + (curr.duration || 0), 0) /
+              missions.missionResults.filter((mr) => mr.duration !== null).length,
+          )
+        : 0;
+
+    dto.averageIdleTime =
+      missions.missionResults.filter((mr) => mr.totalIdleTime !== null).length > 0
+        ? Math.round(
+            missions.missionResults.reduce((acc, curr) => acc + (curr.totalIdleTime || 0), 0) /
+              missions.missionResults.filter((mr) => mr.totalIdleTime !== null).length,
+          )
+        : 0;
+
+    dto.averageRageClickCount =
+      missions.missionResults.filter((mr) => mr.rageClickCount !== null).length > 0
+        ? Math.round(
+            missions.missionResults.reduce((acc, curr) => acc + (curr.rageClickCount || 0), 0) /
+              missions.missionResults.filter((mr) => mr.rageClickCount !== null).length,
+          )
+        : 0;
+
+    dto.averageMouseThrashingCount =
+      missions.missionResults.filter((mr) => mr.mouseThrashingCount !== null).length > 0
+        ? Math.round(
+            missions.missionResults.reduce(
+              (acc, curr) => acc + (curr.mouseThrashingCount || 0),
+              0,
+            ) / missions.missionResults.filter((mr) => mr.mouseThrashingCount !== null).length,
+          )
+        : 0;
+    dto.missionResults = MissionResultOverviewDto.fromEntities(missions.missionResults);
+
+    return dto;
   }
 }

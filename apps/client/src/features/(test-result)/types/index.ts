@@ -64,4 +64,27 @@ export type MissionResultDetail = {
   feedback: string | null;
   missionId: string;
   presignedUrl: string;
-}
+};
+
+export type MissionDetail = {
+  id: string;
+  missionOrder: number;
+  name: string;
+  description: string;
+  missionUrl: string;
+  estimatedDuration: number;
+  averageDuration: number;
+  averageIdleTime: number;
+  averageRageClickCount: number;
+  averageMouseThrashingCount: number;
+  missionResults: MissionResultWithParticipant[];
+};
+
+export type MissionResults = {
+  id: string;
+  status: MissionResultStatus;
+  duration?: number;
+  feedback?: string;
+  participantId: string;
+  persona: string;
+};

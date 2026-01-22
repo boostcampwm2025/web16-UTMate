@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import type { MissionResultWithParticipant } from '../types';
+import type { MissionDetail } from '../types';
 
 interface MissionResultSummaryProps {
-  missionLogs: MissionResultWithParticipant[];
+  missionLogs: MissionDetail;
 }
 
 export function MissionResultSummary({ missionLogs }: MissionResultSummaryProps) {
   //TODO : 통계 계산로직 분리
   const stats = useMemo(() => {
-    const total = missionLogs.length;
+    const total = missionLogs.missionResults.length;
     if (total === 0) {
       return {
         success: 0,
@@ -20,10 +20,12 @@ export function MissionResultSummary({ missionLogs }: MissionResultSummaryProps)
       };
     }
 
-    const successCount = missionLogs.filter((l) => l.status === 'SUCCESS').length;
-    const failureCount = missionLogs.filter((l) => l.status === 'FAILED').length;
-    const dropCount = missionLogs.filter((l) => l.status === 'PENDING').length;
-    const successLogsWithDuration = missionLogs.filter((l) => l.status === 'SUCCESS' && l.duration);
+    const successCount = missionLogs.missionResults.filter((l) => l.status === 'SUCCESS').length;
+    const failureCount = missionLogs.missionResults.filter((l) => l.status === 'FAILED').length;
+    const dropCount = missionLogs.missionResults.filter((l) => l.status === 'PENDING').length;
+    const successLogsWithDuration = missionLogs.missionResults.filter(
+      (l) => l.status === 'SUCCESS' && l.duration,
+    );
 
     const avgDurationSeconds =
       successLogsWithDuration.length > 0
@@ -53,7 +55,12 @@ export function MissionResultSummary({ missionLogs }: MissionResultSummaryProps)
         value: `${stats.success}/${stats.totalCount} ${stats.successRate}%`,
       },
       { title: '평균 소요시간', value: stats.avgDuration },
-      { title: '이탈율', value: stats.dropRate },
+      { title: '이탈율(이탈/총 참가자)', value: stats.dropRate + '%' },
+      { title: '총 참여자 수', value: missionLogs.missionResults.length },
+      { title: '평균 소요시간', value: missionLogs.averageDuration + 'ms' },
+      { title: '평균 Idle 시간', value: missionLogs.averageIdleTime + 'ms' },
+      { title: '평균 Rage Click 수', value: missionLogs.averageRageClickCount },
+      { title: '평균 Mouse Thrashing 수', value: missionLogs.averageMouseThrashingCount },
     ],
     [stats],
   );
