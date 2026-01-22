@@ -57,7 +57,7 @@ function simpleHash(str: string): number {
  * 형식: "형용사 동물 두자리숫자"
  * 예: "날쌘 다람쥐 88"
  */
-export function generateNickname(id: string): string {
+export function generateNicknameFromId(id: string): string {
   const hash = simpleHash(id);
   
   const adjectiveIndex = hash % RANDOM_ADJECTIVES.length;
