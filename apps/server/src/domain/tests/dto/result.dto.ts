@@ -115,6 +115,7 @@ export class MissionResultOverviewDto {
 }
 
 export class MissionOverviewDto {
+  // 미션 정보
   id: string;
   missionOrder: number;
   name: string;
@@ -122,6 +123,9 @@ export class MissionOverviewDto {
   missionUrl: string;
   estimatedDuration: number;
 
+  // 통계 정보
+  successRate: number;
+  dropRate: number;
   averageDuration: number;
   averageIdleTime: number;
   averageRageClickCount: number;
@@ -137,6 +141,26 @@ export class MissionOverviewDto {
     dto.description = missions.description;
     dto.missionUrl = missions.missionUrl;
     dto.estimatedDuration = missions.estimatedDuration;
+
+    dto.successRate =
+      missions.missionResults.length > 0
+        ? Math.round(
+            (missions.missionResults.filter((mr) => mr.status === MissionResultStatus.SUCCESS)
+              .length /
+              missions.missionResults.length) *
+              100,
+          )
+        : 0;
+
+    dto.dropRate =
+      missions.missionResults.length > 0
+        ? Math.round(
+            (missions.missionResults.filter((mr) => mr.status === MissionResultStatus.PENDING)
+              .length /
+              missions.missionResults.length) *
+              100,
+          )
+        : 0;
 
     dto.averageDuration =
       missions.missionResults.filter((mr) => mr.duration !== null).length > 0
@@ -156,21 +180,16 @@ export class MissionOverviewDto {
 
     dto.averageRageClickCount =
       missions.missionResults.filter((mr) => mr.rageClickCount !== null).length > 0
-        ? Math.round(
-            missions.missionResults.reduce((acc, curr) => acc + (curr.rageClickCount || 0), 0) /
-              missions.missionResults.filter((mr) => mr.rageClickCount !== null).length,
-          )
+        ? missions.missionResults.reduce((acc, curr) => acc + (curr.rageClickCount || 0), 0) /
+          missions.missionResults.filter((mr) => mr.rageClickCount !== null).length
         : 0;
 
     dto.averageMouseThrashingCount =
       missions.missionResults.filter((mr) => mr.mouseThrashingCount !== null).length > 0
-        ? Math.round(
-            missions.missionResults.reduce(
-              (acc, curr) => acc + (curr.mouseThrashingCount || 0),
-              0,
-            ) / missions.missionResults.filter((mr) => mr.mouseThrashingCount !== null).length,
-          )
+        ? missions.missionResults.reduce((acc, curr) => acc + (curr.mouseThrashingCount || 0), 0) /
+          missions.missionResults.filter((mr) => mr.mouseThrashingCount !== null).length
         : 0;
+
     dto.missionResults = MissionResultOverviewDto.fromEntities(missions.missionResults);
 
     return dto;

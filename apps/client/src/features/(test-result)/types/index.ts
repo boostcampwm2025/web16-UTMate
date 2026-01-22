@@ -75,6 +75,9 @@ export type MissionDetail = {
   description: string;
   missionUrl: string;
   estimatedDuration: number;
+
+  successRate: number;
+  dropRate: number;
   averageDuration: number;
   averageIdleTime: number;
   averageRageClickCount: number;
