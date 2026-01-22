@@ -18,13 +18,13 @@ export interface SimpleMissionResult extends Pick<
   'id' | 'participantId' | 'missionId'
 > {}
 
-export interface TestSummary {
+export interface TestResultSummary {
   id: number;
   title: string;
   status: TestStatus;
   description: string;
-  startDate: string;
-  endDate: string;
+  startDate?: string;
+  endDate?: string;
   totalParticipants: number;
 }
 
@@ -49,8 +49,9 @@ export interface ParticipantResult {
 
 // 주요 피드백 관련 타입 추가
 export interface MainFeedback {
-  id: number;
+  participantId: string;
   content: string;
+  createdAt: string;
 }
 
 // 특정 미션의 결과 (participant 정보 포함)

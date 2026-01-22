@@ -1,10 +1,15 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { notFound, redirect } from 'next/navigation';
 
 import { TestResultSidebar } from '@/features/(test-result)/components/TestResultSidebar';
+import {getTestByIdonServer}  from '@/features/(test-detail)/api/server';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
+import { ApiError } from '@/shared/constants/api';
+import type { TestDetail } from '@/features/(test-manage)/types';
+
 
 export default async function TestResultLayout({
   children,
@@ -15,16 +20,34 @@ export default async function TestResultLayout({
 }) {
   const { id: testId } = await params;
 
+  let testDetail: TestDetail;
+  try {
+    testDetail = await getTestByIdonServer(testId);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.statusCode === 404 || error.statusCode === 403 ) {
+        notFound();
+      } else if (error.statusCode === 401) {
+        redirect('/login');
+      }
+    }
+    throw error;
+  }
+
+  if (!testDetail) {
+    return notFound();
+  }
+
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Top Header */}
-      <header className="flex h-16 shrink-0 items-center justify-start gap-3 border-b bg-white px-6">
+      <header className="flex h-16 shrink-0 items-center justify-start gap-3 border-b bg-background px-6">
         <Button variant="outline" size="icon" asChild>
           <Link href="/workspace">
             <ArrowLeft />
           </Link>
         </Button>
-        <h1 className="text-lg font-semibold">{testId}번 테스트의 결과입니다</h1>
+        <h1 className="text-lg font-semibold">{testDetail.title}</h1>
       </header>
 
       {/* Sidebar and Content */}

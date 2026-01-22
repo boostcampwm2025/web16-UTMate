@@ -1,10 +1,12 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import Redis from 'ioredis/built/Redis';
 import { EntityManager } from 'typeorm';
 
 import { MissionResultDto } from './dto/mission-result.dto';
@@ -14,8 +16,10 @@ import { MissionResult } from './entities/mission-result.entity';
 import { MissionResultStatus } from './enums';
 import { MissionResultsRepository } from './mission-results.repository';
 
+import { SDK_AUTH_REDIS } from '#common/redis/redis.module';
 import { S3StorageService } from '#common/storage/s3-storage.service';
 import { StorageService } from '#common/storage/storage.service';
+import { AnalyzerService } from '#domain/analyzer/analyzer.service';
 import { Mission } from '#domain/tests/entities/mission.entity';
 
 @Injectable()
@@ -24,6 +28,8 @@ export class MissionResultsService {
     private readonly missionResultsRepository: MissionResultsRepository,
     private readonly storageService: StorageService,
     private readonly s3StorageService: S3StorageService,
+    private readonly analyzerService: AnalyzerService,
+    @Inject(SDK_AUTH_REDIS) private readonly sdkAuthRedis: Redis,
   ) {}
 
   /**
@@ -73,19 +79,18 @@ export class MissionResultsService {
       throw new NotFoundException('미션 결과를 찾을 수 없습니다.');
     }
 
-    const fileName = `replay_log/missions/${missionResult.mission.publicId}/${missionResult.participant.publicId}.log.jsonl`;
+    const fileName = `replay_logs/${missionResult.publicId}.log.jsonl`;
     try {
       const logBuffer = await this.storageService.getBufferByFilename(fileName);
       const s3FileName = await this.s3StorageService.uploadToS3(fileName, logBuffer);
       missionResult.recordUploadedFile(s3FileName);
 
-      /** TODO 로그를 분석 모듈에 보내 분석 후 분석 결과를 업데이트하는 로직 구현
-       * ex)
-       * const results = await this.analysisService.analyzeLogStream(logBuffer);
-       * const missionResult.analyzeResults(results);
-       */
+      const results = this.analyzerService.analyze(logBuffer);
+      missionResult.analyzeResults(results);
 
       await this.missionResultsRepository.save(missionResult);
+      await this.sdkAuthRedis.del(missionResult.publicId);
+      await this.storageService.deleteByFilename(fileName);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
@@ -114,6 +119,10 @@ export class MissionResultsService {
     try {
       missionResult.transition(dto.status, dto.feedback);
       await this.missionResultsRepository.save(missionResult);
+      if (dto.status === MissionResultStatus.IN_PROGRESS) {
+        this.sdkAuthRedis.set(missionResult.publicId, 'in_progress');
+      }
+      return;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

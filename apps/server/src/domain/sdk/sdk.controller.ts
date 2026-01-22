@@ -8,15 +8,8 @@ export class SdkController {
   constructor(private readonly sdkService: SdkService) {}
 
   @Post('/replay_logs')
-  async uploadReplayLogs(
-    @Headers('x-participant-id') participantId: string,
-    @Headers('x-mission-id') missionId: string,
-    @Headers() allHeaders: Record<string, string>,
-    @Req() req: Request,
-  ) {
-    console.log('uploadReplayLogs - All headers:', allHeaders);
-    console.log('uploadReplayLogs - participantId:', participantId, 'missionId:', missionId);
-    return this.sdkService.saveReplayLog(participantId, missionId, req);
+  async uploadReplayLogs(@Headers('authorization') authorization: string, @Req() req: Request) {
+    return this.sdkService.saveReplayLog(authorization, req);
   }
 
   @Post('/tests/:testId/verify-sdk')

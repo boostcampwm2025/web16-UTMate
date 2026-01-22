@@ -1,8 +1,10 @@
 import { Readable } from 'stream';
 import * as zlib from 'zlib';
 
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import Redis from 'ioredis/built/Redis';
 
+import { SDK_AUTH_REDIS } from '#common/redis/redis.module';
 import { StorageService } from '#common/storage/storage.service';
 import { TestsService } from '#domain/tests/tests.service';
 
@@ -11,6 +13,7 @@ export class SdkService {
   constructor(
     private readonly storageService: StorageService,
     private readonly testsService: TestsService,
+    @Inject(SDK_AUTH_REDIS) private readonly sdkAuthRedis: Redis,
   ) {}
 
   /**
@@ -21,18 +24,21 @@ export class SdkService {
    * @param stream 압축된 로그 스트림
    * @throws UnauthorizedException 세션 또는 미션 정보가 없는 경우
    */
-  async saveReplayLog(participantId: string, missionId: string, stream: Readable) {
-    console.log('saveReplayLog called:', { participantId, missionId });
-    if (!participantId || !missionId) {
-      console.log('Missing ids - participantId:', participantId, 'missionId:', missionId);
-      throw new UnauthorizedException('세션 또는 미션 정보가 없습니다.');
+  async saveReplayLog(authorization: string, stream: Readable) {
+    if (!authorization.startsWith('Bearer ')) {
+      throw new UnauthorizedException('유효하지 않은 SDK 인증 정보입니다.');
+    }
+    const missionResultPublicId = authorization.replace('Bearer ', '');
+    const sdkAuthData = await this.sdkAuthRedis.get(missionResultPublicId);
+    if (!sdkAuthData) {
+      throw new UnauthorizedException('유효하지 않은 SDK 인증 정보입니다.');
     }
 
     // Gzip 압축 해제 스트림 생성
     const gunzip = zlib.createGunzip();
     const decompressedStream = stream.pipe(gunzip);
 
-    const filename = `replay_log/missions/${missionId}/${participantId}.log.jsonl`;
+    const filename = `replay_logs/${missionResultPublicId}.log.jsonl`;
 
     // 스트림을 그대로 StorageService에 전달
     await this.storageService.save(filename, decompressedStream);

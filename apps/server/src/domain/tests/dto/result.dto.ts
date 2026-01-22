@@ -65,14 +65,18 @@ export class ParticipantResultsDto {
 }
 
 export class MainFeedbackDto {
+  participantId: string;
   content: string;
+  createdAt: Date;
 
   static fromEntity(participant: Participant) {
     if (!participant.feedback) {
       return null;
     }
     const dto = new MainFeedbackDto();
+    dto.participantId = participant.publicId;
     dto.content = participant.feedback;
+    dto.createdAt = participant.joinedAt;
     return dto;
   }
 
