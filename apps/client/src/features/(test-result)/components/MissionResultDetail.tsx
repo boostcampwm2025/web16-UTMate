@@ -9,13 +9,13 @@ import { MissionInfo } from './MissionInfo';
 
 interface MissionResultDetailProps {
   testId: string;
-  mId: string;
+  missionId: string;
 }
 
-export function MissionResultDetail({ testId, mId }: MissionResultDetailProps) {
+export function MissionResultDetail({ testId, missionId }: MissionResultDetailProps) {
   const { data: missionLogs } = useSuspenseQuery({
-    queryKey: ['missionResult', mId],
-    queryFn: () => getTestMissionsResultById(mId),
+    queryKey: ['missionResult', missionId],
+    queryFn: () => getTestMissionsResultById(missionId),
   });
 
   return (

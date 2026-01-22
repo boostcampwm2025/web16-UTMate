@@ -10,7 +10,7 @@ export default async function MissionDetailPage({
 
   return (
     <QueryBoundary>
-      <MissionResultDetail testId={testId} selectedMissionId={missionId} />
+      <MissionResultDetail testId={testId} missionId={missionId} />
     </QueryBoundary>
   );
 }
