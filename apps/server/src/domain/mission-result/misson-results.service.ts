@@ -16,6 +16,7 @@ import { MissionResultsRepository } from './mission-results.repository';
 
 import { S3StorageService } from '#common/storage/s3-storage.service';
 import { StorageService } from '#common/storage/storage.service';
+import { AnalyzerService } from '#domain/analyzer/analyzer.service';
 import { Mission } from '#domain/tests/entities/mission.entity';
 
 @Injectable()
@@ -24,6 +25,7 @@ export class MissionResultsService {
     private readonly missionResultsRepository: MissionResultsRepository,
     private readonly storageService: StorageService,
     private readonly s3StorageService: S3StorageService,
+    private readonly analyzerService: AnalyzerService,
   ) {}
 
   /**
@@ -79,11 +81,8 @@ export class MissionResultsService {
       const s3FileName = await this.s3StorageService.uploadToS3(fileName, logBuffer);
       missionResult.recordUploadedFile(s3FileName);
 
-      /** TODO 로그를 분석 모듈에 보내 분석 후 분석 결과를 업데이트하는 로직 구현
-       * ex)
-       * const results = await this.analysisService.analyzeLogStream(logBuffer);
-       * const missionResult.analyzeResults(results);
-       */
+      const results = this.analyzerService.analyze(logBuffer);
+      missionResult.analyzeResults(results);
 
       await this.missionResultsRepository.save(missionResult);
     } catch (error) {

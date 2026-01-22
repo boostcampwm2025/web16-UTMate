@@ -22,9 +22,7 @@ export class SdkService {
    * @throws UnauthorizedException 세션 또는 미션 정보가 없는 경우
    */
   async saveReplayLog(participantId: string, missionId: string, stream: Readable) {
-    console.log('saveReplayLog called:', { participantId, missionId });
     if (!participantId || !missionId) {
-      console.log('Missing ids - participantId:', participantId, 'missionId:', missionId);
       throw new UnauthorizedException('세션 또는 미션 정보가 없습니다.');
     }
 
