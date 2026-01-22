@@ -62,7 +62,7 @@ function MissionResultCard({
   const Icon = config.icon;
 
   return (
-    <Link href={`/tests/${testId}/result/missions/${missionResult.missionId}`}>
+    <Link href={`/tests/${testId}/result/mission-result/${missionResult.missionResultId}`}>
       <Card className="transition-shadow hover:shadow-md">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
@@ -121,7 +121,7 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {participant.missionResults.map((missionResult, index) => (
             <MissionResultCard
-              key={missionResult.missionId}
+              key={missionResult.missionResultId}
               testId={testId}
               missionResult={missionResult}
               index={index}
