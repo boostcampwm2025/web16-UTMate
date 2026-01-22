@@ -50,24 +50,27 @@ export function TestResultSidebar() {
     if (isParticipantsActive) setIsParticipantsOpen(true);
   }, [isMissionsActive, isParticipantsActive]);
 
-  // 미션별 보기 헤더 클릭 핸들러
-  const handleMissionsHeaderClick = () => {
-    if (!isMissionsOpen) {
-      setIsMissionsOpen(true);
-      router.push(`/tests/${testId}/result/missions`);
-    } else {
-      setIsMissionsOpen(false);
-    }
+  // 미션별 보기 텍스트 클릭 → 항상 페이지 이동 + 아코디언 열림
+  const handleMissionsTextClick = () => {
+    setIsMissionsOpen(true);
+    router.push(`/tests/${testId}/result/missions`);
   };
 
-  // 참여자별 보기 헤더 클릭 핸들러
-  const handleParticipantsHeaderClick = () => {
-    if (!isParticipantsOpen) {
-      setIsParticipantsOpen(true);
-      router.push(`/tests/${testId}/result/participants`);
-    } else {
-      setIsParticipantsOpen(false);
-    }
+  // 참여자별 보기 텍스트 클릭 → 항상 페이지 이동 + 아코디언 열림
+  const handleParticipantsTextClick = () => {
+    setIsParticipantsOpen(true);
+    router.push(`/tests/${testId}/result/participants`);
+  };
+
+  // 아코디언 토글 (화살표 클릭)
+  const handleMissionsToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsMissionsOpen((prev) => !prev);
+  };
+
+  const handleParticipantsToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsParticipantsOpen((prev) => !prev);
   };
 
   // 테스트 상세 정보 (미션 목록)
@@ -102,23 +105,27 @@ export function TestResultSidebar() {
 
         {/* 미션별 보기 (Collapsible) */}
         <Collapsible open={isMissionsOpen}>
-          <button
-            type="button"
-            onClick={handleMissionsHeaderClick}
+          <div
             className={cn(
               'flex w-full items-center justify-between rounded-md p-3 text-sm font-medium transition-colors',
               'hover:bg-accent hover:text-accent-foreground',
               isMissionsActive && 'bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary',
             )}
           >
-            <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleMissionsTextClick}
+              className="flex flex-1 items-center gap-2"
+            >
               <Target className="h-4 w-4" />
               <span>미션별 보기</span>
-            </div>
-            <ChevronDown
-              className={cn('h-4 w-4 transition-transform', isMissionsOpen && 'rotate-180')}
-            />
-          </button>
+            </button>
+            <button type="button" onClick={handleMissionsToggle} className="p-1">
+              <ChevronDown
+                className={cn('h-4 w-4 transition-transform', isMissionsOpen && 'rotate-180')}
+              />
+            </button>
+          </div>
 
           <CollapsibleContent>
             <div className="ml-4 mt-1 flex flex-col gap-1">
@@ -142,9 +149,7 @@ export function TestResultSidebar() {
 
         {/* 참여자별 보기 (Collapsible) */}
         <Collapsible open={isParticipantsOpen}>
-          <button
-            type="button"
-            onClick={handleParticipantsHeaderClick}
+          <div
             className={cn(
               'flex w-full items-center justify-between rounded-md p-3 text-sm font-medium transition-colors',
               'hover:bg-accent hover:text-accent-foreground',
@@ -152,14 +157,20 @@ export function TestResultSidebar() {
                 'bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary',
             )}
           >
-            <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleParticipantsTextClick}
+              className="flex flex-1 items-center gap-2"
+            >
               <Users className="h-4 w-4" />
               <span>참여자별 보기</span>
-            </div>
-            <ChevronDown
-              className={cn('h-4 w-4 transition-transform', isParticipantsOpen && 'rotate-180')}
-            />
-          </button>
+            </button>
+            <button type="button" onClick={handleParticipantsToggle} className="p-1">
+              <ChevronDown
+                className={cn('h-4 w-4 transition-transform', isParticipantsOpen && 'rotate-180')}
+              />
+            </button>
+          </div>
 
           <CollapsibleContent>
             <div className="ml-4 mt-1 flex flex-col gap-1">
