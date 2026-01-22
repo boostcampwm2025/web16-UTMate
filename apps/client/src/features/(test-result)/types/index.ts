@@ -57,3 +57,11 @@ export interface MissionResultWithParticipant extends ParticipantMissionResult {
   participantId: string;
   persona: string;
 }
+
+export type MissionResultDetail = {
+  id: string;
+  status: MissionResultStatus;
+  feedback: string | null;
+  missionId: string;
+  presignedUrl: string;
+}
