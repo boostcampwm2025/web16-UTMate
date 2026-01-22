@@ -16,7 +16,8 @@ jobs:
         include:
           - name: nginx
             dockerfile: docker/nginx/Dockerfile
-            build-args: ""
+            build-args: |
+              VITE_SERVER_URL=${{ vars.VITE_SERVER_URL }}
 
           - name: server
             dockerfile: docker/server/Dockerfile

@@ -8,6 +8,10 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
+# 빌드 시점 환경변수 선언
+ARG VITE_SERVER_URL
+ENV VITE_SERVER_URL=${VITE_SERVER_URL}
+
 # 워크스페이스 설정 파일만 먼저 복사
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
