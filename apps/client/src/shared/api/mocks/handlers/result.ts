@@ -1,14 +1,14 @@
 import { http, HttpResponse } from 'msw';
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import type {
-  TestSummary,
+  TestResultSummary,
   ParticipantResult,
   MainFeedback,
   MissionResultWithParticipant,
 } from '@/features/(test-result)/types';
 import { TestStatus } from '@/features/(test-manage)/types';
 
-const mockTestSummaries: TestSummary[] = [
+const mockTestSummaries: TestResultSummary[] = [
   {
     id: 1,
     title: 'Notion 서비스 사용성 테스트',
@@ -17,42 +17,6 @@ const mockTestSummaries: TestSummary[] = [
     startDate: '2024-01-01',
     endDate: '2024-01-31',
     totalParticipants: 15,
-  },
-  {
-    id: 2,
-    title: 'New maze 2 테스트 결과',
-    status: TestStatus.DRAFT,
-    description: '두 번째 테스트의 결과입니다.',
-    startDate: '2024-02-01',
-    endDate: '2024-02-28',
-    totalParticipants: 0,
-  },
-  {
-    id: 3,
-    title: '셀프플레너 테스트 결과',
-    status: TestStatus.PUBLISHED,
-    description: '플래너 앱의 사용자 피드백을 수집합니다.',
-    startDate: '2024-02-01',
-    endDate: '2024-02-28',
-    totalParticipants: 8,
-  },
-  {
-    id: 4,
-    title: '테스트 4 결과',
-    status: TestStatus.DRAFT,
-    description: '네 번째 테스트의 결과입니다.',
-    startDate: '2024-03-01',
-    endDate: '2024-03-31',
-    totalParticipants: 0,
-  },
-  {
-    id: 5,
-    title: '테스트 5 결과',
-    status: TestStatus.PUBLISHED,
-    description: '다섯 번째 테스트의 결과입니다.',
-    startDate: '2024-04-01',
-    endDate: '2024-04-30',
-    totalParticipants: 5,
   },
 ];
 
@@ -207,17 +171,11 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
 
 const mockMainFeedbacks: Record<number, MainFeedback[]> = {
   1: [
-    { id: 1, content: '메인 페이지의 디자인이 직관적이어서 사용하기 편리했습니다.' },
-    { id: 2, content: '검색 필터 기능이 좀 더 다양했으면 좋겠습니다.' },
-    { id: 3, content: '전반적인 로딩 속도가 조금 느린 것 같아 개선이 필요해 보입니다.' },
+    { participantId: 'tester-1', content: '메인 페이지의 디자인이 직관적이어서 사용하기 편리했습니다.', createdAt: '2023-12-12' },
+    { participantId: 'tester-2', content: '검색 필터 기능이 좀 더 다양했으면 좋겠습니다.', createdAt: '1000-02-22' },
+    { participantId: 'tester-3', content: '전반적인 로딩 속도가 조금 느린 것 같아 개선이 필요해 보입니다.', createdAt: '2018-03-02' },
   ],
   2: [],
-  3: [
-    { id: 1, content: '플래너 기능이 유용했습니다.' },
-    { id: 2, content: 'UI가 깔끔하고 사용하기 편했습니다.' },
-  ],
-  4: [],
-  5: [{ id: 1, content: '테스트 5의 주요 피드백입니다.' }],
 };
 
 // 특정 미션의 결과 데이터 (missionId별로 필터링된 결과)
