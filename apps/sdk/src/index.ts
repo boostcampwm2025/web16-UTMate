@@ -121,6 +121,7 @@ async function verifySdkInstallation(testId: string) {
     emit(event) {
       eventQueue.push(event);
     },
+    maskAllInputs: true, // 모든 인풋을 마스킹
   });
 
   // 주기적으로 이벤트 전송
