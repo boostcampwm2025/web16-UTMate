@@ -20,7 +20,7 @@ export class Participant {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'public_id', unique: true })
+  @Column({ name: 'public_id', unique: true, length: 11 })
   publicId: string;
 
   @ManyToOne(() => Test, { onDelete: 'CASCADE' })
@@ -79,7 +79,7 @@ export class Participant {
   @BeforeInsert()
   generatePublicId() {
     if (!this.publicId) {
-      this.publicId = nanoid();
+      this.publicId = nanoid(11);
     }
   }
 }
