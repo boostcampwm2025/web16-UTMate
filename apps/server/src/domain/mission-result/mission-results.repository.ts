@@ -22,8 +22,6 @@ export class MissionResultsRepository {
   async findByPublicId(publicId: string) {
     return this.repository
       .createQueryBuilder('missionResult')
-      .leftJoinAndSelect('missionResult.mission', 'mission')
-      .leftJoinAndSelect('missionResult.participant', 'participant')
       .where('missionResult.publicId = :publicId', { publicId })
       .getOne();
   }
