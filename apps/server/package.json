@@ -43,7 +43,6 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.4",
     "@nestjs/typeorm": "^11.0.0",
-    "@rrweb/types": "2.0.0-alpha.18",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "cookie-parser": "^1.4.7",
@@ -56,7 +55,6 @@
     "passport-jwt": "^4.0.1",
     "redis": "^5.10.0",
     "reflect-metadata": "^0.2.2",
-    "rrweb": "2.0.0-alpha.4",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.28"
@@ -69,6 +67,7 @@
     "@nestjs/testing": "^11.0.1",
     "@org/eslint-config": "workspace:*",
     "@org/prettier-config": "workspace:*",
+    "@rrweb/types": "2.0.0-alpha.18",
     "@rushstack/eslint-config": "^3.6.8",
     "@rushstack/eslint-patch": "^1.10.1",
     "@types/cookie-parser": "^1.4.10",
