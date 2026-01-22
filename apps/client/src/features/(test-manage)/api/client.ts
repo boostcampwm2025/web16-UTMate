@@ -8,8 +8,8 @@ export const getMyTestList = async (): Promise<GetTestsResponse> => {
   return clientFetcher<GetTestsResponse>(`${CLIENT_BASE_URL}/tests?scope=me`);
 };
 
-export const createTest = async (title: Test['title']): Promise<string> => {
-  return clientFetcher<string>(`${CLIENT_BASE_URL}/tests`, {
+export const createTest = async (title: Test['title']): Promise<{ testId: string }> => {
+  return clientFetcher<{ testId: string }>(`${CLIENT_BASE_URL}/tests`, {
     method: 'POST',
     body: JSON.stringify({ title }),
     headers: {
