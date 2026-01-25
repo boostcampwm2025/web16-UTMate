@@ -1,12 +1,14 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
+import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
+import { Logger } from '@nestjs/common/services/logger.service';
+import { Job, UnrecoverableError } from 'bullmq';
 import { DataSource } from 'typeorm';
 
+import { PARTICIPANT_QUEUE } from './const';
 import { ParticipantsRepository } from './participants.repository';
 
 import { MissionResultsService } from '#domain/mission-result/misson-results.service';
 
-@Processor('participant-queue')
+@Processor(PARTICIPANT_QUEUE)
 export class ParticipantsProcessor extends WorkerHost {
   constructor(
     private readonly participantsRepository: ParticipantsRepository,
@@ -20,7 +22,7 @@ export class ParticipantsProcessor extends WorkerHost {
     const { participantId } = job.data;
     const participant = await this.participantsRepository.findById(participantId);
     if (!participant) {
-      return;
+      throw new UnrecoverableError('Participant not found');
     }
     this.dataSource.transaction(async (manager) => {
       // 참가자 상태를 DROP으로 변경
@@ -30,5 +32,10 @@ export class ParticipantsProcessor extends WorkerHost {
       // 연관된 MissionResult들도 모두 DROP으로 변경
       await this.missionResultsService.dropMissionResultsByParticipantId(participant.id, manager);
     });
+  }
+
+  @OnWorkerEvent('failed')
+  onError(job: Job, error: Error) {
+    Logger.error(`Job ${job.id} failed with error: ${error.message}`);
   }
 }

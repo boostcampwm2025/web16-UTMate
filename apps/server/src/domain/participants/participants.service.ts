@@ -1,9 +1,12 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Queue } from 'bullmq';
 import { DataSource } from 'typeorm';
 
 import { CompleteParticipantDto } from './dto/complete-participant.dto';
 import { ParticipantDto } from './dto/participant.dto';
 import { Participant } from './entities/participant.entity';
+import { PARTICIPANT_QUEUE, PARTICIPANT_TIMEOUT } from './const';
 import { ParticipantsRepository } from './participants.repository';
 
 import { MissionResultsService } from '#domain/mission-result/misson-results.service';
@@ -15,6 +18,7 @@ export class ParticipantsService {
     @Inject() private readonly participantsRepository: ParticipantsRepository,
     @Inject() private readonly missionResultsService: MissionResultsService,
     @Inject() private readonly dataSource: DataSource,
+    @InjectQueue(PARTICIPANT_QUEUE) private readonly participantQueue: Queue,
   ) {}
 
   /**
@@ -38,6 +42,13 @@ export class ParticipantsService {
         missions,
         savedParticipant.id,
         manager,
+      );
+
+      // 참가자 타임아웃 작업 큐에 추가
+      await this.participantQueue.add(
+        'check-timeout',
+        { participantId: participant.id },
+        { delay: PARTICIPANT_TIMEOUT, jobId: `complete-participant-${participant.id}` },
       );
 
       return ParticipantDto.fromEntity(savedParticipant, missionResults);
@@ -73,13 +84,13 @@ export class ParticipantsService {
    * @throws BadRequestException 잘못된 상태로 변경하려는 경우
    */
   async completeParticipant(publicId: string, dto: CompleteParticipantDto) {
-    const paricipants = await this.participantsRepository.findByPublicId(publicId);
-    if (!paricipants) {
+    const participant = await this.participantsRepository.findByPublicId(publicId);
+    if (!participant) {
       throw new NotFoundException('Participant not found');
     }
     try {
-      paricipants.complete(dto.status, dto.feedback);
-      await this.participantsRepository.save(paricipants);
+      participant.complete(dto.status, dto.feedback);
+      await this.participantsRepository.save(participant);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

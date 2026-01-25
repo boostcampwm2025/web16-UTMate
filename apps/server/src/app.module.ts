@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -76,6 +77,19 @@ import { UsersModule } from '#domain/users/users.module';
         migrationsRun: config.get<string>(ENV_KEYS.NODE_ENV)! === 'production',
         synchronize: config.get<string>(ENV_KEYS.NODE_ENV)! !== 'production',
         logging: config.get<string>(ENV_KEYS.NODE_ENV)! !== 'production',
+      }),
+    }),
+
+    // BullMQ(Redis)
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        connection: {
+          host: config.get<string>(ENV_KEYS.REDIS_HOST)!,
+          port: config.get<number>(ENV_KEYS.REDIS_PORT)!,
+          db: 1,
+        },
+        prefix: 'drop:',
       }),
     }),
 
