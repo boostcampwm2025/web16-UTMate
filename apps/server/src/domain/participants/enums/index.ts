@@ -6,4 +6,5 @@ export enum UserType {
 export enum ParticipantStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
+  DROP = 'DROP',
 }

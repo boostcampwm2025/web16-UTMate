@@ -3,4 +3,5 @@ export enum MissionResultStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
+  DROP = 'DROP',
 }
