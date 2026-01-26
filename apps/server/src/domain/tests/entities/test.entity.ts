@@ -4,6 +4,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -34,6 +36,10 @@ export class Test {
 
   @Column({ name: 'owner_id' })
   ownerId: number;
+
+  @ManyToMany(() => User, (user) => user.sharedTests)
+  @JoinTable()
+  member: User[];
 
   @Column()
   title: string;
