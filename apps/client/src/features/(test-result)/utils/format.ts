@@ -28,3 +28,11 @@ export const formatRelativeTime = (timestamp: number, startTime: number): string
     }
   }
 };
+
+export const formatDuration = (minutes: number | undefined | null): string => {
+  if (minutes == null || isNaN(minutes)) return '-';
+  if (minutes < 60) return `${Math.round(minutes)}분`;
+  const hours = Math.floor(minutes / 60);
+  const mins = Math.round(minutes % 60);
+  return mins > 0 ? `${hours}시간 ${mins}분` : `${hours}시간`;
+};
