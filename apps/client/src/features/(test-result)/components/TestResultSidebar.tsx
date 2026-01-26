@@ -98,7 +98,7 @@ export function TestResultSidebar() {
             <button
               type="button"
               onClick={handleMissionsTextClick}
-              className="flex flex-1 items-center gap-2"
+              className="flex flex-1 items-center gap-2 cursor-pointer"
             >
               <Target className="h-4 w-4" />
               <span>미션별 보기</span>
@@ -144,7 +144,7 @@ export function TestResultSidebar() {
             <button
               type="button"
               onClick={handleParticipantsTextClick}
-              className="flex flex-1 items-center gap-2"
+              className="flex flex-1 items-center gap-2 cursor-pointer"
             >
               <Users className="h-4 w-4" />
               <span>참여자별 보기</span>
