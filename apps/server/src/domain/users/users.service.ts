@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { SearchUserDto } from './dto/search-user.dto';
 import { UserSummaryDto } from './dto/user-summary.dto';
 import { UsersRepository } from './users.repository';
 
@@ -74,5 +75,10 @@ export class UsersService {
       throw new BadRequestException('User not found');
     }
     return user.id;
+  }
+
+  async getUsersByUsername(query: SearchUserDto) {
+    const users = await this.usersRepository.findByUsernameLike(query.username);
+    return UserSummaryDto.fromUserEntities(users);
   }
 }

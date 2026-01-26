@@ -6,9 +6,11 @@ import {
   HttpStatus,
   Inject,
   Patch,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
+import { SearchUserDto } from './dto/search-user.dto';
 import { UsersService } from './users.service';
 
 import { UserId } from '#domain/auth/decorator/param.decorator';
@@ -22,6 +24,12 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   getProfile(@UserId() userId: number) {
     return this.usersService.getUserSummary(userId);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  getUserByUsername(@Query() query: SearchUserDto) {
+    return this.usersService.getUsersByUsername(query);
   }
 
   @Delete('/me')

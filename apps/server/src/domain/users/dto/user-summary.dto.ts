@@ -12,4 +12,8 @@ export class UserSummaryDto {
     dto.avatarUrl = user.avatarUrl;
     return dto;
   }
+
+  static fromUserEntities(users: User[]): UserSummaryDto[] {
+    return users.map((user) => this.fromUserEntity(user));
+  }
 }
