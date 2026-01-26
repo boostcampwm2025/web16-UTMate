@@ -22,6 +22,16 @@ export class TestsRepository {
       .getOne();
   }
 
+  async findByPublicIdWithUser(publicId: string, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
+    return repo
+      .createQueryBuilder('tests')
+      .where('tests.publicId = :publicId', { publicId })
+      .leftJoinAndSelect('tests.owner', 'owner')
+      .leftJoinAndSelect('tests.members', 'members')
+      .getOne();
+  }
+
   async findByPublicIdAndOwnerWithMissions(
     publicId: string,
     ownerId: number,

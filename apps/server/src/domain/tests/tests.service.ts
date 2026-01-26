@@ -20,6 +20,8 @@ import { TestsRepository } from './tests.repository';
 
 import { ENV_KEYS } from '#common/config/env.constants';
 import { ParticipantsService } from '#domain/participants/participants.service';
+import { User } from '#domain/users/entities/user.entity';
+import { UsersService } from '#domain/users/users.service';
 
 @Injectable()
 export class TestsService {
@@ -27,6 +29,7 @@ export class TestsService {
     @Inject() private readonly testsRepository: TestsRepository,
     @Inject() private readonly missionsService: MissionsService,
     @Inject() private readonly participantsService: ParticipantsService,
+    @Inject() private readonly usersService: UsersService,
     @Inject() private readonly dataSource: DataSource,
     @Inject() private readonly configService: ConfigService,
   ) {}
@@ -332,5 +335,44 @@ export class TestsService {
       throw new NotFoundException('Participant not found');
     }
     return ParticipantResultsDto.fromEntity(test.participants[0], test.missions);
+  }
+
+  async addMember(userId: number, publicId: string, memberPublicId: string) {
+    const test = await this.testsRepository.findByPublicIdWithUser(publicId);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    if (test.ownerId !== userId) {
+      throw new ForbiddenException('You do not have permission to add members to this test');
+    }
+
+    const findMemberId = await this.usersService.getIdByPublicId(memberPublicId);
+    if (!findMemberId) {
+      throw new NotFoundException('User not found');
+    }
+    if (test.members.some((member) => member.id === findMemberId)) {
+      throw new BadRequestException('User is already a member of this test');
+    }
+
+    test.members.push({ id: findMemberId } as User);
+    await this.testsRepository.save(test);
+  }
+
+  async removeMember(userId: number, publicId: string, memberId: string) {
+    const test = await this.testsRepository.findByPublicIdWithUser(publicId);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    if (test.ownerId !== userId) {
+      throw new ForbiddenException('You do not have permission to remove members from this test');
+    }
+
+    const memberIndex = test.members.findIndex((member) => member.publicId === memberId);
+    if (memberIndex === -1) {
+      throw new NotFoundException('Member not found in this test');
+    }
+
+    test.members.splice(memberIndex, 1);
+    await this.testsRepository.save(test);
   }
 }

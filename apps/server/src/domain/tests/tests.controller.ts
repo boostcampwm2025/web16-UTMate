@@ -15,6 +15,7 @@ import type { Request } from 'express';
 import { UAParser } from 'ua-parser-js';
 
 import { CreateTestDto } from './dto/create-test.dto';
+import { AddMemberDto } from './dto/member.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { TestStatus } from './entities/test.entity';
 import { DeviceInfo } from './interface';
@@ -133,5 +134,25 @@ export class TestsController {
     @Param('participantId') participantId: string,
   ) {
     return this.testsService.getTestParticipantDetail(userId, publicId, participantId);
+  }
+
+  @Post('/:id/members')
+  @UseGuards(JwtAuthGuard)
+  async addMember(
+    @UserId() userId: number,
+    @Param('id') publicId: string,
+    @Param() addMemberDto: AddMemberDto,
+  ) {
+    return this.testsService.addMember(userId, publicId, addMemberDto.memberId);
+  }
+
+  @Delete('/:id/members/:memberId')
+  @UseGuards(JwtAuthGuard)
+  async removeMember(
+    @UserId() userId: number,
+    @Param('id') publicId: string,
+    @Param('memberId') memberId: string,
+  ) {
+    return this.testsService.removeMember(userId, publicId, memberId);
   }
 }
