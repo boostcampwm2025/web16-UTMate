@@ -7,10 +7,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { LayoutDashboard, Target, Users, ChevronDown } from 'lucide-react';
 
 import { cn } from '@/shared/utils';
-import { CLIENT_BASE_URL } from '@/shared/constants/api';
-import { clientFetcher } from '@/shared/utils/fetcher/clientFetcher';
 import { Collapsible, CollapsibleContent } from '@/shared/components/ui/collapsible';
-import type { TestDetail } from '@/features/(test-manage)/types';
 import { generateNicknameFromId } from '@/shared/utils/nickname';
 import { getTestById } from '@/features/(test-detail)/api/client';
 
@@ -23,8 +20,9 @@ export function TestResultSidebar() {
   const router = useRouter();
   const testId = params.id as string;
 
-  const isMissionsActive = pathname.startsWith(`/tests/${testId}/result/missions`);
-  const isParticipantsActive = pathname.startsWith(`/tests/${testId}/result/participants`);
+  const isMissionsActive = pathname === `/tests/${testId}/result/missions`;
+  const isParticipantsActive = pathname === `/tests/${testId}/result/participants`;
+  const isSummaryActive = pathname === `/tests/${testId}/result`;
 
   // 아코디언 열림 상태 - 해당 경로에 있으면 자동으로 열림
   const [isMissionsOpen, setIsMissionsOpen] = useState(isMissionsActive);
@@ -47,8 +45,6 @@ export function TestResultSidebar() {
     queryKey: ['testParticipantsResults', testId],
     queryFn: () => getTestParticipantsResults(testId),
   });
-
-  const isSummaryActive = pathname === `/tests/${testId}/result`;
 
   // 미션별 보기 텍스트 클릭 → 항상 페이지 이동 + 아코디언 열림
   const handleMissionsTextClick = () => {
@@ -121,13 +117,14 @@ export function TestResultSidebar() {
                   key={mission.publicId}
                   href={`/tests/${testId}/result/missions/${mission.publicId}`}
                   className={cn(
-                    'rounded-md p-2 text-sm transition-colors',
+                    'flex items-center justify-between rounded-md p-3 text-sm transition-colors',
                     'hover:bg-accent hover:text-accent-foreground',
                     pathname === `/tests/${testId}/result/missions/${mission.publicId}` &&
-                      'bg-primary/10 text-primary',
+                      'bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary',
                   )}
                 >
-                  미션 {mission.order} : {mission.name}
+                  <span>{mission.name}</span>
+                  {/* <span className="text-muted-foreground text-xs">{mission.order + 1}번</span> */}
                 </Link>
               ))}
             </div>
@@ -168,11 +165,11 @@ export function TestResultSidebar() {
                     key={participant.participantId}
                     href={`/tests/${testId}/result/participants/${participant.participantId}`}
                     className={cn(
-                      'flex items-center justify-between rounded-md p-2 text-sm transition-colors',
+                      'flex items-center justify-between rounded-md p-3 text-sm transition-colors',
                       'hover:bg-accent hover:text-accent-foreground',
                       pathname ===
                         `/tests/${testId}/result/participants/${participant.participantId}` &&
-                        'bg-primary/10 text-primary',
+                        'bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary',
                     )}
                   >
                     <span>{generateNicknameFromId(participant.participantId)}</span>
