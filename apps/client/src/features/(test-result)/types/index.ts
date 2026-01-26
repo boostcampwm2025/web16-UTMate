@@ -44,6 +44,7 @@ export interface ParticipantMissionResult {
 export interface ParticipantResult {
   participantId: string;
   persona: string;
+  joinedAt: string;
   missionResults: ParticipantMissionResult[];
 }
 

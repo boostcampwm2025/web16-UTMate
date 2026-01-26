@@ -45,6 +45,7 @@ export class ParticipantMissionResultDto {
 export class ParticipantResultsDto {
   participantId: string;
   persona: string;
+  joinedAt: Date;
   missionResults: ParticipantMissionResultDto[];
 
   static fromEntity(participant: Participant, missions: Mission[]) {
@@ -52,6 +53,7 @@ export class ParticipantResultsDto {
     dto.participantId = participant.publicId;
     // TODO : 참가자 페르소나 기능 구현 시 수정 필요
     dto.persona = 'GUEST';
+    dto.joinedAt = participant.joinedAt;
     dto.missionResults = ParticipantMissionResultDto.fromEntities(
       missions,
       participant.missionResults,

@@ -162,7 +162,7 @@ export function TestResultSidebar() {
           <CollapsibleContent>
             <div className="mt-1 ml-4 flex flex-col gap-1">
               {participants.map((participant, index) => {
-                const createdAt = participant.missionResults[0]?.createdAt;
+                const joinedAt = participant.joinedAt;
                 return (
                   <Link
                     key={participant.participantId}
@@ -176,11 +176,9 @@ export function TestResultSidebar() {
                     )}
                   >
                     <span>{generateNicknameFromId(participant.participantId)}</span>
-                    {createdAt && (
-                      <span className="text-muted-foreground text-xs">
-                        {formatDistanceToNow(createdAt)}
-                      </span>
-                    )}
+                    <span className="text-muted-foreground text-xs">
+                      {formatDistanceToNow(joinedAt)}
+                    </span>
                   </Link>
                 );
               })}
