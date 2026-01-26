@@ -1,6 +1,7 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Mission } from '../entities/mission.entity';
+import { Test } from '../entities/test.entity';
 
 import { MissionResult } from '#domain/mission-result/entities/mission-result.entity';
 import { MissionResultStatus } from '#domain/mission-result/enums';
@@ -194,6 +195,20 @@ export class MissionOverviewDto {
 
     dto.missionResults = MissionResultOverviewDto.fromEntities(missions.missionResults);
 
+    return dto;
+  }
+
+  static fromEntities(missions: Mission[]): MissionOverviewDto[] {
+    return missions.map((mission) => this.fromEntity(mission));
+  }
+}
+
+export class TestMissionsResultsDto {
+  missions: MissionOverviewDto[];
+
+  static fromTest(test: Test): TestMissionsResultsDto {
+    const dto = new TestMissionsResultsDto();
+    dto.missions = MissionOverviewDto.fromEntities(test.missions || []);
     return dto;
   }
 }

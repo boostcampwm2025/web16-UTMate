@@ -142,4 +142,16 @@ export class TestsRepository {
       .andWhere('participants.publicId = :participantPublicId', { participantPublicId })
       .getOne();
   }
+
+  findByPublicIdAndOwnerWithMissionsAndResults(publicId: string, ownerId: number) {
+    return this.testsRepository
+      .createQueryBuilder('tests')
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .leftJoinAndSelect('missions.missionResults', 'missionResults')
+      .leftJoinAndSelect('missionResults.participant', 'participant')
+      .where('tests.publicId = :publicId', { publicId })
+      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .orderBy('missions.order', 'ASC')
+      .getOne();
+  }
 }
