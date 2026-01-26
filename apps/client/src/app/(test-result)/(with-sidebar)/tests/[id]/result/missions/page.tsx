@@ -1,5 +1,5 @@
 import { QueryBoundary } from '@/shared/components/QueryBoundary';
-import { TestMissionResults } from '@/features/(test-result)/components/TestMissionResults';
+import { TestMissionResultList } from '@/features/(test-result)/components/TestMissionResultList';
 
 export default async function MissionResultsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: testId } = await params;
@@ -9,7 +9,7 @@ export default async function MissionResultsPage({ params }: { params: Promise<{
 
   return (
     <QueryBoundary>
-      <TestMissionResults testId={testId} />
+      <TestMissionResultList testId={testId} />
     </QueryBoundary>
   );
 }

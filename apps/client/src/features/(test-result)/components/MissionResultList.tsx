@@ -11,6 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table';
+import { generateNicknameFromId } from '@/shared/utils/nickname';
+import { formatDistanceToNow } from '../utils/dates';
+import { formatTimestamp } from '../utils/format';
 import type { MissionDetail } from '../types';
 
 interface MissionResultListProps {
@@ -32,16 +35,18 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
         <TableCaption className="sr-only">미션 로그 목록</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>아이디</TableHead>
-            <TableHead>일시</TableHead>
-            <TableHead>성공여부</TableHead>
+            <TableHead>참여자</TableHead>
+
+            <TableHead className="text-center">성공여부</TableHead>
             <TableHead>피드백</TableHead>
+            <TableHead className="text-right">소요시간</TableHead>
+            <TableHead className="text-right">일시</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {missionLogs.missionResults.length === 0 ? (
+          {!missionLogs.missionResults || missionLogs.missionResults.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center">
+              <TableCell colSpan={5} className="text-center">
                 해당 미션에 대한 결과가 없습니다.
               </TableCell>
             </TableRow>
@@ -52,17 +57,23 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
                 onClick={() => handleRowClick(missionResult.id)}
                 className="cursor-pointer"
               >
-                <TableCell>{missionResult.id}</TableCell>
-                <TableCell className="text-center">{new Date().toLocaleString() || '-'}</TableCell>
+                <TableCell>{generateNicknameFromId(missionResult.participantId)}</TableCell>
+
                 <TableCell className="text-center">
                   {missionResult.status === 'SUCCESS' ? (
-                    <span className="inline-flex items-center font-bold text-green-600">O</span>
+                    <span className="mx-auto inline-flex items-center font-bold text-green-600">
+                      O
+                    </span>
                   ) : missionResult.status === 'FAILED' ? (
-                    <span className="inline-flex items-center font-bold text-red-600">X</span>
+                    <span className="mx-auto inline-flex items-center font-bold text-red-600">
+                      X
+                    </span>
                   ) : missionResult.status === 'PENDING' ? (
-                    <span className="inline-flex items-center font-bold text-gray-500">이탈</span>
+                    <span className="mx-auto inline-flex items-center font-bold text-gray-500">
+                      이탈
+                    </span>
                   ) : (
-                    <span className="text-gray-400">-</span>
+                    <span className="mx-auto text-gray-400">-</span>
                   )}
                 </TableCell>
                 <TableCell>
@@ -70,6 +81,13 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
                     <span className="text-gray-300 italic">피드백 없음</span>
                   )}
                 </TableCell>
+                <TableCell className="text-right">
+                  {missionResult.duration != null
+                    ? formatTimestamp(missionResult.duration)
+                    : '-'}
+                </TableCell>
+                {/* TODO : 응답에 일시 추가 */}
+                <TableCell className="text-right">-</TableCell>
               </TableRow>
             ))
           )}

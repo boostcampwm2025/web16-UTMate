@@ -419,6 +419,58 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
   ],
 };
 
+// mission-1에 대한 MissionDetail 모킹 데이터
+const mockMissionDetail: Record<string, MissionDetail> = {
+  'mission-1': {
+    id: 'mission-1',
+    missionOrder: 0,
+    name: '메인 페이지 탐색',
+    description: '웹사이트의 메인 페이지를 둘러보고 주요 기능을 확인해주세요.',
+    missionUrl: 'https://notion.so',
+    estimatedDuration: 5,
+    successRate: 100,
+    dropRate: 0,
+    averageDuration: 187500, // 밀리초 단위 (약 3분 7초)
+    averageIdleTime: 45000, // 밀리초 단위 (약 45초)
+    averageRageClickCount: 2.5,
+    averageMouseThrashingCount: 1.2,
+    missionResults: [
+      {
+        id: 'mission-result-1',
+        status: 'SUCCESS',
+        duration: 300000,
+        feedback: '매우 만족스러웠습니다.',
+        participantId: 'tester-1',
+        persona: 'GUEST',
+      },
+      {
+        id: 'mission-result-2',
+        status: 'SUCCESS',
+        duration: 150000,
+        feedback: '좋아요',
+        participantId: 'tester-2',
+        persona: 'GUEST',
+      },
+      {
+        id: 'mission-result-3',
+        status: 'SUCCESS',
+        duration: 200000,
+        feedback: undefined,
+        participantId: 'tester-3',
+        persona: 'GUEST',
+      },
+      {
+        id: 'mission-result-4',
+        status: 'SUCCESS',
+        duration: 100000,
+        feedback: undefined,
+        participantId: 'tester-4',
+        persona: 'GUEST',
+      },
+    ],
+  },
+};
+
 export const resultHandlers = [
   // GET /tests/:testId/result - 테스트 요약 정보 조회
   http.get(`${CLIENT_BASE_URL}/tests/:testId/result`, ({ params }) => {
@@ -461,12 +513,32 @@ export const resultHandlers = [
   // GET /missions/:missionId/result - 특정 미션의 결과 조회
   http.get(`${CLIENT_BASE_URL}/missions/:missionId/result`, ({ params }) => {
     const { missionId } = params;
-    const results = mockMissionResults[Number(missionId)] || [];
 
     console.log('[MSW] Intercepted request for missionId:', missionId);
-    console.log('[MSW] Returning results:', results);
 
-    return HttpResponse.json(results);
+    // mission-1 같은 문자열 ID 처리
+    if (typeof missionId === 'string' && missionId.startsWith('mission-')) {
+      const missionDetail = mockMissionDetail[missionId];
+      if (missionDetail) {
+        console.log('[MSW] Returning mission detail:', missionDetail);
+        return HttpResponse.json(missionDetail);
+      }
+    }
+
+    // 숫자 ID 처리 (기존 로직 유지)
+    const numericId = Number(missionId);
+    if (!isNaN(numericId)) {
+      const results = mockMissionResults[numericId] || [];
+      console.log('[MSW] Returning results:', results);
+      return HttpResponse.json(results);
+    }
+
+    // 찾을 수 없는 경우
+    console.warn(`[MSW] Mission detail not found for missionId: ${missionId}`);
+    return new HttpResponse(null, {
+      status: 404,
+      statusText: 'Mission detail not found',
+    });
   }),
 
   // GET /tests/:testId/result/missions - 테스트의 모든 미션과 각 미션의 결과 조회
