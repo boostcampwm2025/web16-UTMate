@@ -21,7 +21,7 @@ export function MetricCard({ label, value, description }: MetricCardProps) {
   return (
     <div
       onClick={handleClick}
-      className={`flex flex-col items-start justify-center rounded-2xl bg-gray-50/80 p-4 text-left transition-colors hover:bg-gray-100 ${
+      className={`flex flex-col items-start justify-center rounded-2xl bg-gray-50 p-4 text-left transition-colors hover:bg-gray-100 ${
         description ? 'cursor-pointer' : ''
       }`}
     >

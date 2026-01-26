@@ -18,7 +18,7 @@ interface MissionInfoProps {
 export function MissionInfo({ missionLogs }: MissionInfoProps) {
   return (
     <Card className="overflow-hidden gap-2">
-      <CardHeader className="bg-gray-50/50">
+      <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-bold text-gray-900">미션 정보</CardTitle>
           <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -28,28 +28,32 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent className="p-0 space-y-6">
         {/* Mission Overview Section */}
-        <div className="p-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 px-6">
+            <div className="flex flex-col justify-between">
                <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
-                    <Info size={16} /> 미션 이름
+                    <Info size={16} /> 미션 정보
                   </h3>
-                  <p className="text-lg font-semibold text-gray-900">{missionLogs.name}</p>
-               </div>
-               <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
-                    <Info size={16} /> 미션 설명
-                  </h3>
-                  <p className="text-base text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg border border-gray-100">
-                    {missionLogs.description || '등록된 설명이 없습니다.'}
-                  </p>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-lg font-semibold text-gray-900">{missionLogs.name}</p>
+                    <p className="text-base text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg">
+                      {missionLogs.description || '등록된 설명이 없습니다.'}
+                    </p>
+                  </div>
                </div>
             </div>
             
-            <div className="space-y-4">
+            <div className="flex flex-col  justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
+                    <Clock size={16} /> 예상 소요 시간
+                  </h3>
+                   <div className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-900">
+                      {formatDuration(missionLogs.estimatedDuration)}
+                   </div>
+               </div>
                <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
                     <Link size={16} /> 연결된 URL
@@ -65,24 +69,15 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
                     </div>
                   </a>
                </div>
-               <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
-                    <Clock size={16} /> 예상 소요 시간
-                  </h3>
-                   <div className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-900">
-                      {formatDuration(missionLogs.estimatedDuration)}
-                   </div>
-               </div>
             </div>
           </div>
-        </div>
 
         {/* Performance Metrics Section */}
-        <div className="bg-gray-50/30 p-6">
+        <div className="bg-gray-50/30 px-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           성과 지표
           </h3>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
             <MetricCard
               label="성공률"
               value={`${missionLogs.successRate}%`}
