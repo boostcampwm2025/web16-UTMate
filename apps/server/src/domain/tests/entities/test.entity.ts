@@ -39,7 +39,7 @@ export class Test {
 
   @ManyToMany(() => User, (user) => user.sharedTests)
   @JoinTable()
-  member: User[];
+  members: User[];
 
   @Column()
   title: string;

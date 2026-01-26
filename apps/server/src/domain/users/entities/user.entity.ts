@@ -42,7 +42,7 @@ export class User {
   @OneToMany(() => Test, (test) => test.owner)
   ownedTests: Test[];
 
-  @ManyToMany(() => Test, (test) => test.member)
+  @ManyToMany(() => Test, (test) => test.members)
   sharedTests: Test[];
 
   @Column({ name: 'created_at', type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
