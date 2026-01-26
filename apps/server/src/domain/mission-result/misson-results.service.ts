@@ -166,6 +166,12 @@ export class MissionResultsService {
     );
 
     for (const missionResult of missionResults) {
+      if (
+        missionResult.status === MissionResultStatus.SUCCESS ||
+        missionResult.status === MissionResultStatus.FAILED
+      ) {
+        continue;
+      }
       if (missionResult.status === MissionResultStatus.IN_PROGRESS) {
         await this.createMissionResultRecord(missionResult.publicId);
       }

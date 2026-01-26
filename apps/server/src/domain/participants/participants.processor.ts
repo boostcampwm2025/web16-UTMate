@@ -4,6 +4,7 @@ import { Job, UnrecoverableError } from 'bullmq';
 import { DataSource } from 'typeorm';
 
 import { PARTICIPANT_QUEUE } from './const';
+import { ParticipantStatus } from './enums';
 import { ParticipantsRepository } from './participants.repository';
 
 import { MissionResultsService } from '#domain/mission-result/misson-results.service';
@@ -24,6 +25,11 @@ export class ParticipantsProcessor extends WorkerHost {
     if (!participant) {
       throw new UnrecoverableError('Participant not found');
     }
+
+    if (participant.status === ParticipantStatus.COMPLETED) {
+      return;
+    }
+
     this.dataSource.transaction(async (manager) => {
       // 참가자 상태를 DROP으로 변경
       participant.markAsDropped();
