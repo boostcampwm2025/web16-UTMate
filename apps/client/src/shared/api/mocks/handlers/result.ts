@@ -5,6 +5,9 @@ import type {
   ParticipantResult,
   MainFeedback,
   MissionResultWithParticipant,
+  TestMissionsResults,
+  MissionDetail,
+  MissionResults,
 } from '@/features/(test-result)/types';
 import { TestStatus } from '@/features/(test-manage)/types';
 
@@ -464,5 +467,88 @@ export const resultHandlers = [
     console.log('[MSW] Returning results:', results);
 
     return HttpResponse.json(results);
+  }),
+
+  // GET /tests/:testId/result/missions - 테스트의 모든 미션과 각 미션의 결과 조회
+  http.get(`${CLIENT_BASE_URL}/tests/:testId/result/missions`, ({ params }) => {
+    const { testId } = params;
+    const testIdNum = Number(testId);
+
+    // 테스트 ID와 미션 publicId 매핑 (테스트 ID 1의 경우만 처리)
+    const missionIdMapping: Record<string, number> = {
+      'mission-1': 1,
+      'mission-2': 2,
+      'mission-3': 3,
+      'mission-4': 4,
+    };
+
+    // 테스트의 미션 목록 가져오기 (tests.ts의 mockMissions 사용)
+    const testMissions = testIdNum === 1
+      ? [
+          { publicId: 'mission-1', order: 0, name: '메인 페이지 탐색', description: '웹사이트의 메인 페이지를 둘러보고 주요 기능을 확인해주세요.', missionUrl: 'https://notion.so', estimatedDuration: 5 },
+          { publicId: 'mission-2', order: 1, name: '검색 기능 테스트', description: '검색 기능을 사용하여 원하는 정보를 찾아보세요.', missionUrl: 'https://notion.so/search', estimatedDuration: 10 },
+        ]
+      : testIdNum === 3
+        ? [
+            { publicId: 'mission-3', order: 0, name: '플래너 작성', description: '새로운 플래너를 작성하고 저장해주세요.', missionUrl: 'https://example.com/planner', estimatedDuration: 15 },
+          ]
+        : [];
+
+    // 각 미션에 대한 결과 생성
+    const missions: MissionDetail[] = testMissions.map((mission) => {
+      const missionId = missionIdMapping[mission.publicId];
+      const missionResults = mockMissionResults[missionId] || [];
+
+      // 통계 계산
+      const totalResults = missionResults.length;
+      const successCount = missionResults.filter((r) => r.status === 'SUCCESS').length;
+      const pendingCount = missionResults.filter((r) => r.status === 'PENDING').length;
+      const successRate = totalResults > 0 ? Math.round((successCount / totalResults) * 100) : 0;
+      const dropRate = totalResults > 0 ? Math.round((pendingCount / totalResults) * 100) : 0;
+
+      const resultsWithDuration = missionResults.filter((r) => r.duration !== undefined && r.duration !== null);
+      const averageDuration =
+        resultsWithDuration.length > 0
+          ? Math.round(
+              resultsWithDuration.reduce((sum, r) => sum + (r.duration || 0), 0) /
+                resultsWithDuration.length,
+            )
+          : 0;
+
+      // MissionResults 형태로 변환
+      const missionResultsData: MissionResults[] = missionResults.map((r) => ({
+        id: r.missionResultId,
+        status: r.status,
+        duration: r.duration,
+        feedback: r.feedback || undefined,
+        participantId: r.participantId,
+        persona: r.persona,
+      }));
+
+      return {
+        id: mission.publicId,
+        missionOrder: mission.order,
+        name: mission.name,
+        description: mission.description,
+        missionUrl: mission.missionUrl,
+        estimatedDuration: mission.estimatedDuration,
+        successRate,
+        dropRate,
+        averageDuration,
+        averageIdleTime: 0,
+        averageRageClickCount: 0,
+        averageMouseThrashingCount: 0,
+        missionResults: missionResultsData,
+      };
+    });
+
+    const response: TestMissionsResults = {
+      missions,
+    };
+
+    console.log('[MSW] Intercepted request for testId:', testId);
+    console.log('[MSW] Returning missions results:', response);
+
+    return HttpResponse.json(response);
   }),
 ];

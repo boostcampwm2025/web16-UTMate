@@ -96,3 +96,8 @@ export type MissionResults = {
 };
 // 참여자 상세 조회는 ParticipantResult와 동일한 구조
 export type ParticipantDetail = ParticipantResult;
+
+// 테스트의 모든 미션과 각 미션의 결과
+export type TestMissionsResults = {
+  missions: MissionDetail[];
+};

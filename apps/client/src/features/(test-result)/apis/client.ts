@@ -9,6 +9,7 @@ import type {
   MissionResultDetail,
   MissionDetail,
   ParticipantDetail,
+  TestMissionsResults,
 } from '../types';
 
 export const getTestResultSummary = async (testId: string): Promise<TestResultSummary> => {
@@ -23,6 +24,12 @@ export const getTestParticipantsResults = async (testId: string): Promise<Partic
 
 export const getTestMainFeedback = async (testId: string): Promise<MainFeedback[]> => {
   return clientFetcher<MainFeedback[]>(`${CLIENT_BASE_URL}/tests/${testId}/result/mainfeedback`);
+};
+
+export const getTestMissionsResults = async (
+  testId: string,
+): Promise<TestMissionsResults> => {
+  return clientFetcher<TestMissionsResults>(`${CLIENT_BASE_URL}/tests/${testId}/result/missions`);
 };
 
 export const getTestMissionsResultById = async (missionId: string): Promise<MissionDetail> => {
