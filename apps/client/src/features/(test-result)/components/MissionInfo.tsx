@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  Info,
-  Link,
-  Clock,
-} from 'lucide-react';
+import { Info, Link, Clock } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { formatDuration } from '../utils/format';
@@ -17,65 +13,63 @@ interface MissionInfoProps {
 
 export function MissionInfo({ missionLogs }: MissionInfoProps) {
   return (
-    <Card className="overflow-hidden gap-2">
+    <Card className="gap-2 overflow-hidden">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-bold text-gray-900">미션 정보</CardTitle>
           <div className="flex items-center gap-2 text-sm text-gray-500">
-             <span className="flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-blue-700 font-medium text-xs ring-1 ring-blue-700/10">
-               {missionLogs.missionOrder + 1}번째 미션
-             </span>
+            <span className="flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-blue-700/10">
+              {missionLogs.missionOrder + 1}번째 미션
+            </span>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-0 space-y-6">
+      <CardContent className="space-y-6 p-0">
         {/* Mission Overview Section */}
-          <div className="grid gap-4 md:grid-cols-2 px-6">
-            <div className="flex flex-col justify-between">
-               <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
-                    <Info size={16} /> 미션 정보
-                  </h3>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-lg font-semibold text-gray-900">{missionLogs.name}</p>
-                    <p className="text-base text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg">
-                      {missionLogs.description || '등록된 설명이 없습니다.'}
-                    </p>
-                  </div>
-               </div>
-            </div>
-            
-            <div className="flex flex-col  justify-between">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
-                    <Clock size={16} /> 예상 소요 시간
-                  </h3>
-                   <div className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-900">
-                      {formatDuration(missionLogs.estimatedDuration)}
-                   </div>
-               </div>
-               <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
-                    <Link size={16} /> 연결된 URL
-                  </h3>
-                  <a
-                    href={missionLogs.missionUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-2 rounded-lg border border-gray-200 p-3 hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex-1 truncate text-sm font-medium text-gray-700 group-hover:text-primary">
-                      {missionLogs.missionUrl}
-                    </div>
-                  </a>
-               </div>
+        <div className="grid gap-4 px-6 md:grid-cols-2">
+          <div className="flex flex-col justify-between">
+            <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-500">
+              <Info size={16} /> 미션 정보
+            </h3>
+            <div className="flex flex-col gap-2">
+              <p className="text-lg font-semibold text-gray-900">{missionLogs.name}</p>
+              <p className="rounded-lg bg-gray-50 p-4 text-base leading-relaxed text-gray-700">
+                {missionLogs.description || '등록된 설명이 없습니다.'}
+              </p>
             </div>
           </div>
 
+          <div className="flex flex-col justify-between gap-2">
+            <div>
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-500">
+                <Clock size={16} /> 예상 소요 시간
+              </h3>
+              <div className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-900">
+                {formatDuration(missionLogs.estimatedDuration)}
+              </div>
+            </div>
+            <div>
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-500">
+                <Link size={16} /> 연결된 URL
+              </h3>
+              <a
+                href={missionLogs.missionUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50"
+              >
+                <div className="group-hover:text-primary flex-1 truncate text-sm font-medium text-gray-700">
+                  {missionLogs.missionUrl}
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
         {/* Performance Metrics Section */}
-        <div className="bg-gray-50/30 px-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          성과 지표
+        <div className="px-6">
+          <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900">
+            성과 지표
           </h3>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
             <MetricCard
@@ -167,13 +161,12 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
 function MetricExplanation({ formula, description }: { formula: string; description: string }) {
   return (
     <div className="space-y-6 pt-2">
-      <div className="flex items-center justify-center rounded-xl bg-slate-100 py-8 px-4 text-center">
-        <span className="font-medium text-slate-700 text-lg break-keep leading-relaxed">{formula}</span>
+      <div className="flex items-center justify-center rounded-xl bg-slate-100 px-4 py-8 text-center">
+        <span className="text-lg leading-relaxed font-medium break-keep text-slate-700">
+          {formula}
+        </span>
       </div>
-      <p className="text-gray-600 leading-relaxed text-base break-keep">{description}</p>
+      <p className="text-base leading-relaxed break-keep text-gray-600">{description}</p>
     </div>
   );
 }
-
-
-

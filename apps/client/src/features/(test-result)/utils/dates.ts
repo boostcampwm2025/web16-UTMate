@@ -39,3 +39,12 @@ export const formatDistanceToNow = (timestamp: string): string => {
   const years = Math.floor(diffInDays / 365);
   return rtf.format(-years, 'year');
 };
+
+export const formatDate = (timestamp: string): string => {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+};

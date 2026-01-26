@@ -18,7 +18,7 @@ export function MissionResultDetail({ testId, missionId }: MissionResultDetailPr
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {/* 미션 정보 */}
       <MissionInfo missionLogs={missionLogs} />
       {/* 미션 결과 리스트 */}
