@@ -35,6 +35,8 @@ export interface ParticipantMissionResult {
   missionResultId: string;
   missionId: number;
   missionOrder: number;
+  missionTitle: string;
+  missionDescription: string;
   status: ParticipantMissionStatus;
   duration?: number;
   feedback?: string | null;

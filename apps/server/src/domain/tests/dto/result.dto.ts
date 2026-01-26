@@ -11,6 +11,8 @@ export class ParticipantMissionResultDto {
   missionResultId: string;
   missionId: string;
   missionOrder: number;
+  missionTitle: string;
+  missionDescription: string;
   status: MissionResultStatus;
   duration?: number;
   feedback?: string;
@@ -28,6 +30,8 @@ export class ParticipantMissionResultDto {
     dto.missionResultId = missionResult.publicId;
     dto.missionId = mission.publicId;
     dto.missionOrder = mission.order;
+    dto.missionTitle = mission.name;
+    dto.missionDescription = mission.description;
     dto.status = missionResult.status;
     dto.duration = missionResult.duration;
     dto.feedback = missionResult.feedback;
