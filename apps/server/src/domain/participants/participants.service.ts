@@ -11,6 +11,7 @@ import { ParticipantsRepository } from './participants.repository';
 
 import { MissionResultsService } from '#domain/mission-result/misson-results.service';
 import { Mission } from '#domain/tests/entities/mission.entity';
+import { DeviceInfo } from '#domain/tests/interface';
 
 @Injectable()
 export class ParticipantsService {
@@ -31,10 +32,15 @@ export class ParticipantsService {
    * @param missions 미션 배열
    * @returns 생성된 참가자 정보 및 미션 결과 배열
    */
-  async createParticipant(userId: number | undefined, testId: number, missions: Mission[]) {
+  async createParticipant(
+    userId: number | undefined,
+    testId: number,
+    missions: Mission[],
+    deviceInfo: DeviceInfo,
+  ) {
     return await this.dataSource.transaction(async (manager) => {
       // Participant 생성
-      const participant = Participant.create(userId, testId);
+      const participant = Participant.create(userId, testId, deviceInfo);
       const savedParticipant = await this.participantsRepository.save(participant, manager);
 
       // 각 미션에 대해 MissionResult 생성

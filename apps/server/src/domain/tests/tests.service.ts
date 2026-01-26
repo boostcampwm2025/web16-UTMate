@@ -14,6 +14,7 @@ import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
+import { DeviceInfo } from './interface';
 import { MissionsService } from './missions.service';
 import { TestsRepository } from './tests.repository';
 
@@ -241,7 +242,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없는 경우
    * @throws BadRequestException 테스트가 게시되지 않은 경우
    */
-  async participateTest(userId: number | undefined, publicId: string) {
+  async participateTest(userId: number | undefined, publicId: string, deviceInfo: DeviceInfo) {
     const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
@@ -249,7 +250,7 @@ export class TestsService {
     if (test.status !== TestStatus.PUBLISHED) {
       throw new BadRequestException('Test is not published');
     }
-    return this.participantsService.createParticipant(userId, test.id, test.missions);
+    return this.participantsService.createParticipant(userId, test.id, test.missions, deviceInfo);
   }
 
   /**
