@@ -116,15 +116,17 @@ export class MissionResultsService {
     }
 
     // 상태 전이 및 저장
-    try {
-      missionResult.transition(dto.status, dto.feedback);
-      await this.missionResultsRepository.save(missionResult);
-      if (dto.status === MissionResultStatus.IN_PROGRESS) {
+    switch (dto.status) {
+      case MissionResultStatus.IN_PROGRESS:
+        missionResult.start();
         this.sdkAuthRedis.set(missionResult.publicId, 'in_progress');
-      }
-      return;
-    } catch (error) {
-      throw new BadRequestException(error.message);
+        break;
+      case MissionResultStatus.SUCCESS:
+      case MissionResultStatus.FAILED:
+        missionResult.complete(dto.status, dto.feedback);
+        break;
+      default:
+        throw new BadRequestException('유효하지 않은 미션 결과 상태입니다.');
     }
   }
 
@@ -155,5 +157,26 @@ export class MissionResultsService {
 
     const presignedUrl = await this.s3StorageService.getPresignedUrl(missionResults.filename!);
     return MissionResultDetailDto.fromMissionResultEntity(missionResults, presignedUrl);
+  }
+
+  async dropMissionResultsByParticipantId(participantId: number, manager: EntityManager) {
+    const missionResults = await this.missionResultsRepository.findByParticipantId(
+      participantId,
+      manager,
+    );
+
+    for (const missionResult of missionResults) {
+      if (
+        missionResult.status === MissionResultStatus.SUCCESS ||
+        missionResult.status === MissionResultStatus.FAILED
+      ) {
+        continue;
+      }
+      if (missionResult.status === MissionResultStatus.IN_PROGRESS) {
+        await this.createMissionResultRecord(missionResult.publicId);
+      }
+      missionResult.drop();
+    }
+    await this.missionResultsRepository.saveAll(missionResults, manager);
   }
 }

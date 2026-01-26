@@ -34,6 +34,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.967.0",
     "@aws-sdk/s3-request-presigner": "^3.967.0",
+    "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -44,6 +45,7 @@
     "@nestjs/swagger": "^11.2.4",
     "@nestjs/typeorm": "^11.0.0",
     "@rrweb/types": "2.0.0-alpha.18",
+    "bullmq": "^5.67.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "cookie-parser": "^1.4.7",

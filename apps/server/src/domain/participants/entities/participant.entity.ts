@@ -76,6 +76,12 @@ export class Participant {
     this.feedback = feedback;
   }
 
+  markAsDropped() {
+    if (this.status === ParticipantStatus.IN_PROGRESS) {
+      this.status = ParticipantStatus.DROP;
+    }
+  }
+
   @BeforeInsert()
   generatePublicId() {
     if (!this.publicId) {
