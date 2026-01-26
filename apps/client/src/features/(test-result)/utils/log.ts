@@ -8,6 +8,7 @@ export interface GroupedInteractionLog {
   count: number;
   endTime?: number;
   scrollDirection?: ScrollDirection;
+  targetInfo?: string; // 클릭/입력한 요소 정보
 }
 
 type IncrementalSnapshotEvent = eventWithTime & {
@@ -40,6 +41,40 @@ function getScrollY(log: IncrementalSnapshotEvent): number {
 function getScrollDirection(prevY: number, currentY: number): ScrollDirection | undefined {
   if (currentY > prevY) return 'Down';
   if (currentY < prevY) return 'Up';
+  return undefined;
+}
+
+/**
+ * 이벤트에서 target element 정보를 추출합니다.
+ */
+function getTargetInfo(log: IncrementalSnapshotEvent): string | undefined {
+  const source = log.data.source;
+
+  if (source === IncrementalSource.MouseInteraction) {
+    const id = (log.data as any).id;
+    const interactionType = (log.data as any).type;
+    const interactionNames: Record<number, string> = {
+      0: 'MouseUp',
+      1: 'MouseDown',
+      2: 'Click',
+      3: 'ContextMenu',
+      4: 'DblClick',
+      5: 'Focus',
+      6: 'Blur',
+      7: 'TouchStart',
+      8: 'TouchEnd',
+    };
+    const typeName = interactionNames[interactionType] || `Type${interactionType}`;
+    return id ? `요소 #${id} (${typeName})` : undefined;
+  }
+
+  if (source === IncrementalSource.Input) {
+    const id = (log.data as any).id;
+    const text = (log.data as any).text;
+    const truncatedText = text && text.length > 20 ? text.slice(0, 20) + '...' : text;
+    return id ? `요소 #${id}${truncatedText ? ` "${truncatedText}"` : ''}` : undefined;
+  }
+
   return undefined;
 }
 
@@ -95,8 +130,9 @@ export function groupLogsByType(logs: eventWithTime[]): GroupedInteractionLog[] 
       continue;
     }
 
-    // 스크롤 외 다른 이벤트는 개별 그룹
-    const newEntry: InternalGroup = { log, count: 1, endTime: log.timestamp };
+    // 스크롤 외 다른 이벤트는 개별 그룹 (+ target 정보 추출)
+    const targetInfo = getTargetInfo(log);
+    const newEntry: InternalGroup = { log, count: 1, endTime: log.timestamp, targetInfo };
     result.push(newEntry);
     lastEntry = newEntry;
   }
