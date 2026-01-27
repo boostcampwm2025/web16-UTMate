@@ -1,7 +1,8 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 
 import { MissionResult } from '../entities/mission-result.entity';
 import { MissionResultStatus } from '../enums';
+import { AnalyzerResult } from '#domain/analyzer/dto/analyzer.dto';
 
 export class MissionResultDetailDto {
   @IsString()
@@ -21,7 +22,24 @@ export class MissionResultDetailDto {
   @IsString()
   presignedUrl: string;
 
-  // TODO : 추후 로그 분석 결과 필드 추가 예정
+  @IsOptional()
+  @IsNumber()
+  duration?: number;
+
+  @IsOptional()
+  @IsNumber()
+  totalIdleTime?: number;
+
+  @IsOptional()
+  @IsNumber()
+  rageClickCount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  mouseThrashingCount?: number;
+
+  @IsOptional()
+  analysisData?: AnalyzerResult;
 
   constructor() {}
 
@@ -32,6 +50,11 @@ export class MissionResultDetailDto {
     dto.feedback = missionResult.feedback;
     dto.missionId = missionResult.mission.publicId;
     dto.presignedUrl = presignedUrl;
+    dto.duration = missionResult.duration;
+    dto.totalIdleTime = missionResult.totalIdleTime;
+    dto.rageClickCount = missionResult.rageClickCount;
+    dto.mouseThrashingCount = missionResult.mouseThrashingCount;
+    dto.analysisData = missionResult.analysisData;
     return dto;
   }
 }

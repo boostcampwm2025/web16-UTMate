@@ -63,12 +63,32 @@ export interface MissionResultWithParticipant extends ParticipantMissionResult {
   persona: string;
 }
 
+export interface ActivitySegment {
+  timestamp: number;
+  duration: number;
+  count?: number;
+}
+
+export interface AnalyzerResult {
+  startTime: number;
+  endTime: number;
+  timeToFirstInteraction?: number;
+  idleTime: ActivitySegment[];
+  rageClickCount: ActivitySegment[];
+  mouseThrashingCount: ActivitySegment[];
+}
+
 export type MissionResultDetail = {
   id: string;
   status: MissionResultStatus;
   feedback: string | null;
   missionId: string;
   presignedUrl: string;
+  duration?: number;
+  totalIdleTime?: number;
+  rageClickCount?: number;
+  mouseThrashingCount?: number;
+  analysisData?: AnalyzerResult;
 };
 
 export type MissionDetail = {
