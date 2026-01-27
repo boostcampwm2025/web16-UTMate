@@ -17,7 +17,6 @@ import { UAParser } from 'ua-parser-js';
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { TestStatus } from './entities/test.entity';
-import { DeviceInfo } from './interface';
 import { TestsService } from './tests.service';
 
 import { UserId } from '#domain/auth/decorator/param.decorator';
@@ -98,13 +97,7 @@ export class TestsController {
     const parser = new UAParser(uaString);
     const uaInfo = parser.getResult();
 
-    const deviceInfo: DeviceInfo = {
-      browser: uaInfo.browser.name || 'Unknown',
-      os: uaInfo.os.name || 'Unknown',
-      type: uaInfo.device.type || 'desktop',
-    };
-
-    return this.testsService.participateTest(userId, publicId, deviceInfo);
+    return this.testsService.participateTest(userId, publicId, uaInfo);
   }
 
   @Get('/:id/result')
