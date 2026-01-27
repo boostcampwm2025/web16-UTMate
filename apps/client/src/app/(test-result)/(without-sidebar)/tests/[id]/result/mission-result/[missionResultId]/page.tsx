@@ -37,6 +37,7 @@ export default function MissionResultDetailPage() {
     select: (text) => parseJsonlToEvents(text),
   });
 
+  //TODO : 렌더링 로직 개선하기 (useSuspenseQuery로 리팩토링 고려)
   if (!missionResultData || !eventLogs || !missionDetail) {
     return null;
   }
