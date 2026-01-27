@@ -67,9 +67,10 @@ export class MissionsService {
     if (!mission) {
       throw new NotFoundException('Mission not found');
     }
-    if (mission.test.ownerId !== userId) {
+    if (mission.test.ownerId !== userId && !mission.test.members.some((m) => m.id === userId)) {
       throw new NotFoundException('Mission not found');
     }
+
     return MissionOverviewDto.fromEntity(mission);
   }
 }
