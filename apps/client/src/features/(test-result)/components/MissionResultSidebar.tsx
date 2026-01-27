@@ -6,9 +6,11 @@ interface MissionResultSidebarProps {
   missionDetail?: MissionDetail;
 }
 
-function formatDuration(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
+function formatDuration(milliseconds: number): string {
+  // 밀리초를 초로 변환
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const remainingSeconds = totalSeconds % 60;
   if (minutes > 0) {
     return `${minutes}분 ${remainingSeconds}초`;
   }
@@ -82,7 +84,7 @@ export function MissionResultSidebar({ missionResultData, missionDetail }: Missi
           {missionDetail?.successRate !== undefined && (
             <div className="flex justify-between">
               <span className="text-muted-foreground">성공률</span>
-              <span className="font-medium">{(missionDetail.successRate * 100).toFixed(1)}%</span>
+              <span className="font-medium">{missionDetail.successRate.toFixed(1)}%</span>
             </div>
           )}
         </CardContent>
