@@ -2,6 +2,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { DataSource } from 'typeorm';
+import { UAParser } from 'ua-parser-js';
 
 import { CompleteParticipantDto } from './dto/complete-participant.dto';
 import { ParticipantDto } from './dto/participant.dto';
@@ -31,10 +32,15 @@ export class ParticipantsService {
    * @param missions 미션 배열
    * @returns 생성된 참가자 정보 및 미션 결과 배열
    */
-  async createParticipant(userId: number | undefined, testId: number, missions: Mission[]) {
+  async createParticipant(
+    userId: number | undefined,
+    testId: number,
+    missions: Mission[],
+    uaInfo: UAParser.IResult,
+  ) {
     return await this.dataSource.transaction(async (manager) => {
       // Participant 생성
-      const participant = Participant.create(userId, testId);
+      const participant = Participant.create(userId, testId, uaInfo);
       const savedParticipant = await this.participantsRepository.save(participant, manager);
 
       // 각 미션에 대해 MissionResult 생성

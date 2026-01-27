@@ -8,8 +8,11 @@ import {
   ParseEnumPipe,
   Post,
   Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
+import { UAParser } from 'ua-parser-js';
 
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
@@ -85,8 +88,16 @@ export class TestsController {
 
   @Post('/:id/participants')
   @UseGuards(OptionalJwtAuthGuard)
-  async participateTest(@UserId() userId: number | undefined, @Param('id') publicId: string) {
-    return this.testsService.participateTest(userId, publicId);
+  async participateTest(
+    @UserId() userId: number | undefined,
+    @Param('id') publicId: string,
+    @Req() req: Request,
+  ) {
+    const uaString = req.headers['user-agent'];
+    const parser = new UAParser(uaString);
+    const uaInfo = parser.getResult();
+
+    return this.testsService.participateTest(userId, publicId, uaInfo);
   }
 
   @Get('/:id/result')

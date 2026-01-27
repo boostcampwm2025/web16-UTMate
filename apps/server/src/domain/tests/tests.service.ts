@@ -241,7 +241,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없는 경우
    * @throws BadRequestException 테스트가 게시되지 않은 경우
    */
-  async participateTest(userId: number | undefined, publicId: string) {
+  async participateTest(userId: number | undefined, publicId: string, uaInfo: UAParser.IResult) {
     const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
@@ -249,7 +249,7 @@ export class TestsService {
     if (test.status !== TestStatus.PUBLISHED) {
       throw new BadRequestException('Test is not published');
     }
-    return this.participantsService.createParticipant(userId, test.id, test.missions);
+    return this.participantsService.createParticipant(userId, test.id, test.missions, uaInfo);
   }
 
   /**
