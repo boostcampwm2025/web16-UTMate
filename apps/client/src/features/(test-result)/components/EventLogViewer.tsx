@@ -5,6 +5,7 @@ import type { eventWithTime } from '@rrweb/types';
 
 import { EventLogItem } from '@/features/(test-result)/components/EventLogItem';
 import { groupLogsByType } from '@/features/(test-result)/utils/log';
+
 interface EventLogViewerProps {
   logs: eventWithTime[];
   onLogClick: (timestamp: number) => void;
@@ -16,14 +17,14 @@ export function EventLogViewer({ logs, onLogClick }: EventLogViewerProps) {
   // 전체 로그 중 가장 빠른 시간을 기준 시간으로 설정 (logs[0]이 항상 가장 빠르다는 보장이 없을 수 있어 min 사용)
   const startTime = useMemo(() => {
     if (logs.length === 0) return 0;
-    return logs.reduce((min, log) => (log.timestamp < min ? log.timestamp : min), logs[0].timestamp);
+    return logs.reduce(
+      (min, log) => (log.timestamp < min ? log.timestamp : min),
+      logs[0].timestamp,
+    );
   }, [logs]);
 
   return (
-    <div className="h-96 w-full space-y-2 overflow-y-auto rounded-md border p-4">
-      <div className="mb-2 text-sm text-gray-600">
-        총 {groupedLogs.length}개의 인터랙션 그룹 (원본 {logs.length}개)
-      </div>
+    <div className="h-full w-full space-y-2 overflow-y-auto p-4">
       {groupedLogs.map((entry, index) => (
         <EventLogItem
           key={`${entry.log.timestamp}-${index}`}

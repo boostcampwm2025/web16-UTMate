@@ -1,5 +1,7 @@
 'use client';
 
+import { MousePointerClick, ScrollText, Keyboard, Monitor, MoreHorizontal } from 'lucide-react';
+
 import { formatRelativeTime } from '@/features/(test-result)/utils/format';
 import type { GroupedInteractionLog } from '@/features/(test-result)/utils/log';
 import { getEventLabel } from '@/features/(test-result)/utils/log';
@@ -9,38 +11,66 @@ interface EventLogItemProps extends GroupedInteractionLog {
   onLogClick: (relativeMs: number) => void;
 }
 
-export function EventLogItem({ log, count, endTime, scrollDirection, startTime, onLogClick, targetInfo }: EventLogItemProps) {
+function getEventIcon(log: GroupedInteractionLog['log']) {
+  // rrweb event types: 0: DomContentLoaded, 1: Load, 2: FullSnapshot, 3: IncrementalSnapshot
+  if (log.type === 2) return <Monitor className="h-4 w-4" />;
+
+  // IncrementalSnapshot
+  if (log.type === 3) {
+    const source = log.data?.source;
+    // 0: Mutation, 1: MouseMove, 2: MouseInteraction, 3: Scroll, 4: ViewportResize, 5: Input
+    if (source === 2) return <MousePointerClick className="h-4 w-4" />;
+    if (source === 3) return <ScrollText className="h-4 w-4" />;
+    if (source === 5) return <Keyboard className="h-4 w-4" />;
+  }
+
+  return <MoreHorizontal className="h-4 w-4" />;
+}
+
+export function EventLogItem({
+  log,
+  count,
+  // endTime,
+  scrollDirection,
+  startTime,
+  onLogClick,
+  targetInfo,
+}: EventLogItemProps) {
   const relativeMs = log.timestamp - startTime;
 
   const handleLogClick = () => {
     onLogClick(relativeMs);
   };
 
+  const Icon = getEventIcon(log);
+
   return (
     <button
       type="button"
-      className="w-full cursor-pointer rounded border border-gray-200 bg-gray-50 p-2 text-left transition-colors hover:bg-gray-100"
+      className="flex w-full cursor-pointer flex-col gap-2 rounded-xl border border-slate-100 bg-white p-4 text-left transition-all hover:border-slate-300 hover:bg-slate-50"
       onClick={handleLogClick}
     >
-      <div className="font-medium">
-        {getEventLabel(log)}
-        {scrollDirection && <span className="ml-1 text-gray-600">({scrollDirection})</span>}
-        {count > 1 && <span className="ml-2 text-blue-600">({count}회 연속)</span>}
-      </div>
-      {targetInfo && (
-        <div className="mt-1 text-xs text-gray-600">
-          {targetInfo}
+      <div className="flex w-full items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+            {Icon}
+          </div>
+          <span className="font-semibold text-slate-900">
+            {getEventLabel(log)}
+            {scrollDirection && (
+              <span className="ml-1 font-normal text-slate-500">({scrollDirection})</span>
+            )}
+          </span>
         </div>
-      )}
-      <div className="flex gap-2 text-xs text-gray-500">
-        <span>{formatRelativeTime(log.timestamp, startTime)}</span>
-        <span className="text-gray-300">|</span>
-        <span>
-          {new Date(log.timestamp).toLocaleTimeString()}
-          {count > 1 && endTime && <span> ~ {new Date(endTime).toLocaleTimeString()}</span>}
+        <span className="text-xs font-medium text-slate-400 tabular-nums">
+          {formatRelativeTime(log.timestamp, startTime)}
         </span>
       </div>
+      {targetInfo && (
+        <div className="ml-10 flex items-center gap-2 text-sm text-slate-500">
+          <span className="line-clamp-1">{targetInfo}</span>
+        </div>
+      )}
     </button>
   );
 }
-

@@ -1,98 +1,101 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
-import type rrwebPlayer from 'rrweb-player';
+import { useRef, useEffect, useLayoutEffect } from 'react';
+import rrwebPlayer from 'rrweb-player';
 import type { eventWithTime } from '@rrweb/types';
 
-import { EventLogPlayer } from '@/features/(test-result)/components/EventLogPlayer';
 import { EventLogViewer } from '@/features/(test-result)/components/EventLogViewer';
 import { useEventListener } from '@/shared/hooks/useEventListener';
+import './EventLogPlayer.css';
 
 interface EventLogContainerProps {
   eventLogs: eventWithTime[];
 }
 
 export function EventLogContainer({ eventLogs }: EventLogContainerProps) {
-  const [replayer, setReplayer] = useState<rrwebPlayer | null>(null);
-  const pendingGoto = useRef<number | null>(null);
+  const playerRootRef = useRef<HTMLDivElement>(null);
+  const replayer = useRef<rrwebPlayer | null>(null);
+  const playerContainerRef = useRef<{ width: number; height: number }>(null);
 
-  const handlePlayerReady = useCallback((player: rrwebPlayer) => {
-    setReplayer(player);
-    // 플레이어가 준비되었을 때 대기 중인 이동 명령 수행
-    if (pendingGoto.current !== null) {
-      player.goto(pendingGoto.current);
-      pendingGoto.current = null;
+  useLayoutEffect(() => {
+    if (!playerRootRef.current) return;
+    playerContainerRef.current = {
+      width: playerRootRef.current.offsetWidth,
+      height: playerRootRef.current.offsetHeight - 100,
+    };
+  }, [eventLogs]);
+
+  useEffect(() => {
+    if (!playerRootRef.current) return;
+
+    const player = new rrwebPlayer({
+      target: playerRootRef.current,
+      props: {
+        events: eventLogs,
+        width: playerContainerRef.current?.width,
+        height: playerContainerRef.current?.height,
+        autoPlay: false,
+      },
+    });
+    replayer.current = player;
+
+    return () => {
+      // Clean up the player instance
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const playerInstance = replayer.current as any;
+      if (playerInstance) {
+        if (typeof playerInstance.$destroy === 'function') {
+          playerInstance.$destroy();
+        } else if (typeof playerInstance.destroy === 'function') {
+          playerInstance.destroy();
+        }
+      }
+      replayer.current = null;
+      if (playerRootRef.current) {
+        playerRootRef.current.innerHTML = '';
+      }
+    };
+  }, [eventLogs]);
+
+  const handleLogClick = (ms: number) => {
+    if (!replayer.current) return;
+    console.log(replayer.current);
+    replayer.current.goto(ms, true);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!replayer.current) return;
+
+    switch (event.code) {
+      case 'Space':
+        event.preventDefault();
+        console.log(replayer.current);
+        replayer.current.toggle();
+        break;
     }
-  }, []);
-
-  const handleLogClick = useCallback(
-    (relativeMs: number) => {
-      if (replayer) {
-        replayer.goto(relativeMs);
-      } else {
-        pendingGoto.current = relativeMs;
-      }
-    },
-    [replayer],
-  );
-
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (!replayer) return;
-
-      switch (event.code) {
-        // 스페이스바 일시정지 또는 재생
-        case 'Space':
-          event.preventDefault();
-          replayer.toggle();
-          break;
-        // 왼쪽 화살표 5초 이전으로 이동
-        case 'ArrowLeft': {
-          event.preventDefault();
-          const currentTime = replayer.getCurrentTime();
-
-          if (currentTime < 5000) {
-            replayer.goto(0);
-          } else {
-            replayer.goto(currentTime - 5000);
-          }
-          break;
-        }
-        // 오른쪽 화살표 5초 이후로 이동
-        case 'ArrowRight': {
-          event.preventDefault();
-          const currentTime = replayer.getCurrentTime();
-          const meta = replayer.getMetaData();
-          const totalTime = meta.totalTime;
-
-          if (currentTime + 5000 > totalTime) {
-            replayer.goto(totalTime);
-          } else {
-            replayer.goto(currentTime + 5000);
-          }
-          break;
-        }
-      }
-    },
-    [replayer],
-  );
+  };
 
   useEventListener('keydown', handleKeyDown);
 
   return (
-    <main className="grid h-full min-h-0 grid-cols-3 gap-6 p-6">
-      <section className="col-span-2 flex h-full flex-col space-y-2">
-        <h3 className="text-lg font-semibold">리플레이</h3>
-        <div className="min-h-0 flex-1">
-          <EventLogPlayer logs={eventLogs} onPlayerReady={handlePlayerReady} />
+    <div className="flex h-full w-full flex-col p-6">
+      <div className="grid h-full min-h-0 grid-cols-3 gap-6">
+        {/* Left Column: Player */}
+        <div className="col-span-2 flex min-h-0 flex-col">
+          <h2 className="mb-4 text-lg font-bold text-gray-800">리플레이</h2>
+          <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl border">
+            <div className="h-full w-full" ref={playerRootRef} />
+          </div>
         </div>
-      </section>
-      <section className="col-span-1 flex h-full flex-col space-y-2">
-        <h3 className="text-lg font-semibold">로그</h3>
-        <div className="min-h-0 flex-1">
-          <EventLogViewer logs={eventLogs} onLogClick={handleLogClick} />
+
+        {/* Right Column: Event Logs */}
+        <div className="col-span-1 flex min-h-0 flex-col">
+          <h2 className="mb-4 text-lg font-bold text-gray-800">이벤트 로그</h2>
+          <div className="bg-card min-h-0 flex-1 rounded-xl border">
+            <EventLogViewer logs={eventLogs} onLogClick={handleLogClick} />
+          </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
