@@ -1,6 +1,7 @@
 import type { ParticipantResponse, StartTestResponse, TestInfo } from '../types';
 
 import { CLIENT_BASE_URL as API_BASE_URL } from '@/shared/constants/api';
+import { clientFetcher } from '@/shared/utils/fetcher/clientFetcher';
 
 /**
  * 테스트 정보 조회
@@ -8,20 +9,14 @@ import { CLIENT_BASE_URL as API_BASE_URL } from '@/shared/constants/api';
  */
 export async function getTestForParticipation(testId: string): Promise<TestInfo | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/tests/${testId}`, {
-      credentials: 'include',
+    return await clientFetcher<TestInfo>(`${API_BASE_URL}/tests/${testId}`, {
       cache: 'no-store',
     });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null;
-      }
-      throw new Error('Failed to fetch test');
+  } catch (error: any) {
+    // 404는 null 반환
+    if (error.statusCode === 404) {
+      return null;
     }
-
-    return await response.json();
-  } catch (error) {
     console.error('Error fetching test:', error);
     throw error;
   }
@@ -32,18 +27,11 @@ export async function getTestForParticipation(testId: string): Promise<TestInfo 
  * POST /tests/:testId/participants
  */
 export async function startTestParticipation(testId: string): Promise<StartTestResponse> {
-  const response = await fetch(`${API_BASE_URL}/tests/${testId}/participants`, {
+  return await clientFetcher<StartTestResponse>(`${API_BASE_URL}/tests/${testId}/participants`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify({ testId }),
   });
-
-  if (!response.ok) {
-    throw new Error('Failed to start test participation');
-  }
-
-  return await response.json();
 }
 
 /**
@@ -51,16 +39,11 @@ export async function startTestParticipation(testId: string): Promise<StartTestR
  * PATCH /mission-results/:missionResultId
  */
 export async function startMission(missionResultId: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/mission-results/${missionResultId}`, {
+  await clientFetcher<void>(`${API_BASE_URL}/mission-results/${missionResultId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify({ status: 'IN_PROGRESS' }),
   });
-
-  if (!response.ok) {
-    throw new Error('미션 시작에 실패했습니다.');
-  }
 }
 
 /**
@@ -68,14 +51,9 @@ export async function startMission(missionResultId: string): Promise<void> {
  * POST /mission-results/:missionResultId/record
  */
 export async function uploadMissionRecording(missionResultId: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/mission-results/${missionResultId}/record`, {
+  await clientFetcher<void>(`${API_BASE_URL}/mission-results/${missionResultId}/record`, {
     method: 'POST',
-    credentials: 'include',
   });
-
-  if (!response.ok) {
-    throw new Error('녹화 업로드에 실패했습니다.');
-  }
 }
 
 /**
@@ -87,16 +65,11 @@ export async function submitMissionResult(
   status: 'SUCCESS' | 'FAILED',
   feedback?: string,
 ): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/mission-results/${missionResultId}`, {
+  await clientFetcher<void>(`${API_BASE_URL}/mission-results/${missionResultId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify({ status, feedback }),
   });
-
-  if (!response.ok) {
-    throw new Error('Failed to submit mission result');
-  }
 }
 
 /**
@@ -104,16 +77,11 @@ export async function submitMissionResult(
  * PATCH /participants/:participantId
  */
 export async function completeTestParticipation(participantId: string, feedback?: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/participants/${participantId}`, {
+  await clientFetcher<void>(`${API_BASE_URL}/participants/${participantId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify({ status: 'COMPLETED', feedback }),
   });
-
-  if (!response.ok) {
-    throw new Error('Failed to complete test participation');
-  }
 }
 
 /**
@@ -122,20 +90,14 @@ export async function completeTestParticipation(participantId: string, feedback?
  */
 export async function getParticipant(participantId: string): Promise<ParticipantResponse | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/participants/${participantId}`, {
-      credentials: 'include',
+    return await clientFetcher<ParticipantResponse>(`${API_BASE_URL}/participants/${participantId}`, {
       cache: 'no-store',
     });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null;
-      }
-      throw new Error('Failed to fetch participant');
+  } catch (error: any) {
+    // 404는 null 반환
+    if (error.statusCode === 404) {
+      return null;
     }
-
-    return await response.json();
-  } catch (error) {
     console.error('Error fetching participant:', error);
     return null;
   }
