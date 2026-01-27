@@ -18,6 +18,7 @@ export interface Test {
   url: string;
   sdkStatus: boolean;
   owner: UserSummary;
+  members: UserSummary[];
 }
 
 export interface TestMission {

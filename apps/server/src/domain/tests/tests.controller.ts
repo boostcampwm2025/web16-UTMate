@@ -141,7 +141,7 @@ export class TestsController {
   async addMember(
     @UserId() userId: number,
     @Param('id') publicId: string,
-    @Param() addMemberDto: AddMemberDto,
+    @Body() addMemberDto: AddMemberDto,
   ) {
     return this.testsService.addMember(userId, publicId, addMemberDto.memberId);
   }
