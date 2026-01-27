@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { Brackets, EntityManager, ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { Test } from './entities/test.entity';
 
@@ -8,94 +8,18 @@ import { Test } from './entities/test.entity';
 export class TestsRepository {
   constructor(@InjectRepository(Test) private readonly testsRepository: Repository<Test>) {}
 
-  async save(test: Test, manager?: EntityManager): Promise<Test> {
-    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    return repo.save(test);
+  /*----------- CUD -----------*/
+
+  save(test: Test, manager?: EntityManager): Promise<Test> {
+    return this.getRepo(manager).save(test);
   }
 
-  async findByPublicIdAndOwner(publicId: string, ownerId: number, manager?: EntityManager) {
-    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    return repo
-      .createQueryBuilder('tests')
-      .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId })
-      .getOne();
-  }
-
-  async findByPublicIdWithUser(publicId: string, manager?: EntityManager) {
-    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    return repo
-      .createQueryBuilder('tests')
-      .where('tests.publicId = :publicId', { publicId })
-      .leftJoinAndSelect('tests.owner', 'owner')
-      .leftJoinAndSelect('tests.members', 'members')
-      .getOne();
-  }
-
-  async findByPublicIdAndOwnerWithMissions(
-    publicId: string,
-    ownerId: number,
-    manager?: EntityManager,
-  ) {
-    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    return repo
-      .createQueryBuilder('tests')
-      .leftJoinAndSelect('tests.missions', 'missions')
-      .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId })
-      .getOne();
-  }
-
-  async findSummariesByOwner(ownerId: number, manager?: EntityManager) {
-    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    return repo
-      .createQueryBuilder('tests')
-      .select([
-        'tests.publicId',
-        'tests.title',
-        'tests.status',
-        'tests.sdkStatus',
-        'tests.url',
-        'owner.publicId',
-        'owner.username',
-        'owner.avatarUrl',
-      ])
-      .leftJoin('tests.owner', 'owner')
-      .where('tests.owner_id = :ownerId', { ownerId })
-      .getMany();
-  }
-
-  async findSdkStatusByPublicIdAndOwner(
-    publicId: string,
-    ownerId: number,
-    manager?: EntityManager,
-  ) {
-    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    return repo
-      .createQueryBuilder('tests')
-      .select(['tests.sdkStatus'])
-      .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId })
-      .getOne();
-  }
-
-  async findByPublicIdWithMissions(publicId: string, manager?: EntityManager) {
-    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    return repo
-      .createQueryBuilder('tests')
-      .leftJoinAndSelect('tests.missions', 'missions')
-      .where('tests.publicId = :publicId', { publicId })
-      .getOne();
-  }
-
-  async remove(test: Test, manager?: EntityManager) {
-    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    return repo.remove(test);
+  remove(test: Test, manager?: EntityManager) {
+    return this.getRepo(manager).remove(test);
   }
 
   async updateSdkStatus(publicId: string, sdkStatus: boolean, manager?: EntityManager) {
-    const repo = manager ? manager.getRepository(Test) : this.testsRepository;
-    const result = await repo
+    const result = await this.getRepo(manager)
       .createQueryBuilder()
       .update(Test)
       .set({ sdkStatus })
@@ -105,51 +29,256 @@ export class TestsRepository {
     return result.affected || 0;
   }
 
-  async findIdByPublicId(publicId: string) {
-    return await this.testsRepository
+  /*----------- 조회 메서드 (비권한 체크) -----------*/
+
+  /**
+   * 공개 ID로 테스트를 조회합니다.
+   * Missions, Members에 대한 정보도 함께 조회합니다.
+   *
+   * @param publicId 테스트 공개 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test | undefined>
+   */
+  findByPublicIdWithMembers(publicId: string, manager?: EntityManager) {
+    return this.getRepo(manager)
       .createQueryBuilder('tests')
-      .select(['tests.id'])
+      .leftJoinAndSelect('tests.owner', 'owner')
+      .leftJoinAndSelect('tests.members', 'members')
+      .leftJoinAndSelect('tests.missions', 'missions')
       .where('tests.publicId = :publicId', { publicId })
       .getOne();
   }
 
-  async findByPublicId(publicId: string) {
-    return this.testsRepository.findOneBy({ publicId });
-  }
-
-  findByPublicIdAndOwnerWithParticipants(publicId: string, ownerId: number) {
-    return this.testsRepository
-      .createQueryBuilder('tests')
-      .leftJoinAndSelect('tests.participants', 'participants')
-      .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId })
-      .getOne();
-  }
-
-  findByPublicIdAndOwnerWithAllRelations(publicId: string, ownerId: number) {
-    return this.testsRepository
+  /**
+   * 공개 ID로 테스트를 조회합니다.
+   * Missions에 대한 정보도 함께 조회합니다.
+   *
+   * @param publicId 테스트 공개 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test | undefined>
+   */
+  findByPublicIdWithMissions(publicId: string, manager?: EntityManager) {
+    return this.getRepo(manager)
       .createQueryBuilder('tests')
       .leftJoinAndSelect('tests.missions', 'missions')
-      .leftJoinAndSelect('tests.participants', 'participants')
-      .leftJoinAndSelect('participants.missionResults', 'missionResults')
       .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId })
       .getOne();
   }
 
-  findByPublicIdAndOwnerWithParticipant(
-    testPublicId: string,
-    ownerId: number,
-    participantPublicId: string,
+  /*----------- 조회 메서드 (권한 체크) -----------*/
+
+  /**
+   * 사용자 ID로 접근 가능한 모든 테스트를 조회합니다.
+   *
+   * @param userId 사용자 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test[]>
+   */
+  findByUserIdWithUsers(userId: number, manager?: EntityManager) {
+    return this.createAccessibleQuery(userId, manager)
+      .leftJoinAndSelect('tests.owner', 'owner')
+      .leftJoinAndSelect('tests.members', 'members')
+      .getMany();
+  }
+
+  /**
+   * 공개 ID와 사용자 ID로 테스트를 조회합니다.
+   * 사용자 ID를 기반으로 접근 권한이 있는지 확인합니다.(소유자 또는 멤버)
+   *
+   * @param publicId 테스트 공개 ID
+   * @param userId 사용자 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test | undefined>
+   */
+  findByPublicIdAndUserId(publicId: string, userId: number, manager?: EntityManager) {
+    return this.createAccessibleQuery(userId, manager)
+      .andWhere('tests.publicId = :publicId', { publicId })
+      .getOne();
+  }
+
+  /**
+   * SDK 설치 상태를 공개 ID와 사용자 ID로 조회합니다.
+   * 사용자 ID를 기반으로 접근 권한이 있는지 확인합니다.(소유자 또는 멤버)
+   *
+   * @param publicId 테스트 공개 ID
+   * @param userId 사용자 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test | undefined>
+   */
+  findSdkStatusByPublicIdAndUserId(publicId: string, userId: number, manager?: EntityManager) {
+    return this.createAccessibleQuery(userId, manager)
+      .select(['tests.sdkStatus'])
+      .andWhere('tests.publicId = :publicId', { publicId })
+      .getOne();
+  }
+
+  /**
+   * 공개 ID와 사용자 ID로 테스트를 조회합니다.
+   * 사용자 ID를 기반으로 접근 권한이 있는지 확인합니다.(소유자 또는 멤버)
+   * Members에 대한 정보도 함께 조회합니다.
+   *
+   * @param publicId 테스트 공개 ID
+   * @param userId 사용자 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test | undefined>
+   */
+  findByPublicIdAndUserIdWithMembers(publicId: string, userId: number, manager?: EntityManager) {
+    return this.createAccessibleQuery(userId, manager)
+      .leftJoinAndSelect('tests.owner', 'owner')
+      .leftJoinAndSelect('tests.members', 'members')
+      .andWhere('tests.publicId = :publicId', { publicId })
+      .getOne();
+  }
+
+  /**
+   * 공개 ID와 사용자 ID로 테스트를 조회합니다.
+   * 사용자 ID를 기반으로 접근 권한이 있는지 확인합니다.(소유자 또는 멤버)
+   * Missions에 대한 정보도 함께 조회합니다.
+   *
+   * @param publicId 테스트 공개 ID
+   * @param userId 사용자 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test | undefined>
+   */
+  findByPublicIdAndUserIdWithMissions(publicId: string, userId: number, manager?: EntityManager) {
+    return this.createAccessibleQuery(userId, manager)
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .andWhere('tests.publicId = :publicId', { publicId })
+      .getOne();
+  }
+
+  /**
+   * 공개 ID와 사용자 ID로 테스트를 조회합니다.
+   * 사용자 ID를 기반으로 접근 권한이 있는지 확인합니다.(소유자 또는 멤버)
+   * Missions와 Members에 대한 정보도 함께 조회합니다.
+   *
+   * @param publicId 테스트 공개 ID
+   * @param userId 사용자 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test | undefined>
+   */
+  findByPublicIdAndUserIdWithMissionsAndMembers(
+    publicId: string,
+    userId: number,
+    manager?: EntityManager,
   ) {
-    return this.testsRepository
-      .createQueryBuilder('tests')
+    return this.createAccessibleQuery(userId, manager)
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .leftJoinAndSelect('tests.members', 'members')
+      .andWhere('tests.publicId = :publicId', { publicId })
+      .getOne();
+  }
+
+  /**
+   * 공개 ID와 사용자 ID로 테스트를 조회합니다.
+   * 사용자 ID를 기반으로 접근 권한이 있는지 확인합니다.(소유자 또는 멤버)
+   * Participants에 대한 정보도 함께 조회합니다.
+   *
+   * @param publicId 테스트 공개 ID
+   * @param userId 사용자 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test | undefined>
+   */
+  findByPublicIdAndUserIdWithParticipants(
+    publicId: string,
+    userId: number,
+    manager?: EntityManager,
+  ) {
+    return this.createAccessibleQuery(userId, manager)
+      .leftJoinAndSelect('tests.participants', 'participants')
+      .andWhere('tests.publicId = :publicId', { publicId })
+      .getOne();
+  }
+
+  /**
+   * 공개 ID와 사용자 ID로 테스트를 조회합니다.
+   * 사용자 ID를 기반으로 접근 권한이 있는지 확인합니다.(소유자 또는 멤버)
+   * missions, Participants 및 MissionResults에 대한 정보도 함께 조회합니다.
+   *
+   * @param publicId 테스트 공개 ID
+   * @param userId 사용자 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test | undefined>
+   */
+  findByPublicIdAndUserIdWithRelations(publicId: string, userId: number, manager?: EntityManager) {
+    return this.createAccessibleQuery(userId, manager)
       .leftJoinAndSelect('tests.missions', 'missions')
       .leftJoinAndSelect('tests.participants', 'participants')
       .leftJoinAndSelect('participants.missionResults', 'missionResults')
-      .where('tests.publicId = :testPublicId', { testPublicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId })
+      .andWhere('tests.publicId = :publicId', { publicId })
+      .getOne();
+  }
+
+  /**
+   * 한 참가자의 리포트를 생성하기 위한 메서드입니다.
+   * 테스트 공개 ID, 참가자 공개 ID 및 사용자 ID로 테스트를 조회합니다.
+   * 사용자 ID를 기반으로 접근 권한이 있는지 확인합니다.(소유자 또는 멤버)
+   * missions, Participants 및 MissionResults에 대한 정보도 함께 조회합니다.
+   *
+   * @param testPublicId 테스트 공개 ID
+   * @param participantPublicId 참가자 공개 ID
+   * @param userId 사용자 ID
+   * @param manager EntityManager (Optional)
+   * @returns Promise<Test | undefined>
+   */
+  findForParticipantReport(
+    testPublicId: string,
+    participantPublicId: string,
+    userId: number,
+    manager?: EntityManager,
+  ) {
+    return this.createAccessibleQuery(userId, manager)
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .leftJoinAndSelect('tests.participants', 'participants')
+      .leftJoinAndSelect('participants.missionResults', 'missionResults')
+      .andWhere('tests.publicId = :testPublicId', { testPublicId })
       .andWhere('participants.publicId = :participantPublicId', { participantPublicId })
       .getOne();
+  }
+
+  // private 내부 메서드
+
+  /**
+   * EntityManager 유무에 따라 적절한 Repository를 반환합니다.
+   *
+   * @param manager EntityManager (Optional)
+   * @returns Repository<Test>
+   */
+  private getRepo(manager?: EntityManager): Repository<Test> {
+    return manager ? manager.getRepository(Test) : this.testsRepository;
+  }
+
+  /**
+   * 사용자 접근 권한이 있는 테스트만 조회하는 QueryBuilder를 생성합니다.
+   *
+   * @param userId 사용자 ID
+   * @param manager EntityManager (Optional)
+   * @returns SelectQueryBuilder<Test>
+   */
+  private createAccessibleQuery(userId: number, manager?: EntityManager): SelectQueryBuilder<Test> {
+    return this.getRepo(manager)
+      .createQueryBuilder('tests')
+      .where(this.getPermissionCondition()) // 기본적으로 권한 필터 장착
+      .setParameter('userId', userId);
+  }
+
+  /**
+   * 사용자 접근 권한 조건을 반환합니다.
+   *
+   * @returns Brackets
+   */
+  private getPermissionCondition() {
+    return new Brackets((qb) => {
+      qb.where('tests.ownerId = :userId').orWhere((subQb: SelectQueryBuilder<ObjectLiteral>) => {
+        const subQuery = subQb
+          .subQuery()
+          .select('1')
+          .from('test_members', 'tm')
+          .where('tm.test_id = tests.id')
+          .andWhere('tm.member_id = :userId')
+          .getQuery();
+        return `EXISTS ${subQuery}`;
+      });
+    });
   }
 }

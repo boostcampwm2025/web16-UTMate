@@ -52,16 +52,16 @@ export class TestsService {
    * 하나의 트랜잭션 내에서 테스트 업데이트와 미션 업데이트를 처리합니다.
    * 미션 업데이트는 MissionsService에 위임합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @param publicId 테스트 public id
    * @param updateTestDto 업데이트할 테스트 DTO
-   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   * @throws NotFoundException 테스트를 찾을 수 없거나 테스트에 접근할 권한이 없는 경우
    */
-  async updateTest(ownerId: number, publicId: string, updateTestDto: UpdateTestDto) {
+  async updateTest(userId: number, publicId: string, updateTestDto: UpdateTestDto) {
     // 트랜잭션 시작
     await this.dataSource.transaction(async (manager) => {
       // 테스트 업데이트
-      const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId, manager);
+      const test = await this.testsRepository.findByPublicIdAndUserId(publicId, userId, manager);
       if (!test) {
         throw new NotFoundException('Test not found');
       }
@@ -78,13 +78,14 @@ export class TestsService {
   }
 
   /**
-   * 내가 소유한 테스트들을 요약 정보만 조회합니다.
+   * 소유한 테스트 혹은 공유 받은 테스트의 요약 정보만 조회합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @returns 테스트 요약 DTO 배열
    */
-  async getMyTests(ownerId: number) {
-    const tests = await this.testsRepository.findSummariesByOwner(ownerId);
+  async getMyTests(userId: number) {
+    const tests = await this.testsRepository.findByUserIdWithUsers(userId);
+
     return TestSummaryDto.fromTestEntities(tests);
   }
 
@@ -92,53 +93,61 @@ export class TestsService {
    * 특정 테스트의 상세 정보를 조회합니다.
    * 공개된 테스트이거나, 소유자가 조회하는 경우에만 접근을 허용합니다.
    *
-   * @param ownerId 테스트 소유자 id (Optional)
+   * @param userId 사용자 id (Optional)
    * @param publicId 테스트 public id
    * @returns 테스트 DTO
-   * @throws NotFoundException 테스트를 찾을 수 없는 경우
-   * @throws ForbiddenException 공개 상태가 아닌 테스트에 대해 소유자가 이외의 사용자가 접근하는 경우
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자(맴버) 이외의 사용자가 접근하는 경우
    */
-  async getTestById(ownerId: number | undefined, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
+  async getTestById(userId: number | undefined, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdWithMembers(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
 
+    // 공개된 테스트인 경우 바로 반환
     if (test.status === TestStatus.PUBLISHED) return TestDto.fromTestEntity(test);
 
-    if (test.ownerId !== ownerId) {
-      throw new ForbiddenException('Test not found');
+    // 비공개 테스트인 경우 소유자(맴버)인지 확인
+
+    if (!userId) {
+      throw new NotFoundException('Test not found');
     }
+
+    if (userId !== test.ownerId && test.members.every((member) => member.id !== userId)) {
+      throw new NotFoundException('Test not found');
+    }
+
     return TestDto.fromTestEntity(test);
   }
 
   /**
    * SDK의 설치 상태만 조회합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @param publicId 테스트 public id
    * @returns SDK 설치 상태
-   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자(맴버) 이외의 사용자가 접근하는 경우
    */
-  async getSdkStatus(ownerId: number, publicId: string) {
-    const test = await this.testsRepository.findSdkStatusByPublicIdAndOwner(publicId, ownerId);
+  async getSdkStatus(userId: number, publicId: string) {
+    const test = await this.testsRepository.findSdkStatusByPublicIdAndUserId(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
+
     return { sdkStatus: test.sdkStatus };
   }
 
   /**
    * 테스트를 삭제합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @param publicId 테스트 public id
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
-  async deleteTest(ownerId: number, publicId: string) {
+  async deleteTest(userId: number, publicId: string) {
     // 테스트 삭제
     // 관련된 미션들은 Test 엔티티의 onDelete: 'CASCADE' 옵션에 의해 자동 삭제됨
-    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId);
+    const test = await this.testsRepository.findByPublicIdAndUserId(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
@@ -148,17 +157,18 @@ export class TestsService {
   /**
    * 테스트 상태를 업데이트합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @param publicId 테스트 public id
    * @param status 업데이트할 테스트 상태
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    * @throws BadRequestException 잘못된 상태로 변경하려는 경우
    */
-  async updateTestStatus(ownerId: number, publicId: string, status: TestStatus) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithMissions(publicId, ownerId);
+  async updateTestStatus(userId: number, publicId: string, status: TestStatus) {
+    const test = await this.testsRepository.findByPublicIdAndUserIdWithMissions(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
+
     try {
       test.transitionStatus(status);
     } catch (error) {
@@ -170,13 +180,13 @@ export class TestsService {
   /**
    * SDK 설치를 검증합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @param publicId 테스트 public id
    * @returns SDK 설치 상태
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
-  async verifySdkInstallation(ownerId: number, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId);
+  async verifySdkInstallation(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndUserId(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
@@ -265,7 +275,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
   async getTestResultSummary(userId: number, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipants(
+    const test = await this.testsRepository.findByPublicIdAndUserIdWithParticipants(
       publicId,
       userId,
     );
@@ -284,10 +294,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
   async getTestParticipantsResults(userId: number, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithAllRelations(
-      publicId,
-      userId,
-    );
+    const test = await this.testsRepository.findByPublicIdAndUserIdWithRelations(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
@@ -303,7 +310,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
   async getTestMainFeedback(userId: number, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipants(
+    const test = await this.testsRepository.findByPublicIdAndUserIdWithParticipants(
       publicId,
       userId,
     );
@@ -323,10 +330,10 @@ export class TestsService {
    * @throws NotFoundException 테스트 또는 참여자를 찾을 수 없거나 소유자가 아닌 경우
    */
   async getTestParticipantDetail(userId: number, publicId: string, participantId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipant(
+    const test = await this.testsRepository.findForParticipantReport(
       publicId,
-      userId,
       participantId,
+      userId,
     );
     if (!test) {
       throw new NotFoundException('Test not found');
@@ -337,8 +344,18 @@ export class TestsService {
     return ParticipantResultsDto.fromEntity(test.participants[0], test.missions);
   }
 
+  /**
+   * 테스트 멤버를 추가합니다.
+   *
+   * @param userId 사용자 ID
+   * @param publicId 테스트 공개 ID
+   * @param memberPublicId 추가할 멤버 공개 ID
+   * @throws NotFoundException 테스트 또는 멤버를 찾을 수 없는 경우
+   * @throws ForbiddenException 소유자가 아닌 사용자가 접근하는 경우
+   * @throws BadRequestException 이미 멤버인 사용자를 추가하려는 경우
+   */
   async addMember(userId: number, publicId: string, memberPublicId: string) {
-    const test = await this.testsRepository.findByPublicIdWithUser(publicId);
+    const test = await this.testsRepository.findByPublicIdWithMembers(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
@@ -358,8 +375,17 @@ export class TestsService {
     await this.testsRepository.save(test);
   }
 
+  /**
+   * 테스트 멤버를 제거합니다.
+   *
+   * @param userId 사용자 ID
+   * @param publicId 테스트 공개 ID
+   * @param memberId 제거할 멤버 공개 ID
+   * @throws NotFoundException 테스트 또는 멤버를 찾을 수 없는 경우
+   * @throws ForbiddenException 소유자가 아닌 사용자가 접근하는 경우
+   */
   async removeMember(userId: number, publicId: string, memberId: string) {
-    const test = await this.testsRepository.findByPublicIdWithUser(publicId);
+    const test = await this.testsRepository.findByPublicIdWithMembers(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }

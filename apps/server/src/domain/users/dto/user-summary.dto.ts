@@ -2,6 +2,7 @@ import { User } from '../entities/user.entity';
 
 export class UserSummaryDto {
   publicId: string;
+  role: string;
   username: string;
   avatarUrl: string;
 
