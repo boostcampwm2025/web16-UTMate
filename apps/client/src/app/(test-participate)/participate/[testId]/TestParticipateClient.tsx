@@ -34,12 +34,13 @@ export function TestParticipateClient({ initialTestInfo }: TestParticipateClient
   const [participantData, setParticipantData] = useState<ParticipantResponse | null>(null);
 
   // React Query로 테스트 정보 가져오기 (서버에서 받은 초기값 사용)
+  // initialData로 non-null TestInfo를 전달하므로 data는 항상 TestInfo 타입
   const { data: testInfo } = useQuery({
     queryKey: ['test', testId],
     queryFn: () => getTestForParticipation(testId),
     initialData: initialTestInfo,
     staleTime: 1000 * 60 * 5, // 5분간 신선한 상태 유지
-  });
+  }) as { data: TestInfo };
 
   // testId별 Zustand store 인스턴스 가져오기
   const store = useTestParticipateStore(testId);
