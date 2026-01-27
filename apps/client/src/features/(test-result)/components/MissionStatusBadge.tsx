@@ -31,6 +31,11 @@ const statusConfig = {
     className: 'bg-blue-50 text-blue-700 ring-blue-600/20',
     icon: Clock,
   },
+  DROP: {
+    label: '이탈',
+    className: 'bg-orange-50 text-orange-700 ring-orange-600/20',
+    icon: MinusCircle,
+  },
 } as const;
 
 export function MissionStatusBadge({ status, className }: MissionStatusBadgeProps) {
