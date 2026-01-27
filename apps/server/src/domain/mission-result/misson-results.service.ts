@@ -119,7 +119,7 @@ export class MissionResultsService {
     switch (dto.status) {
       case MissionResultStatus.IN_PROGRESS:
         missionResult.start();
-        this.sdkAuthRedis.set(missionResult.publicId, 'in_progress');
+        await this.sdkAuthRedis.set(missionResult.publicId, 'in_progress');
         break;
       case MissionResultStatus.SUCCESS:
       case MissionResultStatus.FAILED:
@@ -128,6 +128,9 @@ export class MissionResultsService {
       default:
         throw new BadRequestException('유효하지 않은 미션 결과 상태입니다.');
     }
+
+    // DB에 저장 (중요!)
+    await this.missionResultsRepository.save(missionResult);
   }
 
   /**
