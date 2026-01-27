@@ -12,6 +12,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/shared/components/ui/card';
+import { formatDuration } from '../utils/format';
 
 export function TestMissionResultList({ testId }: { testId: string }) {
   const { data: missionsData } = useSuspenseQuery({
@@ -68,8 +69,7 @@ function TestMissionResultItem({ testId, mission }: TestMissionResultItemProps) 
             </div>
             <div className="flex items-center gap-2">
               <div className="text-muted-foreground text-xs">평균 소요시간</div>
-              {/* TODO: 단위 체크 후 추가 */}
-              <div className="text-sm font-semibold">{mission.averageDuration}</div>
+              <div className="text-sm font-semibold">{formatDuration(mission.averageDuration)}</div>
             </div>
           </div>
         </CardContent>
