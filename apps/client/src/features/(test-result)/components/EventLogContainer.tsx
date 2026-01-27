@@ -1,11 +1,13 @@
 'use client';
 
-import { useRef, useEffect, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect } from 'react';
+//더 커스텀하려면 rrweb-player 패키지가 아니라 @rrweb/player를 사용해야 함(기본 UI가 제공되지 않고, 인터페이스도 다름)
 import rrwebPlayer from 'rrweb-player';
 import type { eventWithTime } from '@rrweb/types';
 
 import { EventLogViewer } from '@/features/(test-result)/components/EventLogViewer';
 import { useEventListener } from '@/shared/hooks/useEventListener';
+
 import './EventLogPlayer.css';
 
 interface EventLogContainerProps {
@@ -15,41 +17,24 @@ interface EventLogContainerProps {
 export function EventLogContainer({ eventLogs }: EventLogContainerProps) {
   const playerRootRef = useRef<HTMLDivElement>(null);
   const replayer = useRef<rrwebPlayer | null>(null);
-  const playerContainerRef = useRef<{ width: number; height: number }>(null);
 
   useLayoutEffect(() => {
     if (!playerRootRef.current) return;
-    playerContainerRef.current = {
-      width: playerRootRef.current.offsetWidth,
-      height: playerRootRef.current.offsetHeight - 100,
-    };
-  }, [eventLogs]);
 
-  useEffect(() => {
-    if (!playerRootRef.current) return;
+    playerRootRef.current.innerHTML = '';
 
     const player = new rrwebPlayer({
       target: playerRootRef.current,
       props: {
         events: eventLogs,
-        width: playerContainerRef.current?.width,
-        height: playerContainerRef.current?.height,
+        width: playerRootRef.current.offsetWidth,
+        height: playerRootRef.current.offsetHeight - 80,
         autoPlay: false,
       },
     });
     replayer.current = player;
 
     return () => {
-      // Clean up the player instance
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const playerInstance = replayer.current as any;
-      if (playerInstance) {
-        if (typeof playerInstance.$destroy === 'function') {
-          playerInstance.$destroy();
-        } else if (typeof playerInstance.destroy === 'function') {
-          playerInstance.destroy();
-        }
-      }
       replayer.current = null;
       if (playerRootRef.current) {
         playerRootRef.current.innerHTML = '';
@@ -69,7 +54,6 @@ export function EventLogContainer({ eventLogs }: EventLogContainerProps) {
     switch (event.code) {
       case 'Space':
         event.preventDefault();
-        console.log(replayer.current);
         replayer.current.toggle();
         break;
     }

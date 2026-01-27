@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { MissionStatusBadge } from './MissionStatusBadge';
-import { formatDuration } from '../utils/format';
+import { formatDuration, formatTimestamp } from '../utils/format';
 
 import type { MissionResultDetail, MissionDetail } from '../types';
 
 interface MissionResultSidebarProps {
   missionResultData: MissionResultDetail;
-  missionDetail?: MissionDetail;
+  missionDetail: MissionDetail;
 }
 
 export function MissionResultSidebar({
@@ -22,23 +22,18 @@ export function MissionResultSidebar({
             <CardTitle className="text-base">미션 정보</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            {missionDetail && (
-              <>
-                <div>
-                  <p className="text-muted-foreground mb-1 font-medium">미션명</p>
-                  <p className="text-gray-900">{missionDetail.name}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground mb-1 font-medium">미션 설명</p>
-                  <p className="leading-relaxed text-gray-900">{missionDetail.description}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground mb-1 font-medium">예상 소요 시간</p>
-                  <p className="text-gray-900">{formatDuration(missionDetail.estimatedDuration)}</p>
-                </div>
-              </>
-            )}
-            {!missionDetail && <div className="text-gray-500">미션 정보를 불러오는 중...</div>}
+            <div>
+              <p className="text-muted-foreground mb-1 font-medium">미션명</p>
+              <p className="text-gray-900">{missionDetail.name}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground mb-1 font-medium">미션 설명</p>
+              <p className="leading-relaxed text-gray-900">{missionDetail.description}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground mb-1 font-medium">예상 소요 시간</p>
+              <p className="text-gray-900">{formatDuration(missionDetail.estimatedDuration)}</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -47,15 +42,25 @@ export function MissionResultSidebar({
           <CardHeader>
             <CardTitle className="text-base">미션 결과</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">상태</span>
-              <MissionStatusBadge status={missionResultData.status} />
+          <CardContent className="space-y-3 text-sm">
+            <div>
+              <p className="text-muted-foreground mb-1 font-medium">상태</p>
+              <div className="flex">
+                <MissionStatusBadge status={missionResultData.status} />
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">피드백</span>
-              {missionResultData.feedback}
+            <div>
+              <p className="text-muted-foreground mb-1 font-medium">피드백</p>
+              <p className="leading-relaxed text-gray-900">{missionResultData.feedback}</p>
             </div>
+            {missionResultData.duration && (
+              <div>
+                <p className="text-muted-foreground mb-1 font-medium">소요시간</p>
+                <p className="leading-relaxed text-gray-900">
+                  {formatTimestamp(missionResultData.duration)}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

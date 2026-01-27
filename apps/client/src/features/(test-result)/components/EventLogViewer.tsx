@@ -24,19 +24,25 @@ export function EventLogViewer({ logs, onLogClick }: EventLogViewerProps) {
   }, [logs]);
 
   return (
-    <div className="h-full w-full space-y-2 overflow-y-auto p-4">
-      {groupedLogs.map((entry, index) => (
-        <EventLogItem
-          key={`${entry.log.timestamp}-${index}`}
-          log={entry.log}
-          count={entry.count}
-          endTime={entry.endTime}
-          scrollDirection={entry.scrollDirection}
-          targetInfo={entry.targetInfo}
-          startTime={startTime}
-          onLogClick={onLogClick}
-        />
-      ))}
+    <div className="h-full w-full space-y-2 p-4">
+      <div className="text-muted-foreground text-sm">
+        이벤트를 클릭하면 해당 타임스탬프로 이동합니다
+      </div>
+      <ol className="h-full w-full space-y-2 overflow-y-auto">
+        {groupedLogs.map((entry, index) => (
+          <li key={`${entry.log.timestamp}-${index}`}>
+            <EventLogItem
+              log={entry.log}
+              count={entry.count}
+              endTime={entry.endTime}
+              scrollDirection={entry.scrollDirection}
+              targetInfo={entry.targetInfo}
+              startTime={startTime}
+              onLogClick={onLogClick}
+            />
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

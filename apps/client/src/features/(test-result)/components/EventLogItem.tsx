@@ -5,6 +5,7 @@ import { MousePointerClick, ScrollText, Keyboard, Monitor, MoreHorizontal } from
 import { formatRelativeTime } from '@/features/(test-result)/utils/format';
 import type { GroupedInteractionLog } from '@/features/(test-result)/utils/log';
 import { getEventLabel } from '@/features/(test-result)/utils/log';
+import { Button } from '@/shared/components/ui/button';
 
 interface EventLogItemProps extends GroupedInteractionLog {
   startTime: number;
@@ -45,9 +46,9 @@ export function EventLogItem({
   const Icon = getEventIcon(log);
 
   return (
-    <button
-      type="button"
-      className="flex w-full cursor-pointer flex-col gap-2 rounded-xl border border-slate-100 bg-white p-4 text-left transition-all hover:border-slate-300 hover:bg-slate-50"
+    <Button
+      variant="outline"
+      className="flex h-auto w-full cursor-pointer flex-col items-stretch justify-start gap-2 py-3 whitespace-normal"
       onClick={handleLogClick}
     >
       <div className="flex w-full items-center justify-between">
@@ -71,6 +72,6 @@ export function EventLogItem({
           <span className="line-clamp-1">{targetInfo}</span>
         </div>
       )}
-    </button>
+    </Button>
   );
 }
