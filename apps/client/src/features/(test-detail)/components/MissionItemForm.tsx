@@ -12,6 +12,7 @@ import { Textarea } from '@/shared/components/ui/textarea';
 
 import type { TestFormValues } from '../schemas/testForm';
 import { MissionItemDeleteButton } from './MissionItemDeleteButton';
+import { useUrlInput } from '../hooks/useUrlInput';
 
 interface MissionItemFormProps {
   field: FieldArrayWithId<TestFormValues, 'missions', 'id'>;
@@ -28,6 +29,10 @@ export function MissionItemForm({
   errors,
   onDeleteMission,
 }: MissionItemFormProps) {
+  const { urlValue, isValidUrl, handleUrlChange, handleUrlBlur } = useUrlInput({
+    initialValue: field.missionUrl || '',
+  });
+
   const handleDeleteMission = () => {
     onDeleteMission(field.publicId || '');
   };
@@ -80,15 +85,59 @@ export function MissionItemForm({
 
         <Field data-invalid={!!missionErrors?.missionUrl}>
           <FieldLabel htmlFor={`mission-url-${field.id}`}>대상 URL *</FieldLabel>
-          <Input
-            type="url"
-            id={`mission-url-${field.id}`}
-            placeholder="https://www.stocks.com"
-            {...register(`missions.${missionIndex}.missionUrl`)}
-            className="h-10"
-            aria-invalid={!!missionErrors?.missionUrl}
-          />
-          <FieldDescription>테스트 참여자가 미션을 시작할 URL을 입력해주세요.</FieldDescription>
+          <div className="relative">
+            <Input
+              type="url"
+              id={`mission-url-${field.id}`}
+              placeholder="예: www.stocks.com 또는 https://www.stocks.com"
+              {...register(`missions.${missionIndex}.missionUrl`, {
+                onChange: handleUrlChange,
+                onBlur: handleUrlBlur,
+              })}
+              value={urlValue}
+              className="h-10 pr-10"
+              aria-invalid={!!missionErrors?.missionUrl}
+            />
+            {urlValue && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {isValidUrl ? (
+                  <svg
+                    className="h-5 w-5 text-green-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="h-5 w-5 text-yellow-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                )}
+              </div>
+            )}
+          </div>
+          <FieldDescription>
+            테스트 참여자가 미션을 시작할 URL을 입력해주세요.
+            {urlValue && !isValidUrl && (
+              <span className="text-yellow-700"> (http:// 또는 https://가 자동으로 추가됩니다)</span>
+            )}
+          </FieldDescription>
           {missionErrors?.missionUrl && <FieldError>{missionErrors.missionUrl.message}</FieldError>}
         </Field>
 
