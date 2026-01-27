@@ -1,6 +1,8 @@
 import { EventType, IncrementalSource } from '@rrweb/types';
 import type { eventWithTime } from '@rrweb/types';
 
+import type { ActivitySegment } from '../types';
+
 export type ScrollDirection = 'Up' | 'Down';
 
 export interface GroupedInteractionLog {
@@ -10,6 +12,10 @@ export interface GroupedInteractionLog {
   scrollDirection?: ScrollDirection;
   targetInfo?: string; // 클릭/입력한 요소 정보
 }
+
+export type EventLogDisplayItem =
+  | { type: 'rrweb'; data: GroupedInteractionLog; timestamp: number }
+  | { type: 'rageClick' | 'mouseThrashing' | 'idle'; data: ActivitySegment; timestamp: number };
 
 type IncrementalSnapshotEvent = eventWithTime & {
   type: EventType.IncrementalSnapshot;
@@ -135,7 +141,9 @@ export function groupLogsByType(logs: eventWithTime[]): GroupedInteractionLog[] 
 
     // 클릭/입력/터치 이벤트 처리 (같은 요소 + 짧은 시간 내 발생 시 그룹화)
     const currentId = (log.data as any).id;
-    const timeDiff = lastEntry ? log.timestamp - (lastEntry.endTime || lastEntry.log.timestamp) : Infinity;
+    const timeDiff = lastEntry
+      ? log.timestamp - (lastEntry.endTime || lastEntry.log.timestamp)
+      : Infinity;
 
     if (
       lastEntry &&

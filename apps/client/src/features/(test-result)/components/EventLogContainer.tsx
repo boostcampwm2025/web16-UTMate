@@ -8,13 +8,16 @@ import type { eventWithTime } from '@rrweb/types';
 import { EventLogViewer } from '@/features/(test-result)/components/EventLogViewer';
 import { useEventListener } from '@/shared/hooks/useEventListener';
 
+import type { AnalyzerResult } from '../types';
+
 import './EventLogPlayer.css';
 
 interface EventLogContainerProps {
   eventLogs: eventWithTime[];
+  analysisData?: AnalyzerResult;
 }
 
-export function EventLogContainer({ eventLogs }: EventLogContainerProps) {
+export function EventLogContainer({ eventLogs, analysisData }: EventLogContainerProps) {
   const playerRootRef = useRef<HTMLDivElement>(null);
   const replayer = useRef<rrwebPlayer | null>(null);
 
@@ -76,7 +79,11 @@ export function EventLogContainer({ eventLogs }: EventLogContainerProps) {
         <div className="col-span-1 flex min-h-0 flex-col">
           <h2 className="mb-4 text-lg font-bold text-gray-800">이벤트 로그</h2>
           <div className="bg-card min-h-0 flex-1 rounded-xl border">
-            <EventLogViewer logs={eventLogs} onLogClick={handleLogClick} />
+            <EventLogViewer
+              logs={eventLogs}
+              analysisData={analysisData}
+              onLogClick={handleLogClick}
+            />
           </div>
         </div>
       </div>

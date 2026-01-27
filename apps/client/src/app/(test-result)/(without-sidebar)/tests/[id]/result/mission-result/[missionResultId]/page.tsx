@@ -52,7 +52,7 @@ export default function MissionResultDetailPage() {
         <MissionResultSidebar missionResultData={missionResultData} missionDetail={missionDetail} />
         {/* Main Content - 리플레이 & 이벤트 로그 */}
         <div className="min-h-0 flex-1">
-          <EventLogContainer eventLogs={eventLogs} />
+          <EventLogContainer eventLogs={eventLogs} analysisData={missionResultData.analysisData} />
         </div>
       </div>
     </div>
