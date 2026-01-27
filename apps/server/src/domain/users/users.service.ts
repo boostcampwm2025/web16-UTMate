@@ -78,7 +78,10 @@ export class UsersService {
   }
 
   async getUsersByUsername(query: SearchUserDto) {
-    const users = await this.usersRepository.findByUsernameLike(query.username);
-    return UserSummaryDto.fromUserEntities(users);
+    const findUser = await this.usersRepository.findByUsername(query.username);
+    if (!findUser) {
+      throw new BadRequestException('존재하는 사용자가 없습니다.');
+    }
+    return UserSummaryDto.fromUserEntity(findUser);
   }
 }

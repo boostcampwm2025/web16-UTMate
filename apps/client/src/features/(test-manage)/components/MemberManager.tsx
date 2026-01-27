@@ -12,19 +12,25 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
   const [input, setInput] = useState('');
   const [memberList, setMemberList] = useState<UserSummary[]>(members);
   const [error, setError] = useState<string | null>(null);
-  const [searchResult, setSearchResult] = useState<UserSummary[]>([]);
+  const [searchResult, setSearchResult] = useState<UserSummary | null>(null);
 
   // 검색 버튼 클릭 시 (실제 구현시 API 연동 필요)
   const handleSearch = async () => {
-    const findUsers = await findUserByUsername(input.trim());
-    if (findUsers.length === 0) {
-      setError('일치하는 사용자가 없습니다.');
-      setSearchResult([]);
+    try {
+      const findUser = await findUserByUsername(input.trim());
+      if (!findUser) {
+        setError('일치하는 사용자가 없습니다.');
+        setSearchResult(null);
+        return;
+      }
+
+      setSearchResult(findUser);
+      setError(null);
+    } catch (error: any) {
+      setError(error.message || '사용자 검색에 실패했습니다. 다시 시도해주세요.');
+      setSearchResult(null);
       return;
     }
-
-    setSearchResult(findUsers);
-    setError(null);
   };
 
   // 멤버 추가
@@ -37,7 +43,7 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
     try {
       await addMemberToTest(testId, user.publicId);
       setMemberList([...memberList, user]);
-      setSearchResult([]);
+      setSearchResult(null);
       setInput('');
       setError(null);
     } catch (error) {
@@ -78,21 +84,21 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
       </div>
       {error && <div className="mb-6 text-xs text-red-500">{error}</div>}
       {/* 검색 결과 */}
-      {searchResult.length > 0 && <div className="mb-2 text-base font-bold">검색 결과</div>}
-      {searchResult.map((user) => (
-        <div key={user.publicId} className="mt-2">
+      {searchResult && <div className="mb-2 text-base font-bold">검색 결과</div>}
+      {searchResult && (
+        <div key={searchResult.publicId} className="mt-2">
           <div className="flex items-center gap-4 rounded-lg bg-gray-50 px-4 py-3">
             <img
-              src={user.avatarUrl || '/default-avatar.png'}
-              alt={user.username}
+              src={searchResult.avatarUrl || '/default-avatar.png'}
+              alt={searchResult.username}
               className="h-14 w-14 rounded-full border-2 border-gray-200 bg-white"
             />
             <div className="flex-1">
-              <div className="text-xl font-bold">{user.username}</div>
+              <div className="text-xl font-bold">{searchResult.username}</div>
             </div>
             <button
               className="rounded bg-blue-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600"
-              onClick={() => handleAdd(user)}
+              onClick={() => handleAdd(searchResult)}
             >
               추가
             </button>

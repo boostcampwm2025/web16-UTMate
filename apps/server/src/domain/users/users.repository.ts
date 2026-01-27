@@ -36,10 +36,10 @@ export class UsersRepository {
       .getOne();
   }
 
-  async findByUsernameLike(username: string) {
+  async findByUsername(username: string) {
     return this.usersRepository
       .createQueryBuilder('users')
-      .where('LOWER(users.username) LIKE :username', { username: `%${username.toLowerCase()}%` })
-      .getMany();
+      .where('LOWER(users.username) = :username', { username: username.toLowerCase() })
+      .getOne();
   }
 }

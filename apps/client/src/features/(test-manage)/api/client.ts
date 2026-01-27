@@ -35,7 +35,7 @@ export const updateTestStatus = async (testId: string, status: TestStatus): Prom
 };
 
 export const findUserByUsername = async (username: string) => {
-  return clientFetcher<UserSummary[]>(
+  return clientFetcher<UserSummary>(
     `${CLIENT_BASE_URL}/users?username=${encodeURIComponent(username)}`,
   );
 };
