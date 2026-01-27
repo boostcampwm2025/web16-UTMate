@@ -18,7 +18,9 @@ export interface UseUrlInputReturn {
  * @returns URL 상태와 이벤트 핸들러
  */
 export function useUrlInput({ initialValue = '' }: UseUrlInputOptions = {}): UseUrlInputReturn {
-  const [urlValue, setUrlValue] = useState(initialValue);
+  // initialValue가 비어있으면 'https://' 기본값 설정
+  const defaultValue = initialValue || 'https://';
+  const [urlValue, setUrlValue] = useState(defaultValue);
   const [isValidUrl, setIsValidUrl] = useState(validateUrl(normalizeUrl(initialValue)));
 
   /**
