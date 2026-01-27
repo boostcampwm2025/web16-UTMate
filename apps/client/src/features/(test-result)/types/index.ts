@@ -1,23 +1,4 @@
 import { TestStatus } from '@/features/(test-manage)/types';
-
-type MissionResultStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'SKIPPED';
-
-interface MissionResult {
-  id: number;
-  participantId: string;
-  missionId: string;
-  status: MissionResultStatus;
-  duration: number;
-  feedback: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface SimpleMissionResult extends Pick<
-  MissionResult,
-  'id' | 'participantId' | 'missionId'
-> {}
-
 export interface TestResultSummary {
   id: number;
   title: string;
@@ -28,8 +9,8 @@ export interface TestResultSummary {
   totalParticipants: number;
 }
 
-// 참여자 결과 관련 타입 추가
-export type ParticipantMissionStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'IN_PROGRESS';
+export type MissionResultStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'IN_PROGRESS' | 'DROP';
+export type ParticipantMissionStatus = MissionResultStatus;
 
 export interface ParticipantMissionResult {
   missionResultId: string;
