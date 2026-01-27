@@ -41,7 +41,7 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_GA_ID && <WebVitalsCollector />}
         <DialogProvider />
       </body>
-      <script src="https://utmate.me/sdk/utmate-sdk.iife.js"></script>
+      <script async src="https://utmate.me/sdk/utmate-sdk.iife.js"></script>
     </html>
   );
 }

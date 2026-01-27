@@ -8,7 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
-import { MainFeedbackDto, ParticipantResultsDto } from './dto/result.dto';
+import { MainFeedbackDto, ParticipantResultsDto, TestMissionsResultsDto } from './dto/result.dto';
 import { TestDto } from './dto/test.dto';
 import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
@@ -331,5 +331,24 @@ export class TestsService {
       throw new NotFoundException('Participant not found');
     }
     return ParticipantResultsDto.fromEntity(test.participants[0], test.missions);
+  }
+
+  /**
+   * 테스트의 모든 미션과 각 미션의 결과를 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns 테스트의 모든 미션과 각 미션의 결과 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
+  async getTestMissionsResults(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithMissionsAndResults(
+      publicId,
+      userId,
+    );
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return TestMissionsResultsDto.fromTest(test);
   }
 }

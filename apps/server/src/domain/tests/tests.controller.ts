@@ -101,6 +101,12 @@ export class TestsController {
     return this.testsService.getTestParticipantsResults(userId, publicId);
   }
 
+  @Get('/:id/result/missions')
+  @UseGuards(JwtAuthGuard)
+  async getTestMissionsResults(@UserId() userId: number, @Param('id') publicId: string) {
+    return this.testsService.getTestMissionsResults(userId, publicId);
+  }
+
   @Get('/:id/result/mainfeedback')
   @UseGuards(JwtAuthGuard)
   async getTestMainFeedback(@UserId() userId: number, @Param('id') publicId: string) {
