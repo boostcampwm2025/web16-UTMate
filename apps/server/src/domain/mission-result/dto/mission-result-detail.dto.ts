@@ -1,7 +1,8 @@
-import { IsEnum, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 import { MissionResult } from '../entities/mission-result.entity';
 import { MissionResultStatus } from '../enums';
+
 import { AnalyzerResult } from '#domain/analyzer/dto/analyzer.dto';
 
 export class MissionResultDetailDto {
