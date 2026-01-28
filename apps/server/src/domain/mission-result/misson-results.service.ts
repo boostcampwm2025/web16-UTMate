@@ -119,7 +119,7 @@ export class MissionResultsService {
     switch (dto.status) {
       case MissionResultStatus.IN_PROGRESS:
         missionResult.start();
-        this.sdkAuthRedis.set(missionResult.publicId, 'in_progress');
+        await this.sdkAuthRedis.set(missionResult.publicId, 'in_progress');
         break;
       case MissionResultStatus.SUCCESS:
       case MissionResultStatus.FAILED:

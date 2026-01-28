@@ -50,7 +50,7 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
       const newWindow = window.open(
         `${mission.missionUrl}?utmate-auth=${missionResultId}`,
         '_blank',
-        'width=1200,height=800',
+        'width=1200,height=800,resizable=yes,scrollbars=yes',
       );
       setMissionWindow(newWindow);
       setMissionState('recording');
@@ -74,7 +74,7 @@ export function MissionStep({ testId, mission, missionNumber, totalMissions }: M
       const newWindow = window.open(
         `${mission.missionUrl}?utmate-auth=${missionResultId}`,
         '_blank',
-        'width=1200,height=800',
+        'width=1200,height=800,resizable=yes,scrollbars=yes',
       );
       setMissionWindow(newWindow);
       return;
