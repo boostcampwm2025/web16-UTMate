@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { UserSummary } from '../types';
 import { addMemberToTest, findUserByUsername, removeMemberFromTest } from '../api/client';
+import { Input } from '@/shared/components/ui/input';
+import { Button } from '@/shared/components/ui/button';
 
 interface MemberModalProps {
   testId: string;
@@ -65,7 +67,7 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
     <div className="rounded-xl bg-white p-6">
       {/* 검색 영역 */}
       <div className="mb-2 flex gap-2">
-        <input
+        <Input
           className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-lg focus:ring focus:outline-none"
           type="text"
           placeholder="닉네임 또는 이메일 입력"
@@ -75,12 +77,12 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
             if (e.key === 'Enter') handleSearch();
           }}
         />
-        <button
+        <Button
           className="rounded-lg bg-gray-800 px-5 py-2 text-lg font-semibold text-white hover:bg-gray-900"
           onClick={handleSearch}
         >
           검색
-        </button>
+        </Button>
       </div>
       {error && <div className="mb-6 text-xs text-red-500">{error}</div>}
       {/* 검색 결과 */}
@@ -96,12 +98,12 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
             <div className="flex-1">
               <div className="text-xl font-bold">{searchResult.username}</div>
             </div>
-            <button
+            <Button
               className="rounded bg-blue-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600"
               onClick={() => handleAdd(searchResult)}
             >
               추가
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -144,12 +146,12 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
                   </span>
                 </div>
               </div>
-              <button
+              <Button
                 className="rounded bg-gray-200 px-4 py-1.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-red-500 hover:text-white"
                 onClick={() => handleRemove(m)}
               >
                 제거
-              </button>
+              </Button>
             </div>
           ))}
         </div>
