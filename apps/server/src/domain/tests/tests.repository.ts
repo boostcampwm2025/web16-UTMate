@@ -236,6 +236,16 @@ export class TestsRepository {
       .getOne();
   }
 
+  findByPublicIdAndUserIdWithMissionsAndResults(publicId: string, userId: number) {
+    return this.createAccessibleQuery(userId)
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .leftJoinAndSelect('missions.missionResults', 'missionResults')
+      .leftJoinAndSelect('missionResults.participant', 'participant')
+      .where('tests.publicId = :publicId', { publicId })
+      .orderBy('missions.order', 'ASC')
+      .getOne();
+  }
+
   // private 내부 메서드
 
   /**
@@ -280,17 +290,5 @@ export class TestsRepository {
         return `EXISTS ${subQuery}`;
       });
     });
-  }
-  
-  findByPublicIdAndOwnerWithMissionsAndResults(publicId: string, ownerId: number) {
-    return this.testsRepository
-      .createQueryBuilder('tests')
-      .leftJoinAndSelect('tests.missions', 'missions')
-      .leftJoinAndSelect('missions.missionResults', 'missionResults')
-      .leftJoinAndSelect('missionResults.participant', 'participant')
-      .where('tests.publicId = :publicId', { publicId })
-      .andWhere('tests.owner_id = :ownerId', { ownerId })
-      .orderBy('missions.order', 'ASC')
-      .getOne();
   }
 }
