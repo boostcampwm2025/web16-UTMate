@@ -53,6 +53,45 @@ export function TestSettingsStep({
     }
   };
 
+  // 모두 선택/해제 핸들러
+  const handleGenderSelectAll = () => {
+    // 현재 모든 성별이 선택되어 있으면 전체 해제
+    const allSelected = GENDER_OPTIONS.every((opt) => targetGender.includes(opt.value));
+    if (allSelected) {
+      onTargetGenderChange([]);
+    } else {
+      // 일부만 선택되어 있거나 없으면 전체 선택
+      onTargetGenderChange(GENDER_OPTIONS.map((opt) => opt.value));
+    }
+  };
+
+  const handleAgeGroupSelectAll = () => {
+    const allSelected = AGE_GROUP_OPTIONS.every((opt) => targetAgeGroup.includes(opt.value));
+    if (allSelected) {
+      onTargetAgeGroupChange([]);
+    } else {
+      onTargetAgeGroupChange(AGE_GROUP_OPTIONS.map((opt) => opt.value));
+    }
+  };
+
+  const handleInterestSelectAll = () => {
+    const allSelected = INTEREST_OPTIONS.every((opt) => targetInterests.includes(opt.key));
+    if (allSelected) {
+      onToggleInterest(INTEREST_OPTIONS[0].key); // 첫 항목만 남기기 위해 전체 해제 후 하나씩
+      INTEREST_OPTIONS.forEach((opt) => {
+        if (targetInterests.includes(opt.key)) {
+          onToggleInterest(opt.key);
+        }
+      });
+    } else {
+      INTEREST_OPTIONS.forEach((opt) => {
+        if (!targetInterests.includes(opt.key)) {
+          onToggleInterest(opt.key);
+        }
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -73,7 +112,7 @@ export function TestSettingsStep({
             <button
               type="button"
               onClick={() => onIsPublicChange(true)}
-              className={`flex-1 rounded-lg border-2 p-4 text-center font-medium transition-colors ${
+              className={`flex-1 cursor-pointer rounded-lg border-2 p-4 text-center font-medium transition-colors ${
                 isPublic
                   ? 'border-primary bg-primary text-primary-foreground'
                   : 'border-input hover:bg-accent'
@@ -84,7 +123,7 @@ export function TestSettingsStep({
             <button
               type="button"
               onClick={() => onIsPublicChange(false)}
-              className={`flex-1 rounded-lg border-2 p-4 text-center font-medium transition-colors ${
+              className={`flex-1 cursor-pointer rounded-lg border-2 p-4 text-center font-medium transition-colors ${
                 !isPublic
                   ? 'border-primary bg-primary text-primary-foreground'
                   : 'border-input hover:bg-accent'
@@ -93,7 +132,7 @@ export function TestSettingsStep({
               비공개
             </button>
           </div>
-          <p className="text-muted-foreground mt-3 text-sm">
+          <p className={`mt-3 text-sm ${isPublic ? 'text-muted-foreground' : 'font-semibold text-blue-600'}`}>
             {isPublic
               ? '모든 사용자가 이 테스트를 검색하고 참여할 수 있습니다.'
               : '링크를 공유한 사용자만 이 테스트에 참여할 수 있습니다.'}
