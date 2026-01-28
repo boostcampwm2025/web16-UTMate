@@ -16,6 +16,7 @@ import { UAParser } from 'ua-parser-js';
 
 import { CreateTestDto } from './dto/create-test.dto';
 import { AddMemberDto } from './dto/member.dto';
+import { SearchTestQueryDto } from './dto/search-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { TestStatus } from './entities/test.entity';
 import { TestsService } from './tests.service';
@@ -33,6 +34,11 @@ export class TestsController {
   async getTests(@UserId() userId: number) {
     const tests = await this.testsService.getMyTests(userId);
     return tests;
+  }
+
+  @Get('/search')
+  async searchTests(@Param() query: SearchTestQueryDto) {
+    return this.testsService.searchTestsByQuery(query);
   }
 
   @Get('/:id')

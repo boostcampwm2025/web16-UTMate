@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
 import { MainFeedbackDto, ParticipantResultsDto, TestMissionsResultsDto } from './dto/result.dto';
+import { SearchTestQueryDto, SearchTestResponseDto } from './dto/search-test.dto';
 import { TestDto } from './dto/test.dto';
 import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
@@ -64,7 +65,7 @@ export class TestsService {
       if (!test) {
         throw new NotFoundException('Test not found');
       }
-      test.updateTestInfo(dto.title, dto.description, dto.url);
+      test.updateTestInfo(dto.title, dto.description, dto.url, dto.isPublic);
       test.updateTargeting(dto.targetGender, dto.targetAgeRange, dto.targetInterests);
       await this.testsRepository.save(test, manager);
 
@@ -75,6 +76,18 @@ export class TestsService {
 
       return { success: true };
     });
+  }
+
+  /**
+   * 검색 쿼리에 따라 테스트를 검색합니다.
+   *
+   * @param query 검색 쿼리 DTO
+   * @returns 검색된 테스트 DTO와 총 페이지 수
+   */
+  async searchTestsByQuery(query: SearchTestQueryDto) {
+    const [tests, count] = await this.testsRepository.searchTestsByQuery(query);
+    const totalPage = Math.ceil(count / query.limit);
+    return SearchTestResponseDto.fromTestEntities(tests, totalPage);
   }
 
   /**

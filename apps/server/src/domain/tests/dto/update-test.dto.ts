@@ -16,26 +16,23 @@ export class UpdateTestDto {
   url: string;
 
   @IsBoolean()
-  isPublic: boolean;
+  isPublic: boolean = false;
 
-  @IsOptional()
   @IsArray()
   @IsEnum(Gender, { each: true })
-  targetGender: Gender[];
+  targetGender: Gender[] = [];
 
-  @IsOptional()
   @IsArray()
   @IsEnum(AgeRange, { each: true })
-  targetAgeRange: AgeRange[];
+  targetAgeRange: AgeRange[] = [];
 
-  @IsOptional()
   @IsArray()
   @IsEnum(Interest, { each: true })
-  targetInterests: Interest[];
+  targetInterests: Interest[] = [];
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => UpdateMissionDto)
-  missions: UpdateMissionDto[];
+  missions: UpdateMissionDto[] = [];
 }

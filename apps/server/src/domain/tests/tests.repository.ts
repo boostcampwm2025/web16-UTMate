@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, EntityManager, ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 
-import { Test } from './entities/test.entity';
+import { SearchTestQueryDto } from './dto/search-test.dto';
+import { Test, TestStatus } from './entities/test.entity';
 
 @Injectable()
 export class TestsRepository {
@@ -63,6 +64,35 @@ export class TestsRepository {
       .leftJoinAndSelect('tests.missions', 'missions')
       .where('tests.publicId = :publicId', { publicId })
       .getOne();
+  }
+
+  searchTestsByQuery(query: SearchTestQueryDto, manager?: EntityManager) {
+    const queryBuilder = this.getRepo(manager)
+      .createQueryBuilder('tests')
+      .where('tests.status = :status', { status: TestStatus.PUBLISHED })
+      .andWhere('tests.isPublic = :isPublic', { isPublic: true });
+
+    if (query.gender) {
+      queryBuilder.andWhere(':gender MEMBER OF (tests.target_genders)', { gender: query.gender });
+    }
+
+    if (query.age) {
+      queryBuilder.andWhere(':age MEMBER OF (tests.target_ages)', {
+        age: query.age,
+      });
+    }
+
+    if (query.interests && query.interests.length > 0) {
+      queryBuilder.andWhere('JSON_OVERLAPS(tests.target_interests, :interests)', {
+        interests: JSON.stringify(query.interests),
+      });
+    }
+
+    return queryBuilder
+      .skip((query.page - 1) * query.limit)
+      .take(query.limit)
+      .orderBy('tests.createdAt', 'DESC')
+      .getManyAndCount();
   }
 
   /*----------- 조회 메서드 (권한 체크) -----------*/

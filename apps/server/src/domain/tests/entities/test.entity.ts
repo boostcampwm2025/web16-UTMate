@@ -63,14 +63,17 @@ export class Test {
   @OneToMany(() => Mission, (mission) => mission.test)
   missions: Mission[];
 
-  @Column({ type: 'json', nullable: true })
-  targetGender?: Gender[];
+  @Column({ name: 'is_public', default: false })
+  isPublic: boolean;
 
-  @Column({ type: 'json', nullable: true })
-  targetAge?: AgeRange[];
+  @Column({ name: 'target_genders', type: 'json' })
+  targetGenders: Gender[] = [];
 
-  @Column({ type: 'json', nullable: true })
-  targetInterests?: Interest[];
+  @Column({ name: 'target_ages', type: 'json' })
+  targetAges: AgeRange[] = [];
+
+  @Column({ name: 'target_interests', type: 'json' })
+  targetInterests: Interest[] = [];
 
   @Column({ type: 'timestamp', nullable: true })
   startDate?: Date;
@@ -96,15 +99,16 @@ export class Test {
     return test;
   }
 
-  updateTestInfo(title: string, description: string, url: string) {
+  updateTestInfo(title: string, description: string, url: string, isPublic: boolean) {
     this.title = title;
     this.description = description;
     this.url = url;
+    this.isPublic = isPublic;
   }
 
-  updateTargeting(targetGender: Gender[], targetAge: AgeRange[], targetInterests: Interest[]) {
-    this.targetGender = targetGender;
-    this.targetAge = targetAge;
+  updateTargeting(targetGenders: Gender[], targetAges: AgeRange[], targetInterests: Interest[]) {
+    this.targetGenders = targetGenders;
+    this.targetAges = targetAges;
     this.targetInterests = targetInterests;
   }
 

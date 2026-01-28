@@ -1,8 +1,9 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsEnum, IsString, ValidateNested } from 'class-validator';
 
-import { MissionDto } from '../../missions/dto/mission.dto';
 import { Test, TestStatus } from '../entities/test.entity';
+
+import { MissionDto } from '#domain/missions/dto/mission.dto';
 
 export class TestDto {
   @IsString()
