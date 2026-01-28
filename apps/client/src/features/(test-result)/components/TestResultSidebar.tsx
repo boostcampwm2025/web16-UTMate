@@ -7,29 +7,12 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { LayoutDashboard, Target, Users, ChevronDown } from 'lucide-react';
 
 import { cn } from '@/shared/utils';
-import { CLIENT_BASE_URL } from '@/shared/constants/api';
-import { clientFetcher } from '@/shared/utils/fetcher/clientFetcher';
 import { Collapsible, CollapsibleContent } from '@/shared/components/ui/collapsible';
+import { generateNicknameFromId } from '@/shared/utils/nickname';
+import { getTestById } from '@/features/(test-detail)/api/client';
 
 import { getTestParticipantsResults } from '../apis/client';
-import type { TestDetail } from '@/features/(test-manage)/types';
-
-// 테스트 상세 정보 가져오기 (미션 목록 포함)
-const getTestDetail = async (testId: string): Promise<TestDetail> => {
-  return clientFetcher<TestDetail>(`${CLIENT_BASE_URL}/tests/${testId}`);
-};
-
-// 상대 시간 포맷 (예: 1일전, 3일전)
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return '오늘';
-  if (diffDays === 1) return '1일전';
-  return `${diffDays}일전`;
-}
+import { formatDistanceToNow } from '../utils/dates';
 
 export function TestResultSidebar() {
   const params = useParams();
@@ -37,8 +20,9 @@ export function TestResultSidebar() {
   const router = useRouter();
   const testId = params.id as string;
 
-  const isMissionsActive = pathname.startsWith(`/tests/${testId}/result/missions`);
-  const isParticipantsActive = pathname.startsWith(`/tests/${testId}/result/participants`);
+  const isMissionsActive = pathname === `/tests/${testId}/result/missions`;
+  const isParticipantsActive = pathname === `/tests/${testId}/result/participants`;
+  const isSummaryActive = pathname === `/tests/${testId}/result`;
 
   // 아코디언 열림 상태 - 해당 경로에 있으면 자동으로 열림
   const [isMissionsOpen, setIsMissionsOpen] = useState(isMissionsActive);
@@ -49,6 +33,18 @@ export function TestResultSidebar() {
     if (isMissionsActive) setIsMissionsOpen(true);
     if (isParticipantsActive) setIsParticipantsOpen(true);
   }, [isMissionsActive, isParticipantsActive]);
+
+  // 테스트 상세 정보 (미션 목록)
+  const { data: testDetail } = useSuspenseQuery({
+    queryKey: ['testDetail', testId],
+    queryFn: () => getTestById(testId),
+  });
+
+  // 참여자 목록
+  const { data: participants } = useSuspenseQuery({
+    queryKey: ['testParticipantsResults', testId],
+    queryFn: () => getTestParticipantsResults(testId),
+  });
 
   // 미션별 보기 텍스트 클릭 → 항상 페이지 이동 + 아코디언 열림
   const handleMissionsTextClick = () => {
@@ -73,20 +69,6 @@ export function TestResultSidebar() {
     setIsParticipantsOpen((prev) => !prev);
   };
 
-  // 테스트 상세 정보 (미션 목록)
-  const { data: testDetail } = useSuspenseQuery({
-    queryKey: ['testDetail', testId],
-    queryFn: () => getTestDetail(testId),
-  });
-
-  // 참여자 목록
-  const { data: participants } = useSuspenseQuery({
-    queryKey: ['testParticipantsResults', testId],
-    queryFn: () => getTestParticipantsResults(testId),
-  });
-
-  const isSummaryActive = pathname === `/tests/${testId}/result`;
-
   return (
     <aside className="bg-background w-64 shrink-0 overflow-y-auto border-r p-2">
       <div className="flex flex-col gap-1">
@@ -109,13 +91,14 @@ export function TestResultSidebar() {
             className={cn(
               'flex w-full items-center justify-between rounded-md p-3 text-sm font-medium transition-colors',
               'hover:bg-accent hover:text-accent-foreground',
-              isMissionsActive && 'bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary',
+              isMissionsActive &&
+                'bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary',
             )}
           >
             <button
               type="button"
               onClick={handleMissionsTextClick}
-              className="flex flex-1 items-center gap-2"
+              className="flex flex-1 items-center gap-2 cursor-pointer"
             >
               <Target className="h-4 w-4" />
               <span>미션별 보기</span>
@@ -128,19 +111,20 @@ export function TestResultSidebar() {
           </div>
 
           <CollapsibleContent>
-            <div className="ml-4 mt-1 flex flex-col gap-1">
+            <div className="mt-1 ml-4 flex flex-col gap-1">
               {testDetail.missions.map((mission) => (
                 <Link
                   key={mission.publicId}
                   href={`/tests/${testId}/result/missions/${mission.publicId}`}
                   className={cn(
-                    'rounded-md p-2 text-sm transition-colors',
+                    'flex items-center justify-between rounded-md p-3 text-sm transition-colors',
                     'hover:bg-accent hover:text-accent-foreground',
                     pathname === `/tests/${testId}/result/missions/${mission.publicId}` &&
-                      'bg-primary/10 text-primary',
+                      'bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary',
                   )}
                 >
-                  미션 {mission.order} : {mission.name}
+                  <span>{mission.name}</span>
+                  {/* <span className="text-muted-foreground text-xs">{mission.order + 1}번</span> */}
                 </Link>
               ))}
             </div>
@@ -160,7 +144,7 @@ export function TestResultSidebar() {
             <button
               type="button"
               onClick={handleParticipantsTextClick}
-              className="flex flex-1 items-center gap-2"
+              className="flex flex-1 items-center gap-2 cursor-pointer"
             >
               <Users className="h-4 w-4" />
               <span>참여자별 보기</span>
@@ -173,27 +157,25 @@ export function TestResultSidebar() {
           </div>
 
           <CollapsibleContent>
-            <div className="ml-4 mt-1 flex flex-col gap-1">
+            <div className="mt-1 ml-4 flex flex-col gap-1">
               {participants.map((participant, index) => {
-                const createdAt = participant.missionResults[0]?.createdAt;
+                const joinedAt = participant.joinedAt;
                 return (
                   <Link
                     key={participant.participantId}
                     href={`/tests/${testId}/result/participants/${participant.participantId}`}
                     className={cn(
-                      'flex items-center justify-between rounded-md p-2 text-sm transition-colors',
+                      'flex items-center justify-between rounded-md p-3 text-sm transition-colors',
                       'hover:bg-accent hover:text-accent-foreground',
                       pathname ===
                         `/tests/${testId}/result/participants/${participant.participantId}` &&
-                        'bg-primary/10 text-primary',
+                        'bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary',
                     )}
                   >
-                    <span>참여자 {index + 1}</span>
-                    {createdAt && (
-                      <span className="text-muted-foreground text-xs">
-                        {formatRelativeTime(createdAt)}
-                      </span>
-                    )}
+                    <span>{generateNicknameFromId(participant.participantId)}</span>
+                    <span className="text-muted-foreground text-xs">
+                      {formatDistanceToNow(joinedAt)}
+                    </span>
                   </Link>
                 );
               })}

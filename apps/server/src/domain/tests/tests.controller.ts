@@ -18,7 +18,6 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { AddMemberDto } from './dto/member.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { TestStatus } from './entities/test.entity';
-import { DeviceInfo } from './interface';
 import { TestsService } from './tests.service';
 
 import { UserId } from '#domain/auth/decorator/param.decorator';
@@ -99,13 +98,7 @@ export class TestsController {
     const parser = new UAParser(uaString);
     const uaInfo = parser.getResult();
 
-    const deviceInfo: DeviceInfo = {
-      browser: uaInfo.browser.name || 'Unknown',
-      os: uaInfo.os.name || 'Unknown',
-      type: uaInfo.device.type || 'desktop',
-    };
-
-    return this.testsService.participateTest(userId, publicId, deviceInfo);
+    return this.testsService.participateTest(userId, publicId, uaInfo);
   }
 
   @Get('/:id/result')
@@ -118,6 +111,12 @@ export class TestsController {
   @UseGuards(JwtAuthGuard)
   async getTestParticipantsResults(@UserId() userId: number, @Param('id') publicId: string) {
     return this.testsService.getTestParticipantsResults(userId, publicId);
+  }
+
+  @Get('/:id/result/missions')
+  @UseGuards(JwtAuthGuard)
+  async getTestMissionsResults(@UserId() userId: number, @Param('id') publicId: string) {
+    return this.testsService.getTestMissionsResults(userId, publicId);
   }
 
   @Get('/:id/result/mainfeedback')

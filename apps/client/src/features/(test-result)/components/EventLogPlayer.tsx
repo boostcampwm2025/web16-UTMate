@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import type { eventWithTime } from '@rrweb/types';
 import rrwebPlayer from 'rrweb-player';
-import 'rrweb-player/dist/style.css';
+import '@/styles/rrweb-player-custom.css';
 
 interface EventLogPlayerProps {
   logs: eventWithTime[];

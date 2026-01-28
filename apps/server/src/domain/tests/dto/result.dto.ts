@@ -1,6 +1,7 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Mission } from '../entities/mission.entity';
+import { Test } from '../entities/test.entity';
 
 import { MissionResult } from '#domain/mission-result/entities/mission-result.entity';
 import { MissionResultStatus } from '#domain/mission-result/enums';
@@ -10,6 +11,8 @@ export class ParticipantMissionResultDto {
   missionResultId: string;
   missionId: string;
   missionOrder: number;
+  missionTitle: string;
+  missionDescription: string;
   status: MissionResultStatus;
   duration?: number;
   feedback?: string;
@@ -27,6 +30,8 @@ export class ParticipantMissionResultDto {
     dto.missionResultId = missionResult.publicId;
     dto.missionId = mission.publicId;
     dto.missionOrder = mission.order;
+    dto.missionTitle = mission.name;
+    dto.missionDescription = mission.description;
     dto.status = missionResult.status;
     dto.duration = missionResult.duration;
     dto.feedback = missionResult.feedback;
@@ -45,6 +50,7 @@ export class ParticipantMissionResultDto {
 export class ParticipantResultsDto {
   participantId: string;
   persona: string;
+  joinedAt: Date;
   missionResults: ParticipantMissionResultDto[];
 
   static fromEntity(participant: Participant, missions: Mission[]) {
@@ -52,6 +58,7 @@ export class ParticipantResultsDto {
     dto.participantId = participant.publicId;
     // TODO : 참가자 페르소나 기능 구현 시 수정 필요
     dto.persona = 'GUEST';
+    dto.joinedAt = participant.joinedAt;
     dto.missionResults = ParticipantMissionResultDto.fromEntities(
       missions,
       participant.missionResults,
@@ -192,6 +199,20 @@ export class MissionOverviewDto {
 
     dto.missionResults = MissionResultOverviewDto.fromEntities(missions.missionResults);
 
+    return dto;
+  }
+
+  static fromEntities(missions: Mission[]): MissionOverviewDto[] {
+    return missions.map((mission) => this.fromEntity(mission));
+  }
+}
+
+export class TestMissionsResultsDto {
+  missions: MissionOverviewDto[];
+
+  static fromTest(test: Test): TestMissionsResultsDto {
+    const dto = new TestMissionsResultsDto();
+    dto.missions = MissionOverviewDto.fromEntities(test.missions || []);
     return dto;
   }
 }

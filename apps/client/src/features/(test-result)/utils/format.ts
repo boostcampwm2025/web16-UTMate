@@ -1,34 +1,38 @@
 export const formatTimestamp = (ms: number) => {
-    const seconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
-export const formatRelativeTime = (timestamp: number, startTime: number) => {
-    const diff = timestamp - startTime;
-    const totalSeconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+export const formatRelativeTime = (timestamp: number, startTime: number): string => {
+  const diffMs = timestamp - startTime;
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+
+  if (diffSeconds < 60) {
+    return `${diffSeconds}초`;
+  } else if (diffMinutes < 60) {
+    const remainingSeconds = diffSeconds % 60;
+    return remainingSeconds > 0 ? `${diffMinutes}분 ${remainingSeconds}초` : `${diffMinutes}분`;
+  } else {
+    const remainingMinutes = diffMinutes % 60;
+    const remainingSeconds = diffSeconds % 60;
+    if (remainingMinutes > 0 && remainingSeconds > 0) {
+      return `${diffHours}시간 ${remainingMinutes}분 ${remainingSeconds}초`;
+    } else if (remainingMinutes > 0) {
+      return `${diffHours}시간 ${remainingMinutes}분`;
+    } else {
+      return `${diffHours}시간`;
+    }
+  }
 };
 
-/**
- * 날짜 문자열을 상대 시간 표현으로 변환합니다.
- * 예: "오늘", "1일전", "2주전", "3개월전", "1년전"
- */
-export const formatRelativeDate = (dateString?: string): string => {
-  if (!dateString) return '시간 정보 없음';
-  
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-  
-  if (diffInDays === 0) return '오늘';
-  if (diffInDays === 1) return '1일전';
-  if (diffInDays < 7) return `${diffInDays}일전`;
-  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)}주전`;
-  if (diffInDays < 365) return `${Math.floor(diffInDays / 30)}개월전`;
-  return `${Math.floor(diffInDays / 365)}년전`;
+export const formatDuration = (minutes: number | undefined | null): string => {
+  if (minutes == null || isNaN(minutes)) return '-';
+  if (minutes < 60) return `${Math.round(minutes)}분`;
+  const hours = Math.floor(minutes / 60);
+  const mins = Math.round(minutes % 60);
+  return mins > 0 ? `${hours}시간 ${mins}분` : `${hours}시간`;
 };

@@ -8,13 +8,12 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
-import { MainFeedbackDto, ParticipantResultsDto } from './dto/result.dto';
+import { MainFeedbackDto, ParticipantResultsDto, TestMissionsResultsDto } from './dto/result.dto';
 import { TestDto } from './dto/test.dto';
 import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
-import { DeviceInfo } from './interface';
 import { MissionsService } from './missions.service';
 import { TestsRepository } from './tests.repository';
 
@@ -255,7 +254,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없는 경우
    * @throws BadRequestException 테스트가 게시되지 않은 경우
    */
-  async participateTest(userId: number | undefined, publicId: string, deviceInfo: DeviceInfo) {
+  async participateTest(userId: number | undefined, publicId: string, uaInfo: UAParser.IResult) {
     const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
@@ -263,7 +262,7 @@ export class TestsService {
     if (test.status !== TestStatus.PUBLISHED) {
       throw new BadRequestException('Test is not published');
     }
-    return this.participantsService.createParticipant(userId, test.id, test.missions, deviceInfo);
+    return this.participantsService.createParticipant(userId, test.id, test.missions, uaInfo);
   }
 
   /**
@@ -400,5 +399,25 @@ export class TestsService {
 
     test.members.splice(memberIndex, 1);
     await this.testsRepository.save(test);
+    
+  }
+  
+  /**
+   * 테스트의 모든 미션과 각 미션의 결과를 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns 테스트의 모든 미션과 각 미션의 결과 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
+  async getTestMissionsResults(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndOwnerWithMissionsAndResults(
+      publicId,
+      userId,
+    );
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return TestMissionsResultsDto.fromTest(test);
   }
 }

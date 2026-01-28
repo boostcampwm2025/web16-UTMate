@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { MissionResultSidebar } from '@/features/(test-result)/components/MissionResultSidebar';
 import { MissionResultHeader } from '@/features/(test-result)/components/MissionResultHeader';
 import { EventLogContainer } from '@/features/(test-result)/components/EventLogContainer';
-import { getMissionResultById, getMissionResultLogsByUrl} from '@/features/(test-result)/apis/client';
+import { getMissionResultById, getMissionResultLogsByUrl, getTestMissionsResultById } from '@/features/(test-result)/apis/client';
 import { parseJsonlToEvents } from '@/features/(test-result)/utils/parse';
 
 export default function MissionResultDetailPage() {
@@ -18,6 +18,13 @@ export default function MissionResultDetailPage() {
     queryFn: () => getMissionResultById(missionResultId as string),
   });
 
+  // 미션 상세 정보 가져오기
+  const { data: missionDetail } = useQuery({
+    queryKey: ['missionDetail', missionResultData?.missionId],
+    queryFn: () => getTestMissionsResultById(missionResultData!.missionId),
+    enabled: !!missionResultData?.missionId,
+  });
+
   //TODO :용량 클탠데 캐시관리 어떻게 해야할지
   const { data: eventLogs } = useQuery({
     queryKey: ['eventLogs', missionResultId, missionResultData?.presignedUrl],
@@ -27,7 +34,7 @@ export default function MissionResultDetailPage() {
   });
 
 
-  if (!missionResultData || !eventLogs) {
+  if (!missionResultData || !eventLogs || !missionDetail) {
     return null
   }
 
@@ -38,7 +45,7 @@ export default function MissionResultDetailPage() {
       {/* Body: 남은 높이를 채우도록 flex-1 + min-h-0 */}
       <div className="flex flex-1 min-h-0">
         {/* Left Sidebar - 테스트 정보 */}
-        <MissionResultSidebar missionResultData={missionResultData} />
+        <MissionResultSidebar missionResultData={missionResultData} missionDetail={missionDetail} />
         {/* Main Content - 리플레이 & 이벤트 로그 */}
         <div className="flex-1 min-h-0">
           <EventLogContainer eventLogs={eventLogs} />

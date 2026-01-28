@@ -31,6 +31,7 @@ export function EventLogViewer({ logs, onLogClick }: EventLogViewerProps) {
           count={entry.count}
           endTime={entry.endTime}
           scrollDirection={entry.scrollDirection}
+          targetInfo={entry.targetInfo}
           startTime={startTime}
           onLogClick={onLogClick}
         />

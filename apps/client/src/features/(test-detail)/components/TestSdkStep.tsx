@@ -9,7 +9,7 @@ import { verifySdkInstallation } from '@/shared/api/test';
 import { CopyToClipboardButton } from '@/shared/components/CopyToClipboardButton';
 
 const SDK_URL = process.env.NEXT_PUBLIC_SDK_DOMAIN || 'https://utmate.me/sdk/utmate-sdk.iife.js';
-const SDK_CODE = `<script src="${SDK_URL}"></script>`;
+const SDK_CODE = `<script async src="${SDK_URL}"></script>`;
 
 interface TestSdkStepProps {
   testId: string;

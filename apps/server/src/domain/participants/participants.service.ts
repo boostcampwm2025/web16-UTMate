@@ -2,6 +2,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { DataSource } from 'typeorm';
+import { UAParser } from 'ua-parser-js';
 
 import { CompleteParticipantDto } from './dto/complete-participant.dto';
 import { ParticipantDto } from './dto/participant.dto';
@@ -11,7 +12,6 @@ import { ParticipantsRepository } from './participants.repository';
 
 import { MissionResultsService } from '#domain/mission-result/misson-results.service';
 import { Mission } from '#domain/tests/entities/mission.entity';
-import { DeviceInfo } from '#domain/tests/interface';
 
 @Injectable()
 export class ParticipantsService {
@@ -36,11 +36,11 @@ export class ParticipantsService {
     userId: number | undefined,
     testId: number,
     missions: Mission[],
-    deviceInfo: DeviceInfo,
+    uaInfo: UAParser.IResult,
   ) {
     return await this.dataSource.transaction(async (manager) => {
       // Participant 생성
-      const participant = Participant.create(userId, testId, deviceInfo);
+      const participant = Participant.create(userId, testId, uaInfo);
       const savedParticipant = await this.participantsRepository.save(participant, manager);
 
       // 각 미션에 대해 MissionResult 생성

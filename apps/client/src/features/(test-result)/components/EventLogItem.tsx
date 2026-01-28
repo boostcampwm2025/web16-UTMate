@@ -9,7 +9,7 @@ interface EventLogItemProps extends GroupedInteractionLog {
   onLogClick: (relativeMs: number) => void;
 }
 
-export function EventLogItem({ log, count, endTime, scrollDirection, startTime, onLogClick }: EventLogItemProps) {
+export function EventLogItem({ log, count, endTime, scrollDirection, startTime, onLogClick, targetInfo }: EventLogItemProps) {
   const relativeMs = log.timestamp - startTime;
 
   const handleLogClick = () => {
@@ -27,6 +27,11 @@ export function EventLogItem({ log, count, endTime, scrollDirection, startTime, 
         {scrollDirection && <span className="ml-1 text-gray-600">({scrollDirection})</span>}
         {count > 1 && <span className="ml-2 text-blue-600">({count}회 연속)</span>}
       </div>
+      {targetInfo && (
+        <div className="mt-1 text-xs text-gray-600">
+          {targetInfo}
+        </div>
+      )}
       <div className="flex gap-2 text-xs text-gray-500">
         <span>{formatRelativeTime(log.timestamp, startTime)}</span>
         <span className="text-gray-300">|</span>

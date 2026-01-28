@@ -35,6 +35,8 @@ export interface ParticipantMissionResult {
   missionResultId: string;
   missionId: number;
   missionOrder: number;
+  missionTitle: string;
+  missionDescription: string;
   status: ParticipantMissionStatus;
   duration?: number;
   feedback?: string | null;
@@ -44,6 +46,7 @@ export interface ParticipantMissionResult {
 export interface ParticipantResult {
   participantId: string;
   persona: string;
+  joinedAt: string;
   missionResults: ParticipantMissionResult[];
 }
 
@@ -95,3 +98,8 @@ export type MissionResults = {
 };
 // 참여자 상세 조회는 ParticipantResult와 동일한 구조
 export type ParticipantDetail = ParticipantResult;
+
+// 테스트의 모든 미션과 각 미션의 결과
+export type TestMissionsResults = {
+  missions: MissionDetail[];
+};

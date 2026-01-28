@@ -13,7 +13,6 @@ import { ParticipantStatus, UserType } from '../enums';
 
 import { MissionResult } from '#domain/mission-result/entities/mission-result.entity';
 import { Test } from '#domain/tests/entities/test.entity';
-import { DeviceInfo } from '#domain/tests/interface';
 import { User } from '#domain/users/entities/user.entity';
 
 @Entity('participants')
@@ -53,24 +52,16 @@ export class Participant {
   @Column({ name: 'joined_at', type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   joinedAt: Date;
 
-  // Device Metadata
-  @Column({ name: 'device_os' })
-  deviceOs: string;
-
-  @Column({ name: 'device_browser' })
-  deviceBrowser: string;
-
-  @Column({ name: 'device_type' })
-  deviceType: string;
+  @Column({ name: 'ua_info', type: 'json' })
+  uaInfo: UAParser.IResult;
 
   private constructor() {}
 
-  static create(userId: number | undefined, testId: number, deviceInfo: DeviceInfo): Participant {
+  static create(userId: number | undefined, testId: number, uaInfo: UAParser.IResult): Participant {
     const participant = new Participant();
     participant.testId = testId;
-    participant.deviceOs = deviceInfo.os;
-    participant.deviceBrowser = deviceInfo.browser;
-    participant.deviceType = deviceInfo.type;
+    participant.uaInfo = uaInfo;
+
     // 로그인 사용자인지 비회원인지에 따라 userType 설정
     if (userId) {
       participant.userType = UserType.REGISTERED;
