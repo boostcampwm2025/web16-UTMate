@@ -29,9 +29,9 @@ export async function deleteUser(): Promise<void> {
 }
 
 /**
- * 페르소나 저장 (생성 또는 수정)
+ * 페르소나 생성
  */
-export async function savePersona(persona: PersonaData): Promise<void> {
+export async function createPersona(persona: PersonaData): Promise<void> {
   await clientFetcher<void>(`${CLIENT_BASE_URL}/users/persona`, {
     method: 'POST',
     headers: {
@@ -39,6 +39,35 @@ export async function savePersona(persona: PersonaData): Promise<void> {
     },
     body: JSON.stringify(persona),
   });
+}
+
+/**
+ * 페르소나 수정
+ */
+export async function updatePersona(persona: PersonaData): Promise<void> {
+  await clientFetcher<void>(`${CLIENT_BASE_URL}/users/persona`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(persona),
+  });
+}
+
+/**
+ * 페르소나 저장 (생성 또는 수정 자동 판단)
+ */
+export async function savePersona(persona: PersonaData): Promise<void> {
+  // 먼저 GET으로 존재 여부 확인
+  const existing = await getPersona();
+
+  if (existing) {
+    // 이미 존재하면 PUT으로 수정
+    await updatePersona(persona);
+  } else {
+    // 없으면 POST로 생성
+    await createPersona(persona);
+  }
 }
 
 /**
