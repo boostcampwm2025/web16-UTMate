@@ -4,6 +4,7 @@ import { TestParticipateClient } from './TestParticipateClient';
 
 import { SERVER_BASE_URL as API_BASE_URL } from '@/shared/constants/api';
 import type { TestInfo } from '@/features/(test-participate)/types';
+import { serverFetcher } from '@/shared/utils/fetcher/serverFetcher';
 
 interface PageProps {
   params: Promise<{
@@ -16,18 +17,9 @@ interface PageProps {
  */
 async function getTestInfo(testId: string): Promise<TestInfo | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/tests/${testId}`, {
+    return await serverFetcher<TestInfo>(`${API_BASE_URL}/tests/${testId}`, {
       cache: 'no-store',
     });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null;
-      }
-      throw new Error('Failed to fetch test');
-    }
-
-    return await response.json();
   } catch (error) {
     console.error('Error fetching test:', error);
     return null;
