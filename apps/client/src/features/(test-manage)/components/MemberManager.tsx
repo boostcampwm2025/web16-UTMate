@@ -104,7 +104,7 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
             </button>
           </div>
         </div>
-      ))}
+      )}
       {/* 기존 멤버 목록 */}
       <div className="mb-6">
         <div className="mb-2 text-base font-bold">기존 멤버 목록</div>
