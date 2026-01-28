@@ -143,8 +143,10 @@ export function TestSettingsStep({
       {/* 성별 설정 - 공개인 경우에만 활성화 */}
       <Card className={!isPublic ? 'opacity-50' : ''}>
         <CardHeader>
-          <CardTitle>성별</CardTitle>
-          <CardDescription>중복선택 가능</CardDescription>
+          <CardTitle>
+            성별 <span className="text-destructive">*</span>
+          </CardTitle>
+          <CardDescription>중복선택 가능 (필수)</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
@@ -182,8 +184,10 @@ export function TestSettingsStep({
       {/* 연령대 설정 - 공개인 경우에만 활성화 */}
       <Card className={!isPublic ? 'opacity-50' : ''}>
         <CardHeader>
-          <CardTitle>연령대</CardTitle>
-          <CardDescription>중복선택 가능</CardDescription>
+          <CardTitle>
+            연령대 <span className="text-destructive">*</span>
+          </CardTitle>
+          <CardDescription>중복선택 가능 (필수)</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
@@ -262,14 +266,6 @@ export function TestSettingsStep({
         </CardContent>
       </Card>
 
-      <div className="text-muted-foreground rounded-lg border bg-blue-50 p-4 text-sm">
-        <p className="font-medium">💡 타겟 설정 안내</p>
-        <ul className="mt-2 list-inside list-disc space-y-1">
-          <li>기본 zod 스키마 위 필드 추가</li>
-          <li>타겟 테스터는 공개인 경우에만 표시/비공개 설정하는 것도 고려</li>
-          <li>프론트 constant를 저리하도록 기존 api에 담아서 PUT /api/tests isPublic:boolean에 제공하면 됨</li>
-        </ul>
-      </div>
     </div>
   );
 }
