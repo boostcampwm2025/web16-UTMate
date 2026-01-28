@@ -38,6 +38,7 @@ export class MissionRepository {
     return this.missionRepository
       .createQueryBuilder('missions')
       .leftJoinAndSelect('missions.test', 'test')
+      .leftJoinAndSelect('test.members', 'members')
       .leftJoinAndSelect('missions.missionResults', 'missionResults')
       .leftJoinAndSelect('missionResults.participant', 'participant')
       .where('missions.publicId = :missionId', { missionId })

@@ -121,7 +121,32 @@ async function verifySdkInstallation(testId: string) {
     emit(event) {
       eventQueue.push(event);
     },
-    maskAllInputs: true, // 모든 인풋을 마스킹
+    // 입력 필드 텍스트 마스킹 (보안) - 실제 입력 값은 마스킹하지만 이벤트는 기록
+    maskAllInputs: true,
+    // 클릭, 스크롤, 마우스 이동 등 모든 인터랙션 기록
+    recordCanvas: false, // 성능상 canvas는 제외
+    recordCrossOriginIframes: false,
+    // 샘플링 설정 (성능 최적화)
+    sampling: {
+      // 마우스 이동은 기록
+      mousemove: true,
+      // 마우스 인터랙션 (클릭, 포커스 등)
+      mouseInteraction: {
+        MouseUp: false,
+        MouseDown: false,
+        Click: true,
+        ContextMenu: true,
+        DblClick: true,
+        Focus: true,
+        Blur: true,
+        TouchStart: true,
+        TouchEnd: true,
+      },
+      // 스크롤 이벤트 샘플링 (ms)
+      scroll: 150,
+      // 입력 이벤트는 마지막 값만 (성능 최적화)
+      input: 'last',
+    },
   });
 
   // 주기적으로 이벤트 전송

@@ -29,14 +29,14 @@ export function useTestForm(initialData: TestDetail) {
     defaultValues: {
       title: initialData.title,
       description: initialData.description,
-      url: initialData.url,
+      url: initialData.url || 'https://', // 빈 값이면 https:// 기본값
       missions:
         initialData.missions?.map((mission) => ({
           publicId: mission.publicId,
           order: mission.order,
           name: mission.name,
           description: mission.description,
-          missionUrl: mission.missionUrl,
+          missionUrl: mission.missionUrl || 'https://', // 빈 값이면 https:// 기본값
           estimatedDuration: mission.estimatedDuration,
         })) || [],
     },
@@ -67,7 +67,7 @@ export function useTestForm(initialData: TestDetail) {
       order: fields.length,
       name: '',
       description: '',
-      missionUrl: '',
+      missionUrl: 'https://', // 기본값으로 https:// 설정
       estimatedDuration: 0,
     });
     setSelectedMissionIndex(fields.length);

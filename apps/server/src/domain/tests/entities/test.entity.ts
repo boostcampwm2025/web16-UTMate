@@ -4,6 +4,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -34,6 +36,14 @@ export class Test {
 
   @Column({ name: 'owner_id' })
   ownerId: number;
+
+  @ManyToMany(() => User, (user) => user.sharedTests)
+  @JoinTable({
+    name: 'test_members',
+    joinColumn: { name: 'test_id' },
+    inverseJoinColumn: { name: 'member_id' },
+  })
+  members: User[];
 
   @Column()
   title: string;
@@ -98,7 +108,7 @@ export class Test {
     }
   }
 
-  private publish() {
+  publish() {
     if (this.sdkStatus === false) {
       throw new Error('SDK 연결이 확인되지 않아 테스트를 게시할 수 없습니다.');
     }
@@ -113,7 +123,7 @@ export class Test {
     this.status = TestStatus.PUBLISHED;
   }
 
-  private archive() {
+  archive() {
     if (this.status === TestStatus.DRAFT) {
       throw new Error('Draft 상태의 테스트는 Archive 할 수 없습니다.');
     }

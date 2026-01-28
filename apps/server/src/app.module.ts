@@ -1,10 +1,13 @@
 import { BullModule } from '@nestjs/bullmq';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { makeHistogramProvider, PrometheusModule } from '@willsoto/nestjs-prometheus';
 import * as Joi from 'joi';
 
 import { ENV_KEYS } from '#common/config/env.constants';
+import { HTTP_REQUEST_DURATION_SECONDS } from '#common/metrics/const';
+import { MetricsMiddleware } from '#common/metrics/metrics.middleware';
 import { RedisModule } from '#common/redis/redis.module';
 import { StorageModule } from '#common/storage/storage.module';
 import { AuthModule } from '#domain/auth/auth.module';
@@ -93,6 +96,14 @@ import { UsersModule } from '#domain/users/users.module';
       }),
     }),
 
+    // Prometheus Module
+    PrometheusModule.register({
+      path: '/metrics',
+      defaultMetrics: {
+        enabled: true,
+      },
+    }),
+
     // common modules
     StorageModule,
     RedisModule,
@@ -105,5 +116,17 @@ import { UsersModule } from '#domain/users/users.module';
     ParticipantsModule,
     SdkModule,
   ],
+  providers: [
+    makeHistogramProvider({
+      name: HTTP_REQUEST_DURATION_SECONDS,
+      help: 'HTTP 요청 처리 시간(초 단위)',
+      labelNames: ['method', 'route', 'code'],
+      buckets: [0.1, 0.3, 0.5, 1, 1.5, 2, 5], // 시간 구간 (초 단위)
+    }),
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(MetricsMiddleware).forRoutes('*');
+  }
+}

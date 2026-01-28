@@ -2,6 +2,7 @@ import { User } from '../entities/user.entity';
 
 export class UserSummaryDto {
   publicId: string;
+  role: string;
   username: string;
   avatarUrl: string;
 
@@ -11,5 +12,9 @@ export class UserSummaryDto {
     dto.username = user.username;
     dto.avatarUrl = user.avatarUrl;
     return dto;
+  }
+
+  static fromUserEntities(users: User[]): UserSummaryDto[] {
+    return users.map((user) => this.fromUserEntity(user));
   }
 }
