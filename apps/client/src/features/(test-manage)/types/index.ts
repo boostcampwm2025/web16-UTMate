@@ -1,3 +1,5 @@
+import type { Interest } from '@/features/(auth)/types';
+
 export const enum TestStatus {
   DRAFT = 'DRAFT',
   PUBLISHED = 'PUBLISHED',
@@ -19,6 +21,11 @@ export interface Test {
   sdkStatus: boolean;
   owner: UserSummary;
   members: UserSummary[];
+  // 타겟 페르소나 설정
+  isPublic: boolean; // 공개/비공개 (필수)
+  targetGender?: string[]; // 비어있으면 모든 성별 대상
+  targetAgeGroup?: string[]; // 비어있으면 모든 연령대 대상
+  targetInterests?: Interest[]; // 비어있으면 모든 관심사 대상
 }
 
 export interface TestMission {
