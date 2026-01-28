@@ -140,22 +140,23 @@ export function TestSettingsStep({
         </CardContent>
       </Card>
 
-      {/* 성별 설정 */}
-      <Card>
+      {/* 성별 설정 - 공개인 경우에만 활성화 */}
+      <Card className={!isPublic ? 'opacity-50' : ''}>
         <CardHeader>
           <CardTitle>성별</CardTitle>
-          <CardDescription>공개/비공개 여부를 선택해주세요 (비공개가 디폴트)</CardDescription>
+          <CardDescription>중복선택 가능</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
             <button
               type="button"
-              onClick={() => toggleGender('모두')}
-              className={`flex-1 rounded-lg border-2 p-4 text-center font-medium transition-colors ${
-                targetGender.length === 0
+              onClick={handleGenderSelectAll}
+              disabled={!isPublic}
+              className={`flex-1 cursor-pointer rounded-lg border-2 p-4 text-center font-medium transition-colors ${
+                targetGender.length === 0 || targetGender.length === GENDER_OPTIONS.length
                   ? 'border-primary bg-primary text-primary-foreground'
                   : 'border-input hover:bg-accent'
-              }`}
+              } ${!isPublic ? 'cursor-not-allowed' : ''}`}
             >
               모두
             </button>
@@ -164,49 +165,37 @@ export function TestSettingsStep({
                 key={option.value}
                 type="button"
                 onClick={() => toggleGender(option.value)}
-                className={`flex-1 rounded-lg border-2 p-4 text-center font-medium transition-colors ${
+                disabled={!isPublic}
+                className={`flex-1 cursor-pointer rounded-lg border-2 p-4 text-center font-medium transition-colors ${
                   targetGender.includes(option.value)
                     ? 'border-primary bg-primary text-primary-foreground'
                     : 'border-input hover:bg-accent'
-                }`}
+                } ${!isPublic ? 'cursor-not-allowed' : ''}`}
               >
                 {option.label}
               </button>
             ))}
-            <button
-              type="button"
-              onClick={() => toggleGender('여')}
-              className={`flex-1 rounded-lg border-2 p-4 text-center font-medium transition-colors ${
-                targetGender.includes('여')
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-input hover:bg-accent'
-              }`}
-            >
-              여
-            </button>
           </div>
-          <p className="text-muted-foreground mt-3 text-sm">
-            공개/비공개 여부를 선택해주세요 (비공개가 디폴트)
-          </p>
         </CardContent>
       </Card>
 
-      {/* 연령대 설정 */}
-      <Card>
+      {/* 연령대 설정 - 공개인 경우에만 활성화 */}
+      <Card className={!isPublic ? 'opacity-50' : ''}>
         <CardHeader>
           <CardTitle>연령대</CardTitle>
-          <CardDescription>여러개 선택할 수 있게</CardDescription>
+          <CardDescription>중복선택 가능</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={() => onTargetAgeGroupChange([])}
-              className={`rounded-lg border-2 px-6 py-3 font-medium transition-colors ${
-                targetAgeGroup.length === 0
+              onClick={handleAgeGroupSelectAll}
+              disabled={!isPublic}
+              className={`cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-colors ${
+                targetAgeGroup.length === 0 || targetAgeGroup.length === AGE_GROUP_OPTIONS.length
                   ? 'border-primary bg-primary text-primary-foreground'
                   : 'border-input hover:bg-accent'
-              }`}
+              } ${!isPublic ? 'cursor-not-allowed' : ''}`}
             >
               모두
             </button>
@@ -215,11 +204,12 @@ export function TestSettingsStep({
                 key={option.value}
                 type="button"
                 onClick={() => toggleAgeGroup(option.value)}
-                className={`rounded-lg border-2 px-6 py-3 font-medium transition-colors ${
+                disabled={!isPublic}
+                className={`cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-colors ${
                   targetAgeGroup.includes(option.value)
                     ? 'border-primary bg-primary text-primary-foreground'
                     : 'border-input hover:bg-accent'
-                }`}
+                } ${!isPublic ? 'cursor-not-allowed' : ''}`}
               >
                 {option.label}
               </button>
@@ -228,31 +218,46 @@ export function TestSettingsStep({
         </CardContent>
       </Card>
 
-      {/* 관심사 설정 */}
-      <Card>
+      {/* 관심사 설정 - 공개인 경우에만 활성화 */}
+      <Card className={!isPublic ? 'opacity-50' : ''}>
         <CardHeader>
           <CardTitle>관심사</CardTitle>
           <CardDescription>타겟 사용자의 관심사를 선택하세요 (복수 선택 가능)</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-3">
+            <button
+              type="button"
+              onClick={handleInterestSelectAll}
+              disabled={!isPublic}
+              className={`cursor-pointer rounded-full border-2 px-6 py-2 text-sm font-medium transition-colors ${
+                targetInterests.length === 0 || targetInterests.length === INTEREST_OPTIONS.length
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-input hover:bg-accent'
+              } ${!isPublic ? 'cursor-not-allowed' : ''}`}
+            >
+              모두
+            </button>
+          </div>
           <div className="flex flex-wrap gap-2">
             {INTEREST_OPTIONS.map((option) => (
               <button
                 key={option.key}
                 type="button"
                 onClick={() => onToggleInterest(option.key)}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                disabled={!isPublic}
+                className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                   targetInterests.includes(option.key)
                     ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
                     : 'border-input bg-background hover:bg-accent hover:text-accent-foreground'
-                }`}
+                } ${!isPublic ? 'cursor-not-allowed' : ''}`}
               >
                 {option.label}
               </button>
             ))}
           </div>
           <p className="text-muted-foreground mt-3 text-sm">
-            선택한 관심사: {targetInterests.length === 0 ? '모두' : `${targetInterests.length}개`}
+            선택한 관심사: {targetInterests.length === 0 ? '모두 (선택하지 않을 시 전체선택)' : `${targetInterests.length}개`}
           </p>
         </CardContent>
       </Card>
