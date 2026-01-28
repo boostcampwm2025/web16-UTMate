@@ -35,4 +35,11 @@ export class UsersRepository {
       .where('users.publicId = :publicId', { publicId })
       .getOne();
   }
+
+  async findByUsername(username: string) {
+    return this.usersRepository
+      .createQueryBuilder('users')
+      .where('LOWER(users.username) = :username', { username: username.toLowerCase() })
+      .getOne();
+  }
 }

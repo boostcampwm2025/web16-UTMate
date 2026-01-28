@@ -7,6 +7,7 @@ import { TestStatusBadge } from '@/shared/components/TestStatusBadge';
 
 import { IntegrationButton } from './IntegrationButton';
 import { TestActionButton } from './TestActionButton';
+import { MemberButton } from './MemberButton';
 
 interface TestTableRowProps {
   test: Test;
@@ -30,10 +31,7 @@ export function TestTableRow({ test }: TestTableRowProps) {
   };
 
   return (
-    <TableRow
-      onClick={handleRowClick}
-      className="cursor-pointer"
-    >
+    <TableRow onClick={handleRowClick} className="cursor-pointer">
       <TableCell className="text-left">
         <div className="font-medium text-gray-900">{test.title}</div>
       </TableCell>
@@ -43,6 +41,10 @@ export function TestTableRow({ test }: TestTableRowProps) {
       <TableCell className="text-center">
         <IntegrationButton url={test.url} sdkStatus={test.sdkStatus} testId={test.publicId} />
       </TableCell>
+      <TableCell className="text-center" onClick={handleActionClick}>
+        <MemberButton testId={test.publicId} owner={test.owner} members={test.members} />
+      </TableCell>
+
       {/* TODO: 테스트 참여자 수 표시 */}
       <TableCell className="text-center">
         <span className="cursor-pointer text-sm text-gray-900"></span>

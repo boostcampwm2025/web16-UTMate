@@ -128,8 +128,6 @@ export class MissionResultsService {
       default:
         throw new BadRequestException('유효하지 않은 미션 결과 상태입니다.');
     }
-
-    // DB에 저장 (중요!)
     await this.missionResultsRepository.save(missionResult);
   }
 
@@ -162,6 +160,12 @@ export class MissionResultsService {
     return MissionResultDetailDto.fromMissionResultEntity(missionResults, presignedUrl);
   }
 
+  /**
+   * 참가자 ID에 해당하는 미션 결과 중 진행 중이거나 대기 중인 미션 결과를 이탈 처리합니다.
+   *
+   * @param participantId 참가자 ID
+   * @param manager 트랜잭션 매니저
+   */
   async dropMissionResultsByParticipantId(participantId: number, manager: EntityManager) {
     const missionResults = await this.missionResultsRepository.findByParticipantId(
       participantId,
