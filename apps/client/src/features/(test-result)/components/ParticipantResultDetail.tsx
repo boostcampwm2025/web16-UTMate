@@ -14,13 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table';
+import { AnimalAvatar } from '@/shared/components/AnimalAvatar';
 
 import { MissionStatusBadge } from './MissionStatusBadge';
 import { formatTimestamp } from '../utils/format';
 import { getParticipantDetail } from '../apis/client';
 import { formatDate } from '../utils/dates';
 import { generateNicknameFromId } from '@/shared/utils/nickname';
-import type { ParticipantMissionResult } from '../types';
 
 interface ParticipantResultDetailProps {
   testId: string;
@@ -42,13 +42,17 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
     router.push(`/tests/${testId}/result/mission-result/${missionResultId}`);
   };
 
+  const nickname = generateNicknameFromId(participant.participantId);
+  const animalName = nickname.split(' ')[1];
+
   return (
     <div className="space-y-4">
       {/* Header Section */}
       <Card className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <div className="ml-6 space-y-1">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {generateNicknameFromId(participant.participantId)}
+        <div className="ml-6 space-y-3">
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+            <AnimalAvatar name={animalName} />
+            {nickname}
           </h2>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <div className="flex items-center gap-1.5">
