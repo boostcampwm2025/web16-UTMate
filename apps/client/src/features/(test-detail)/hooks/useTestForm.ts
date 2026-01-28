@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import type { TestDetail } from '@/features/(test-manage)/types';
 import { updateTest } from '@/shared/api/test';
 import type { UpdateTestMission } from '@/shared/api/test';
+import type { Interest } from '@/features/(auth)/types';
 
 import { TestFormStep } from '../components/TestFormSidebar';
 import { testFormSchema, type TestFormValues } from '../schemas/testForm';
@@ -22,6 +23,12 @@ export function useTestForm(initialData: TestDetail) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 타겟 페르소나 상태
+  const [targetGender, setTargetGender] = useState<string[]>([]);
+  const [targetAgeGroup, setTargetAgeGroup] = useState<string[]>([]);
+  const [targetInterests, setTargetInterests] = useState<Interest[]>([]);
+  const [isPublic, setIsPublic] = useState<boolean>(false);
 
   // react-hook-form 설정
   const form = useForm<TestFormValues>({
@@ -122,6 +129,13 @@ export function useTestForm(initialData: TestDetail) {
         missionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }, 100);
+  };
+
+  // === Target Persona Handlers ===
+  const handleToggleInterest = (interest: Interest) => {
+    setTargetInterests((prev) =>
+      prev.includes(interest) ? prev.filter((i) => i !== interest) : [...prev, interest],
+    );
   };
 
   // === Step Navigation ===
@@ -235,6 +249,16 @@ export function useTestForm(initialData: TestDetail) {
 
       // Form
       save: handleSave,
+
+      // Target Persona
+      targetGender,
+      setTargetGender,
+      targetAgeGroup,
+      setTargetAgeGroup,
+      targetInterests,
+      toggleInterest: handleToggleInterest,
+      isPublic,
+      setIsPublic,
     },
   };
 }
