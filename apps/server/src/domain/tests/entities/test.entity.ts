@@ -11,6 +11,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { AgeRange, Gender, Interest } from '#common/enums';
 import { Mission } from '#domain/missions/entities/mission.entity';
 import { Participant } from '#domain/participants/entities/participant.entity';
 import { User } from '#domain/users/entities/user.entity';
@@ -62,6 +63,15 @@ export class Test {
   @OneToMany(() => Mission, (mission) => mission.test)
   missions: Mission[];
 
+  @Column({ type: 'json', nullable: true })
+  targetGender?: Gender[];
+
+  @Column({ type: 'json', nullable: true })
+  targetAge?: AgeRange[];
+
+  @Column({ type: 'json', nullable: true })
+  targetInterests?: Interest[];
+
   @Column({ type: 'timestamp', nullable: true })
   startDate?: Date;
 
@@ -86,10 +96,16 @@ export class Test {
     return test;
   }
 
-  update(title: string, description: string, url: string) {
+  updateTestInfo(title: string, description: string, url: string) {
     this.title = title;
     this.description = description;
     this.url = url;
+  }
+
+  updateTargeting(targetGender: Gender[], targetAge: AgeRange[], targetInterests: Interest[]) {
+    this.targetGender = targetGender;
+    this.targetAge = targetAge;
+    this.targetInterests = targetInterests;
   }
 
   transitionStatus(status: TestStatus) {

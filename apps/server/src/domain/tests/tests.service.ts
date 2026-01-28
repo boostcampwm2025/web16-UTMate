@@ -53,10 +53,10 @@ export class TestsService {
    *
    * @param userId 사용자 id
    * @param publicId 테스트 public id
-   * @param updateTestDto 업데이트할 테스트 DTO
+   * @param dto 업데이트할 테스트 DTO
    * @throws NotFoundException 테스트를 찾을 수 없거나 테스트에 접근할 권한이 없는 경우
    */
-  async updateTest(userId: number, publicId: string, updateTestDto: UpdateTestDto) {
+  async updateTest(userId: number, publicId: string, dto: UpdateTestDto) {
     // 트랜잭션 시작
     await this.dataSource.transaction(async (manager) => {
       // 테스트 업데이트
@@ -64,12 +64,13 @@ export class TestsService {
       if (!test) {
         throw new NotFoundException('Test not found');
       }
-      test.update(updateTestDto.title, updateTestDto.description, updateTestDto.url);
+      test.updateTestInfo(dto.title, dto.description, dto.url);
+      test.updateTargeting(dto.targetGender, dto.targetAgeRange, dto.targetInterests);
       await this.testsRepository.save(test, manager);
 
       // 미션 업데이트
-      if (updateTestDto.missions) {
-        await this.missionsService.updateMissions(test.id, updateTestDto.missions, manager);
+      if (dto.missions) {
+        await this.missionsService.updateMissions(test.id, dto.missions, manager);
       }
 
       return { success: true };
