@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { TestParticipateClient } from './TestParticipateClient';
+import { TestParticipateClient } from '../../../../features/(test-participate)/components/TestParticipateClient';
 
 import { SERVER_BASE_URL as API_BASE_URL } from '@/shared/constants/api';
 import type { TestInfo } from '@/features/(test-participate)/types';
