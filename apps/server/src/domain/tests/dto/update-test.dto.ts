@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
 
-import { UpdateMissionDto } from './update-mission.dto';
+import { UpdateMissionDto } from '../../missions/dto/update-mission.dto';
 
 export class UpdateTestDto {
   @IsString()

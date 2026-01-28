@@ -14,10 +14,10 @@ import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
-import { MissionsService } from './missions.service';
 import { TestsRepository } from './tests.repository';
 
 import { ENV_KEYS } from '#common/config/env.constants';
+import { MissionsService } from '#domain/missions/missions.service';
 import { ParticipantsService } from '#domain/participants/participants.service';
 import { User } from '#domain/users/entities/user.entity';
 import { UsersService } from '#domain/users/users.service';
@@ -69,7 +69,7 @@ export class TestsService {
 
       // 미션 업데이트
       if (updateTestDto.missions) {
-        await this.missionsService.updateMissions(test, updateTestDto.missions, manager);
+        await this.missionsService.updateMissions(test.id, updateTestDto.missions, manager);
       }
 
       return { success: true };
