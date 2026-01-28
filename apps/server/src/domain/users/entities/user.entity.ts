@@ -1,5 +1,15 @@
 import { nanoid } from 'nanoid';
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+
+import { Test } from '#domain/tests/entities/test.entity';
 
 export enum OAuthProvider {
   github = 'github',
@@ -28,6 +38,15 @@ export class User {
 
   @Column()
   providerId: string;
+
+  @OneToMany(() => Test, (test) => test.owner)
+  ownedTests: Test[];
+
+  @ManyToMany(() => Test, (test) => test.members)
+  sharedTests: Test[];
+
+  @Column({ name: 'created_at', type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
   @BeforeInsert()
   generatePublicId() {

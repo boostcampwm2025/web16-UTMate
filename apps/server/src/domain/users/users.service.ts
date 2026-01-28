@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { SearchUserDto } from './dto/search-user.dto';
 import { UserSummaryDto } from './dto/user-summary.dto';
 import { UsersRepository } from './users.repository';
 
@@ -74,5 +75,13 @@ export class UsersService {
       throw new BadRequestException('User not found');
     }
     return user.id;
+  }
+
+  async getUsersByUsername(query: SearchUserDto) {
+    const findUser = await this.usersRepository.findByUsername(query.username);
+    if (!findUser) {
+      throw new BadRequestException('존재하는 사용자가 없습니다.');
+    }
+    return UserSummaryDto.fromUserEntity(findUser);
   }
 }
