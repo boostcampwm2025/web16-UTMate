@@ -31,7 +31,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
-import { Checkbox } from '@/shared/components/ui/checkbox';
 import { getCurrentUser, deleteUser, savePersona, getPersona } from '@/features/(auth)/apis/client';
 import type { User, PersonaData, Interest } from '@/features/(auth)/types';
 import { INTEREST_OPTIONS, GENDER_OPTIONS, AGE_GROUP_OPTIONS } from '@/features/(auth)/constants/interests';
@@ -245,21 +244,20 @@ export default function ProfilePage() {
           {/* 관심사 */}
           <div className="grid gap-3">
             <Label>관심사 (복수 선택 가능)</Label>
-            <div className="grid grid-cols-2 gap-3 rounded-lg border p-4 md:grid-cols-3">
+            <div className="flex flex-wrap gap-2 rounded-lg border p-4">
               {INTEREST_OPTIONS.map((option) => (
-                <div key={option.key} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={option.key}
-                    checked={persona.interests.includes(option.key)}
-                    onCheckedChange={() => toggleInterest(option.key)}
-                  />
-                  <label
-                    htmlFor={option.key}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {option.label}
-                  </label>
-                </div>
+                <button
+                  key={option.key}
+                  type="button"
+                  onClick={() => toggleInterest(option.key)}
+                  className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                    persona.interests.includes(option.key)
+                      ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
+                      : 'border-input bg-background hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                >
+                  {option.label}
+                </button>
               ))}
             </div>
             <p className="text-muted-foreground text-xs">
