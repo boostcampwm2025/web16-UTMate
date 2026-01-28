@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { AnimalAvatar } from '@/shared/components/AnimalAvatar';
 import { generateNicknameFromId } from '@/shared/utils/nickname';
 
 import { getTestMainFeedback } from '../apis/client';
@@ -51,23 +52,22 @@ interface MainFeedbackItemProps {
 }
 
 function MainFeedbackItem({ feedback }: MainFeedbackItemProps) {
+  const nickname = generateNicknameFromId(feedback.participantId);
   return (
     <li className="flex items-start gap-3">
-      {/* 아바타 원형 플레이스홀더 */}
-      {/* TODO 랜덤 아바타 컴포넌트 추가 */}
-      {/* <div className="shrink-0 w-10 h-10 rounded-full border-2 border-gray-200 bg-gray-50" /> */}
+      <AnimalAvatar name={nickname.split(' ')[1]} className="my-auto" />
 
       {/* 피드백 내용 */}
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-900">
-            {generateNicknameFromId(feedback.participantId)}
-          </span>
+          <span className="text-sm font-medium text-gray-900">{nickname}</span>
           <span className="text-muted-foreground text-xs">
             {formatDistanceToNow(feedback.createdAt)}
           </span>
         </div>
-        <p className="text-muted-foreground text-sm leading-relaxed">{feedback.content}</p>
+        <p className="text-muted-foreground line-clamp-1 text-sm leading-relaxed">
+          {feedback.content}
+        </p>
       </div>
     </li>
   );

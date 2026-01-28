@@ -9,11 +9,7 @@ import { DialogProvider } from '@/shared/providers/DialogProvider';
 import '@/styles/globals.css';
 
 // 서버 사이드 MSW 초기화 (SSR/SSG용)
-if (
-  process.env.NODE_ENV === 'development' &&
-  typeof window === 'undefined' &&
-  process.env.NEXT_PUBLIC_MSW_ENABLED === 'true'
-) {
+if (process.env.NODE_ENV === 'development' && typeof window === 'undefined') {
   const { server } = await import('@/shared/api/mocks/node');
   server.listen({ onUnhandledRequest: 'bypass' });
 }
