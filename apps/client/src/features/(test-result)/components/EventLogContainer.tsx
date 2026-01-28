@@ -47,7 +47,6 @@ export function EventLogContainer({ eventLogs, analysisData }: EventLogContainer
 
   const handleLogClick = (ms: number) => {
     if (!replayer.current) return;
-    console.log(replayer.current);
     replayer.current.goto(ms, true);
   };
 
