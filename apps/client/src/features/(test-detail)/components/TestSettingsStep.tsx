@@ -54,17 +54,6 @@ export function TestSettingsStep({
   };
 
   // 모두 선택/해제 핸들러
-  const handleGenderSelectAll = () => {
-    // 현재 모든 성별이 선택되어 있으면 전체 해제
-    const allSelected = GENDER_OPTIONS.every((opt) => targetGender.includes(opt.value));
-    if (allSelected) {
-      onTargetGenderChange([]);
-    } else {
-      // 일부만 선택되어 있거나 없으면 전체 선택
-      onTargetGenderChange(GENDER_OPTIONS.map((opt) => opt.value));
-    }
-  };
-
   const handleAgeGroupSelectAll = () => {
     const allSelected = AGE_GROUP_OPTIONS.every((opt) => targetAgeGroup.includes(opt.value));
     if (allSelected) {
@@ -150,18 +139,6 @@ export function TestSettingsStep({
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={handleGenderSelectAll}
-              disabled={!isPublic}
-              className={`flex-1 cursor-pointer rounded-lg border-2 p-4 text-center font-medium transition-colors ${
-                targetGender.length === 0 || targetGender.length === GENDER_OPTIONS.length
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-input hover:bg-accent'
-              } ${!isPublic ? 'cursor-not-allowed' : ''}`}
-            >
-              모두
-            </button>
             {GENDER_OPTIONS.map((option) => (
               <button
                 key={option.value}
@@ -201,7 +178,7 @@ export function TestSettingsStep({
                   : 'border-input hover:bg-accent'
               } ${!isPublic ? 'cursor-not-allowed' : ''}`}
             >
-              모두
+              {targetAgeGroup.length === AGE_GROUP_OPTIONS.length ? '모두선택취소' : '모두선택'}
             </button>
             {AGE_GROUP_OPTIONS.map((option) => (
               <button
@@ -240,7 +217,7 @@ export function TestSettingsStep({
                   : 'border-input hover:bg-accent'
               } ${!isPublic ? 'cursor-not-allowed' : ''}`}
             >
-              모두
+              {targetInterests.length === INTEREST_OPTIONS.length ? '모두선택취소' : '모두선택'}
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
