@@ -29,9 +29,9 @@ export const testFormSchema = z.object({
     .max(MAX_MISSIONS, `미션은 최대 ${MAX_MISSIONS}개까지만 추가할 수 있습니다.`),
   // 타겟 페르소나 설정
   isPublic: z.boolean(), // 공개/비공개 필수 선택
-  targetGender: z.array(z.string()).optional(),
-  targetAgeGroup: z.array(z.string()).optional(),
-  targetInterests: z.array(z.string() as z.ZodType<Interest>).optional(),
+  targetGender: z.array(z.string()).min(1, '성별을 최소 1개 이상 선택해주세요.'), // 필수
+  targetAgeGroup: z.array(z.string()).min(1, '연령대를 최소 1개 이상 선택해주세요.'), // 필수
+  targetInterests: z.array(z.string() as z.ZodType<Interest>).optional(), // 선택사항
 });
 
 export type TestFormValues = z.infer<typeof testFormSchema>;

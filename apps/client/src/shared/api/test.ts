@@ -19,9 +19,9 @@ interface UpdateTestParams {
   missions: UpdateTestMission[];
   // 타겟 페르소나 설정
   isPublic: boolean;
-  targetGender?: string[];
-  targetAgeGroup?: string[];
-  targetInterests?: Interest[];
+  targetGender: string[]; // 필수
+  targetAgeGroup: string[]; // 필수
+  targetInterests?: Interest[]; // 선택사항
 }
 
 export const updateTest = async (publicId: string, data: UpdateTestParams): Promise<void> => {
