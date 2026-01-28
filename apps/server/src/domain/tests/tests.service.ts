@@ -399,9 +399,8 @@ export class TestsService {
 
     test.members.splice(memberIndex, 1);
     await this.testsRepository.save(test);
-    
   }
-  
+
   /**
    * 테스트의 모든 미션과 각 미션의 결과를 조회합니다.
    *
@@ -411,7 +410,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
   async getTestMissionsResults(userId: number, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithMissionsAndResults(
+    const test = await this.testsRepository.findByPublicIdAndUserIdWithMissionsAndResults(
       publicId,
       userId,
     );
