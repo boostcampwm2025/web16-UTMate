@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse, delay } from 'msw';
 
 import { SearchTestResponse, SearchTestResult } from '@/features/(test-search)/types';
 
@@ -350,7 +350,10 @@ const AGE_MAP: Record<string, string> = {
 };
 
 export const searchHandlers = [
-  http.get('*/tests/search', ({ request }) => {
+  http.get('*/tests/search', async ({ request }) => {
+    // 로딩 테스트를 위한 의도적인 딜레이
+    await delay(600);
+
     const url = new URL(request.url);
     const gender = url.searchParams.get('gender');
     const age = url.searchParams.get('age');
