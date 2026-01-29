@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import { QueryClientProviders } from '@/shared/providers/QueryClientProvider';
 import { MSWProvider } from '@/shared/providers/MswProvider';
@@ -32,7 +33,9 @@ export default function RootLayout({
     <html lang="ko">
       <body className="antialiased">
         <MSWProvider>
-          <QueryClientProviders>{children}</QueryClientProviders>
+          <NuqsAdapter>
+            <QueryClientProviders>{children}</QueryClientProviders>
+          </NuqsAdapter>
         </MSWProvider>
 
         {process.env.NEXT_PUBLIC_GA_ID && (
