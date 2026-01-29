@@ -42,6 +42,8 @@ export class SearchTestResultDto {
   totalTimeMinutes: number;
   participantsCount: number;
 
+  tags: string[];
+
   constructor() {}
 
   static fromTestEntity(test: Test) {
@@ -56,6 +58,9 @@ export class SearchTestResultDto {
       0,
     );
     dto.participantsCount = test.participants.length;
+    test.targetGenders.forEach((gender) => dto.tags.push(gender));
+    test.targetAges.forEach((ageRange) => dto.tags.push(ageRange));
+    test.targetInterests.forEach((interest) => dto.tags.push(interest));
     return dto;
   }
 
