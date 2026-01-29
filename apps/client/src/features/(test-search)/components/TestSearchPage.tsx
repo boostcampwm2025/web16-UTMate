@@ -103,8 +103,13 @@ export function TestSearchPage() {
   return (
     <main className="h-full w-full bg-gray-50 p-6">
       <div className="flex flex-col space-y-4">
+        <div className="w-full">
+          <h2 className="text-2xl font-semibold text-gray-800">테스트 탐색</h2>
+          <p className="text-muted-foreground">당신을 기다리고 있는 UT를 찾아보세요.</p>
+        </div>
+
         {/* Filters */}
-        <section className="w-full">
+        <div className="w-full">
           <SearchFilter
             gender={gender}
             ageGroup={ageGroup}
@@ -113,7 +118,7 @@ export function TestSearchPage() {
             onAgeGroupChange={handleAgeGroupChange}
             onInterestToggle={handleInterestToggle}
           />
-        </section>
+        </div>
 
         {/* Main Content */}
         <div className="w-full">

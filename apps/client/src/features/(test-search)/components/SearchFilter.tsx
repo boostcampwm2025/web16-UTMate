@@ -1,10 +1,4 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select';
+import { NativeSelect, NativeSelectOption } from '@/shared/components/ui/native-select';
 import { Interest, Gender, AgeGroup } from '@/features/(auth)/types/persona';
 import { Label } from '@/shared/components/ui/label';
 
@@ -27,51 +21,53 @@ export function SearchFilter({
   onAgeGroupChange,
   onInterestToggle,
 }: SearchFilterProps) {
+  const handleGenderSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    onGenderChange(value === 'ALL' ? undefined : (value as Gender));
+  };
+
+  const handleAgeGroupSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    onAgeGroupChange(value === 'ALL' ? undefined : (value as AgeGroup));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-6 md:flex-row">
         {/* Gender & Age */}
         <div className="flex shrink-0 gap-4">
           <div className="w-[140px] space-y-2">
-            <Label>성별</Label>
-            <Select
+            <div className="flex h-8 items-center">
+              <Label>성별</Label>
+            </div>
+            <NativeSelect
               value={gender || 'ALL'}
-              onValueChange={(value) =>
-                onGenderChange(value === 'ALL' ? undefined : (value as Gender))
-              }
+              onChange={handleGenderSelectChange}
+              className="bg-card w-full rounded-full"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="성별 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">모두</SelectItem>
-                <SelectItem value="남성">남성</SelectItem>
-                <SelectItem value="여성">여성</SelectItem>
-              </SelectContent>
-            </Select>
+              <NativeSelectOption value="ALL">모두</NativeSelectOption>
+              <NativeSelectOption value="남성">남성</NativeSelectOption>
+              <NativeSelectOption value="여성">여성</NativeSelectOption>
+            </NativeSelect>
           </div>
 
           <div className="w-[140px] space-y-2">
-            <Label>연령대</Label>
-            <Select
+            <div className="flex h-8 items-center">
+              <Label>연령대</Label>
+            </div>
+            <NativeSelect
               value={ageGroup || 'ALL'}
-              onValueChange={(value) =>
-                onAgeGroupChange(value === 'ALL' ? undefined : (value as AgeGroup))
-              }
+              onChange={handleAgeGroupSelectChange}
+              className="bg-card w-full rounded-full"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="연령대 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">모두</SelectItem>
-                <SelectItem value="10대">10대</SelectItem>
-                <SelectItem value="20대">20대</SelectItem>
-                <SelectItem value="30대">30대</SelectItem>
-                <SelectItem value="40대">40대</SelectItem>
-                <SelectItem value="50대">50대</SelectItem>
-                <SelectItem value="60대 이상">60대 이상</SelectItem>
-              </SelectContent>
-            </Select>
+              <NativeSelectOption value="ALL">모두</NativeSelectOption>
+              <NativeSelectOption value="10대">10대</NativeSelectOption>
+              <NativeSelectOption value="20대">20대</NativeSelectOption>
+              <NativeSelectOption value="30대">30대</NativeSelectOption>
+              <NativeSelectOption value="40대">40대</NativeSelectOption>
+              <NativeSelectOption value="50대">50대</NativeSelectOption>
+              <NativeSelectOption value="60대 이상">60대 이상</NativeSelectOption>
+            </NativeSelect>
           </div>
         </div>
 

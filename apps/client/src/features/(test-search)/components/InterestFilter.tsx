@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+
 import { Interest } from '@/features/(auth)/types/persona';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { cn } from '@/shared/utils';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
+import { useToggle } from '@/shared/hooks/useToggle';
 
 const INTEREST_EMOJI_MAP: Record<Interest, string> = {
   [Interest.EDUCATION]: '📚',
@@ -47,7 +49,7 @@ interface InterestFilterProps {
 }
 
 export function InterestFilter({ selectedInterests, onInterestToggle }: InterestFilterProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, toggle] = useToggle(false);
   const interests = Object.values(Interest);
 
   return (
@@ -57,7 +59,7 @@ export function InterestFilter({ selectedInterests, onInterestToggle }: Interest
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={toggle}
           className="text-muted-foreground h-8 px-2 text-xs"
         >
           {isExpanded ? (
@@ -73,8 +75,8 @@ export function InterestFilter({ selectedInterests, onInterestToggle }: Interest
       </div>
       <div
         className={cn(
-          'flex flex-wrap gap-2 overflow-hidden transition-[max-height] duration-800 ease-in-out',
-          isExpanded ? 'max-h-[500px]' : 'max-h-[68px]',
+          'flex flex-wrap gap-2 overflow-hidden transition-[max-height] duration-400',
+          isExpanded ? 'max-h-[400px]' : 'max-h-[68px]',
         )}
       >
         {interests.map((interest) => {
