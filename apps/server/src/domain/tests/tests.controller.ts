@@ -8,6 +8,7 @@ import {
   ParseEnumPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -37,7 +38,7 @@ export class TestsController {
   }
 
   @Get('/search')
-  async searchTests(@Param() query: SearchTestQueryDto) {
+  async searchTests(@Query() query: SearchTestQueryDto) {
     return this.testsService.searchTestsByQuery(query);
   }
 
