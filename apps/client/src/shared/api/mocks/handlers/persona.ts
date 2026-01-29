@@ -1,10 +1,11 @@
 import { http, HttpResponse } from 'msw';
 
+import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import { Interest } from '@/features/(auth)/types/persona';
 import type { PersonaData } from '@/features/(auth)/types/persona';
 
 export const personaHandlers = [
-  http.get('*/users/persona', () => {
+  http.get(`${CLIENT_BASE_URL}/users/persona`, () => {
     const mockPersona: PersonaData = {
       gender: 'MALE',
       ageGroup: '20',

@@ -10,6 +10,9 @@ import { searchHandlers } from './search';
  * 개발 환경에서 API 응답을 모킹합니다.
  */
 export const handlers = [
+  // Search 핸들러
+  ...searchHandlers,
+
   // Tests 핸들러
   ...testsHandlers,
 
@@ -18,7 +21,4 @@ export const handlers = [
 
   // Persona 핸들러
   ...personaHandlers,
-
-  // Search 핸들러
-  ...searchHandlers,
 ];
