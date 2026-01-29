@@ -50,6 +50,7 @@ export class MissionResultsRepository {
       .leftJoinAndSelect('missionResult.participant', 'participant')
       .leftJoinAndSelect('missionResult.mission', 'mission')
       .leftJoinAndSelect('participant.test', 'test')
+      .leftJoinAndSelect('participant.member', 'member')
       .where('missionResult.publicId = :publicId', { publicId })
       .getOne();
   }
