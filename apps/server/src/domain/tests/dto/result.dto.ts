@@ -74,7 +74,7 @@ export class ParticipantResultsDto {
 export class MainFeedbackDto {
   participantId: string;
   content: string;
-  personaTag: string[] = [];
+  personaTags: string[] = [];
   createdAt: Date;
 
   static fromEntity(participant: Participant) {
@@ -86,12 +86,14 @@ export class MainFeedbackDto {
     dto.content = participant.feedback;
     if (participant.userType === 'REGISTERED' && participant.user) {
       if (participant.user.persona) {
-        dto.personaTag.push(participant.user.persona.gender);
-        dto.personaTag.push(participant.user.persona.ageGroup);
-        dto.personaTag.push(...participant.user.persona.interests);
+        dto.personaTags.push(participant.user.persona.gender);
+        dto.personaTags.push(participant.user.persona.ageGroup);
+        dto.personaTags.push(...participant.user.persona.interests);
+      } else {
+        dto.personaTags.push('미설정');
       }
     } else {
-      dto.personaTag.push('GUEST');
+      dto.personaTags.push('GUEST');
     }
     dto.createdAt = participant.joinedAt;
     return dto;
@@ -112,7 +114,7 @@ export class MissionResultOverviewDto {
 
   // 참가자 정보
   participantId: string;
-  persona: string;
+  personaTags: string[] = [];
 
   static fromEntity(missionResult: MissionResult) {
     const dto = new MissionResultOverviewDto();
@@ -122,7 +124,17 @@ export class MissionResultOverviewDto {
     dto.feedback = missionResult.feedback;
 
     dto.participantId = missionResult.participant.publicId;
-    dto.persona = 'GUEST'; // TODO: 참가자 페르소나 기능 구현 시 수정 필요
+    if (missionResult.participant.userType === 'REGISTERED' && missionResult.participant.user) {
+      if (missionResult.participant.user.persona) {
+        dto.personaTags.push(missionResult.participant.user.persona.gender);
+        dto.personaTags.push(missionResult.participant.user.persona.ageGroup);
+        dto.personaTags.push(...missionResult.participant.user.persona.interests);
+      } else {
+        dto.personaTags.push('미설정');
+      }
+    } else {
+      dto.personaTags.push('GUEST');
+    }
     return dto;
   }
 

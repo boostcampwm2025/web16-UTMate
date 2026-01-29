@@ -62,9 +62,9 @@ function MainFeedbackItem({ feedback }: MainFeedbackItemProps) {
         <div className="mb-1 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-900">{nickname}</span>
-            {feedback.personaTag.length > 0 && (
+            {feedback.personaTags.length > 0 && (
               <span className="flex gap-1">
-                {feedback.personaTag.map((tag, idx) => (
+                {feedback.personaTags.map((tag, idx) => (
                   <span
                     key={idx}
                     className="bg-muted text-muted-foreground border-muted-foreground/10 rounded-full border px-2 py-0.5 text-xs"
