@@ -1,16 +1,19 @@
 'use client';
 
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog';
-import { useDialogStore } from '@/shared/stores/useDialogStore';
-import { Button } from '@/shared/components/ui/button';
 import { Loader2 } from 'lucide-react';
+
+import { Button } from '@/shared/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/components/ui/dialog';
+import { useDialogStore } from '@/shared/stores/useDialogStore';
+
+type PointerDownOutsideEvent = CustomEvent<{ originalEvent: PointerEvent }>;
 
 export const DialogProvider = () => {
   const {
@@ -33,15 +36,21 @@ export const DialogProvider = () => {
     }
   }
 
+  function handlePointerDownOutside(e: PointerDownOutsideEvent) {
+    if (isLoading) {
+      e.preventDefault();
+    }
+  }
+
   return (
-    <AlertDialog open={isOpen} onOpenChange={handleOnOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+    <Dialog open={isOpen} onOpenChange={handleOnOpenChange}>
+      <DialogContent showCloseButton={false} onPointerDownOutside={handlePointerDownOutside}>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
           {content}
-        </AlertDialogHeader>
-        <AlertDialogFooter>
+        </DialogHeader>
+        <DialogFooter>
           {hasCancel && (
             <Button variant="outline" onClick={onCancel} disabled={isLoading}>
               {cancelText}
@@ -55,8 +64,8 @@ export const DialogProvider = () => {
             {isLoading && <Loader2 className="mr-2 size-4 animate-spin" />}
             {confirmText}
           </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

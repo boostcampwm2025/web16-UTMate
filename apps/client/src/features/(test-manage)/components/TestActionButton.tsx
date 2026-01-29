@@ -140,9 +140,11 @@ export function TestActionButton({ testId, testStatus }: TestActionButtonProps) 
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={handleUpdate} className="cursor-pointer text-base">
-          수정
-        </DropdownMenuItem>
+        {testStatus === TestStatus.DRAFT && (
+          <DropdownMenuItem onClick={handleUpdate} className="cursor-pointer text-base">
+            수정
+          </DropdownMenuItem>
+        )}
         {testStatus === TestStatus.DRAFT && (
           <DropdownMenuItem
             onClick={handlePublish}

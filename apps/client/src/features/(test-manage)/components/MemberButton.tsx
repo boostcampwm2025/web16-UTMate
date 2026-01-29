@@ -1,7 +1,14 @@
-import { Settings } from 'lucide-react';
-import { UserSummary } from '../types';
-import { MemberManager } from './MemberManager';
+'use client';
+
+import { PlusIcon } from 'lucide-react';
+
 import { useDialogStore } from '@/shared/stores/useDialogStore';
+import { Avatar, AvatarImage } from '@/shared/components/ui/avatar';
+import { Button } from '@/shared/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import { MemberManager } from './MemberManager';
+
+import type { UserSummary } from '../types';
 
 interface MemberButtonProps {
   testId: string;
@@ -16,49 +23,34 @@ export function MemberButton({ testId, owner, members }: MemberButtonProps) {
 
     await confirm(
       '테스트 멤버 관리',
-      '공유 받을 멤버를 추가 삭제 할 수 있습니다.',
+      '테스트 멤버를 추가하여 테스트를 공유할 수 있습니다.',
       <MemberManager testId={testId} owner={owner} members={members} />,
       { hasCancel: false },
     );
   };
 
   const allMembers = [owner, ...members];
-  // 아바타 그룹을 컨테이너 중앙에 오도록 left 오프셋 계산
-  const avatarCount = Math.min(allMembers.length, 4);
-  const avatarSize = 28; // h-7 w-7 = 28px
-  const overlap = 12; // 겹치는 정도
-  const groupWidth = avatarCount > 1 ? avatarSize + (avatarCount - 1) * overlap : avatarSize;
-  const containerWidth = 64;
-  const startLeft = (containerWidth - groupWidth) / 2;
 
   return (
-    <div className="relative inline-flex h-8 items-center gap-2" onClick={handleClick}>
-      <div
-        className="flex h-8 items-center justify-center"
-        style={{
-          width: `${containerWidth}px`,
-          minWidth: `${containerWidth}px`,
-          maxWidth: `${containerWidth}px`,
-          position: 'relative',
-        }}
-      >
-        {allMembers.slice(0, 4).map((user, idx) => (
-          <img
-            key={user.publicId}
-            src={user.avatarUrl}
-            alt={user.username}
-            className="h-7 w-7 rounded-full border-2 border-white bg-white"
-            style={{
-              zIndex: 10 - idx,
-              position: 'absolute',
-              left: `${startLeft + idx * overlap}px`,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              transition: 'left 0.1s',
-            }}
-          />
-        ))}
-      </div>
+    <div className="flex justify-center -space-x-2" onClick={handleClick}>
+      {allMembers.slice(0, 4).map((user, idx) => (
+        <Avatar key={user.publicId} className="size-9">
+          <AvatarImage src={user.avatarUrl} alt={user.username} />
+        </Avatar>
+      ))}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            className="z-10 size-9 rounded-full"
+            onClick={handleClick}
+            aria-label="멤버 추가"
+          >
+            <PlusIcon className="size-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>테스트에 멤버를 추가하여 테스트를 공유할 수 있습니다.</TooltipContent>
+      </Tooltip>
     </div>
   );
 }

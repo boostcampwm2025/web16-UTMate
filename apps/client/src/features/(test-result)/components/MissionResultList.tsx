@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table';
-
+import { AnimalAvatar } from '@/shared/components/AnimalAvatar';
 import { generateNicknameFromId } from '@/shared/utils/nickname';
 
 import { MissionStatusBadge } from './MissionStatusBadge';
@@ -49,34 +49,40 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
             </TableCell>
           </TableRow>
         ) : (
-          missionLogs.missionResults.map((missionResult) => (
-            <TableRow
-              key={missionResult.id}
-              onClick={() => handleRowClick(missionResult.id)}
-              className="cursor-pointer transition-colors hover:bg-gray-50/50"
-            >
-              <TableCell className="font-medium">
-                {generateNicknameFromId(missionResult.participantId)}
-              </TableCell>
+          missionLogs.missionResults.map((missionResult) => {
+            const nickname = generateNicknameFromId(missionResult.participantId);
+            const animalName = nickname.split(' ')[1];
 
-              <TableCell className="text-center">
-                <MissionStatusBadge status={missionResult.status} />
-              </TableCell>
-              <TableCell className="max-w-[200px]">
-                <div
-                  className="text-muted-foreground truncate text-sm"
-                  title={missionResult.feedback || ''}
-                >
-                  {missionResult.feedback || (
-                    <span className="text-gray-300 italic">피드백 없음</span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell className="text-right font-medium">
-                {missionResult.duration != null ? formatTimestamp(missionResult.duration) : '-'}
-              </TableCell>
-            </TableRow>
-          ))
+            return (
+              <TableRow
+                key={missionResult.id}
+                onClick={() => handleRowClick(missionResult.id)}
+                className="cursor-pointer transition-colors hover:bg-gray-50/50"
+              >
+                <TableCell className="flex items-center gap-2 font-medium">
+                  <AnimalAvatar name={animalName} />
+                  {nickname}
+                </TableCell>
+
+                <TableCell className="text-center">
+                  <MissionStatusBadge status={missionResult.status} />
+                </TableCell>
+                <TableCell className="max-w-[200px]">
+                  <div
+                    className="text-muted-foreground truncate text-sm"
+                    title={missionResult.feedback || ''}
+                  >
+                    {missionResult.feedback || (
+                      <span className="text-gray-300 italic">피드백 없음</span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  {missionResult.duration != null ? formatTimestamp(missionResult.duration) : '-'}
+                </TableCell>
+              </TableRow>
+            );
+          })
         )}
       </TableBody>
     </Table>

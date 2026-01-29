@@ -10,6 +10,16 @@ const mockUsers: UserSummary[] = [
     username: '문성',
     avatarUrl: '',
   },
+  {
+    publicId: 'user-2',
+    username: '문성2',
+    avatarUrl: '',
+  },
+  {
+    publicId: 'user-3',
+    username: '문성3',
+    avatarUrl: '',
+  },
 ];
 
 const mockMissions: Record<string, TestMission[]> = {
@@ -55,6 +65,7 @@ const mockTests: Test[] = [
     url: 'https://notion.so',
     sdkStatus: true,
     owner: mockUsers[0],
+    members: mockUsers,
   },
   {
     publicId: '2',
@@ -64,6 +75,7 @@ const mockTests: Test[] = [
     url: '',
     sdkStatus: false,
     owner: mockUsers[0],
+    members: mockUsers,
   },
   {
     publicId: '3',
@@ -73,6 +85,7 @@ const mockTests: Test[] = [
     url: 'https://example.com',
     sdkStatus: true,
     owner: mockUsers[0],
+    members: mockUsers,
   },
   {
     publicId: '4',
@@ -82,6 +95,7 @@ const mockTests: Test[] = [
     url: '',
     sdkStatus: false,
     owner: mockUsers[0],
+    members: mockUsers,
   },
   {
     publicId: '5',
@@ -91,6 +105,7 @@ const mockTests: Test[] = [
     url: 'https://example.com/test5',
     sdkStatus: true,
     owner: mockUsers[0],
+    members: mockUsers,
   },
 ];
 
@@ -144,6 +159,7 @@ export const testsHandlers = [
       url: '',
       sdkStatus: false,
       owner: mockUsers[0],
+      members: [],
     };
 
     mockTests.push(newTest);
