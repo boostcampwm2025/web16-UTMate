@@ -74,6 +74,7 @@ export class ParticipantResultsDto {
 export class MainFeedbackDto {
   participantId: string;
   content: string;
+  personaTag: string[] = [];
   createdAt: Date;
 
   static fromEntity(participant: Participant) {
@@ -83,6 +84,15 @@ export class MainFeedbackDto {
     const dto = new MainFeedbackDto();
     dto.participantId = participant.publicId;
     dto.content = participant.feedback;
+    if (participant.userType === 'REGISTERED' && participant.user) {
+      if (participant.user.persona) {
+        dto.personaTag.push(participant.user.persona.gender);
+        dto.personaTag.push(participant.user.persona.ageGroup);
+        dto.personaTag.push(...participant.user.persona.interests);
+      }
+    } else {
+      dto.personaTag.push('GUEST');
+    }
     dto.createdAt = participant.joinedAt;
     return dto;
   }

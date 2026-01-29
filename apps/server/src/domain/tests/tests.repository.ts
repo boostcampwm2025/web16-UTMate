@@ -216,6 +216,8 @@ export class TestsRepository {
   ) {
     return this.createAccessibleQuery(userId, manager)
       .leftJoinAndSelect('tests.participants', 'participants')
+      .leftJoinAndSelect('participants.user', 'participantUser')
+      .leftJoinAndSelect('participantUser.persona', 'participantPersona')
       .andWhere('tests.publicId = :publicId', { publicId })
       .getOne();
   }

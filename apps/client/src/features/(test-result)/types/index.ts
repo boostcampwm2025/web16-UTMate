@@ -34,6 +34,7 @@ export interface ParticipantResult {
 // 주요 피드백 관련 타입 추가
 export interface MainFeedback {
   participantId: string;
+  personaTag: string[];
   content: string;
   createdAt: string;
 }
