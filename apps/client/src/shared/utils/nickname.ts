@@ -20,23 +20,27 @@ const RANDOM_ADJECTIVES = [
 
 const RANDOM_ANIMALS = [
   '다람쥐',
-  '토끼',
-  '고양이',
-  '강아지',
-  '햄스터',
-  '여우',
-  '곰',
-  '펭귄',
-  '토끼',
-  '사자',
-  '호랑이',
-  '늑대',
-  '오리',
-  '올빼미',
-  '참새',
-  '부엉이',
   '물고기',
   '사슴',
+  '코끼리',
+  '여우',
+  '개구리',
+  '기린',
+  '양',
+  '사자',
+  '라마',
+  '강아지',
+  '문어',
+  '부엉이',
+  '판다',
+  '펠리컨',
+  '펭귄',
+  '북극곰',
+  '토끼',
+  '참새',
+  '청설모',
+  '거북이',
+  '바다코끼리',
 ];
 
 /**
@@ -59,10 +63,10 @@ function simpleHash(str: string): number {
  */
 export function generateNicknameFromId(id: string): string {
   const hash = simpleHash(id);
-  
+
   const adjectiveIndex = hash % RANDOM_ADJECTIVES.length;
   const animalIndex = Math.floor(hash / RANDOM_ADJECTIVES.length) % RANDOM_ANIMALS.length;
   const number = (hash % 100).toString().padStart(2, '0');
-  
+
   return `${RANDOM_ADJECTIVES[adjectiveIndex]} ${RANDOM_ANIMALS[animalIndex]} ${number}`;
 }
