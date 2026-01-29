@@ -36,6 +36,14 @@ export class MissionResultsRepository {
       .getMany();
   }
 
+  async findByParticipantId(participantId: number, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(MissionResult) : this.repository;
+    return repo
+      .createQueryBuilder('missionResult')
+      .where('missionResult.participant_id = :participantId', { participantId })
+      .getMany();
+  }
+
   findByPublicIdWithAllRelations(publicId: string) {
     return this.repository
       .createQueryBuilder('missionResult')

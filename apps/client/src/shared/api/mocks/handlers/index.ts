@@ -1,12 +1,24 @@
 import { testsHandlers } from './tests';
+import { resultHandlers } from './result';
+
+import { personaHandlers } from './persona';
+
+import { searchHandlers } from './search';
 
 /**
  * MSW API 핸들러
  * 개발 환경에서 API 응답을 모킹합니다.
  */
 export const handlers = [
+  // Search 핸들러
+  ...searchHandlers,
+
   // Tests 핸들러
   ...testsHandlers,
 
-  // 필요한 추가 핸들러를 여기에 작성
+  // Result 핸들러 (테스트 결과 페이지)
+  ...resultHandlers,
+
+  // Persona 핸들러
+  ...personaHandlers,
 ];

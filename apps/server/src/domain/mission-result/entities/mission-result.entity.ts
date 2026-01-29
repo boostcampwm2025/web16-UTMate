@@ -11,8 +11,8 @@ import {
 import { MissionResultStatus } from '../enums';
 
 import { AnalyzerResult } from '#domain/analyzer/dto/analyzer.dto';
+import { Mission } from '#domain/missions/entities/mission.entity';
 import { Participant } from '#domain/participants/entities/participant.entity';
-import { Mission } from '#domain/tests/entities/mission.entity';
 
 @Entity('mission_results')
 export class MissionResult {
@@ -81,28 +81,14 @@ export class MissionResult {
     return new MissionResult(missionId, participantId);
   }
 
-  transition(status: MissionResultStatus, feedback: string | undefined) {
-    switch (status) {
-      case MissionResultStatus.IN_PROGRESS:
-        this.start();
-        break;
-      case MissionResultStatus.SUCCESS:
-      case MissionResultStatus.FAILED:
-        this.complete(status, feedback);
-        break;
-      default:
-        throw new Error('유효하지 않은 미션 결과 상태입니다.');
-    }
-  }
-
-  private start() {
+  start() {
     if (this.status === MissionResultStatus.FAILED || this.status === MissionResultStatus.SUCCESS) {
       throw new Error('이미 완료된 미션입니다. 진행 중 상태로 변경할 수 없습니다.');
     }
     this.status = MissionResultStatus.IN_PROGRESS;
   }
 
-  private complete(status: MissionResultStatus, feedback?: string) {
+  complete(status: MissionResultStatus, feedback?: string) {
     if (this.status !== MissionResultStatus.IN_PROGRESS) {
       throw new Error('미션 결과는 진행 중 상태에서만 완료할 수 있습니다.');
     }
@@ -111,6 +97,10 @@ export class MissionResult {
     }
     this.status = status;
     this.feedback = feedback;
+  }
+
+  drop() {
+    this.status = MissionResultStatus.DROP;
   }
 
   recordUploadedFile(filename: string) {

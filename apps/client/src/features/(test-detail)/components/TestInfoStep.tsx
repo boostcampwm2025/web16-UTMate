@@ -56,7 +56,7 @@ export function TestInfoStep({ register, errors }: TestInfoStepProps) {
           <FieldLabel htmlFor="test-url">서비스 URL *</FieldLabel>
           <Input
             id="test-url"
-            placeholder="https://www.utmate.me"
+            placeholder="https://"
             {...register('url')}
             autoComplete="off"
             aria-invalid={!!errors.url}

@@ -19,7 +19,7 @@ export class UsersRepository {
   async findSummary(id: number) {
     return this.usersRepository
       .createQueryBuilder('users')
-      .select(['users.publicId', 'users.username', 'users.avatarUrl'])
+      .select(['users.publicId', 'users.username', 'users.avatarUrl', 'users.email'])
       .where('users.id = :id', { id })
       .getOne();
   }
@@ -33,6 +33,13 @@ export class UsersRepository {
       .createQueryBuilder('users')
       .select(['users.id'])
       .where('users.publicId = :publicId', { publicId })
+      .getOne();
+  }
+
+  async findByUsername(username: string) {
+    return this.usersRepository
+      .createQueryBuilder('users')
+      .where('LOWER(users.username) = :username', { username: username.toLowerCase() })
       .getOne();
   }
 }

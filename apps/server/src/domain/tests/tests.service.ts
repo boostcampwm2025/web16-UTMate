@@ -8,17 +8,20 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
-import { MainFeedbackDto, ParticipantResultsDto } from './dto/result.dto';
+import { MainFeedbackDto, ParticipantResultsDto, TestMissionsResultsDto } from './dto/result.dto';
+import { SearchTestQueryDto, SearchTestResponseDto } from './dto/search-test.dto';
 import { TestDto } from './dto/test.dto';
 import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
-import { MissionsService } from './missions.service';
 import { TestsRepository } from './tests.repository';
 
 import { ENV_KEYS } from '#common/config/env.constants';
+import { MissionsService } from '#domain/missions/missions.service';
 import { ParticipantsService } from '#domain/participants/participants.service';
+import { User } from '#domain/users/entities/user.entity';
+import { UsersService } from '#domain/users/users.service';
 
 @Injectable()
 export class TestsService {
@@ -26,6 +29,7 @@ export class TestsService {
     @Inject() private readonly testsRepository: TestsRepository,
     @Inject() private readonly missionsService: MissionsService,
     @Inject() private readonly participantsService: ParticipantsService,
+    @Inject() private readonly usersService: UsersService,
     @Inject() private readonly dataSource: DataSource,
     @Inject() private readonly configService: ConfigService,
   ) {}
@@ -48,25 +52,26 @@ export class TestsService {
    * 하나의 트랜잭션 내에서 테스트 업데이트와 미션 업데이트를 처리합니다.
    * 미션 업데이트는 MissionsService에 위임합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @param publicId 테스트 public id
-   * @param updateTestDto 업데이트할 테스트 DTO
-   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   * @param dto 업데이트할 테스트 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 테스트에 접근할 권한이 없는 경우
    */
-  async updateTest(ownerId: number, publicId: string, updateTestDto: UpdateTestDto) {
+  async updateTest(userId: number, publicId: string, dto: UpdateTestDto) {
     // 트랜잭션 시작
     await this.dataSource.transaction(async (manager) => {
       // 테스트 업데이트
-      const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId, manager);
+      const test = await this.testsRepository.findByPublicIdAndUserId(publicId, userId, manager);
       if (!test) {
         throw new NotFoundException('Test not found');
       }
-      test.update(updateTestDto.title, updateTestDto.description, updateTestDto.url);
+      test.updateTestInfo(dto.title, dto.description, dto.url, dto.isPublic);
+      test.updateTargeting(dto.targetGenders, dto.targetAges, dto.targetInterests);
       await this.testsRepository.save(test, manager);
 
       // 미션 업데이트
-      if (updateTestDto.missions) {
-        await this.missionsService.updateMissions(test, updateTestDto.missions, manager);
+      if (dto.missions) {
+        await this.missionsService.updateMissions(test.id, dto.missions, manager);
       }
 
       return { success: true };
@@ -74,13 +79,26 @@ export class TestsService {
   }
 
   /**
-   * 내가 소유한 테스트들을 요약 정보만 조회합니다.
+   * 검색 쿼리에 따라 테스트를 검색합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param query 검색 쿼리 DTO
+   * @returns 검색된 테스트 DTO와 총 페이지 수
+   */
+  async searchTestsByQuery(query: SearchTestQueryDto) {
+    const [tests, count] = await this.testsRepository.searchTestsByQuery(query);
+    const totalPage = Math.ceil(count / query.limit);
+    return SearchTestResponseDto.fromTestEntities(tests, totalPage);
+  }
+
+  /**
+   * 소유한 테스트 혹은 공유 받은 테스트의 요약 정보만 조회합니다.
+   *
+   * @param userId 사용자 id
    * @returns 테스트 요약 DTO 배열
    */
-  async getMyTests(ownerId: number) {
-    const tests = await this.testsRepository.findSummariesByOwner(ownerId);
+  async getMyTests(userId: number) {
+    const tests = await this.testsRepository.findByUserIdWithUsers(userId);
+
     return TestSummaryDto.fromTestEntities(tests);
   }
 
@@ -88,53 +106,61 @@ export class TestsService {
    * 특정 테스트의 상세 정보를 조회합니다.
    * 공개된 테스트이거나, 소유자가 조회하는 경우에만 접근을 허용합니다.
    *
-   * @param ownerId 테스트 소유자 id (Optional)
+   * @param userId 사용자 id (Optional)
    * @param publicId 테스트 public id
    * @returns 테스트 DTO
-   * @throws NotFoundException 테스트를 찾을 수 없는 경우
-   * @throws ForbiddenException 공개 상태가 아닌 테스트에 대해 소유자가 이외의 사용자가 접근하는 경우
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자(맴버) 이외의 사용자가 접근하는 경우
    */
-  async getTestById(ownerId: number | undefined, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
+  async getTestById(userId: number | undefined, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdWithMembers(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
 
+    // 공개된 테스트인 경우 바로 반환
     if (test.status === TestStatus.PUBLISHED) return TestDto.fromTestEntity(test);
 
-    if (test.ownerId !== ownerId) {
-      throw new ForbiddenException('Test not found');
+    // 비공개 테스트인 경우 소유자(맴버)인지 확인
+
+    if (!userId) {
+      throw new NotFoundException('Test not found');
     }
+
+    if (userId !== test.ownerId && test.members.every((member) => member.id !== userId)) {
+      throw new NotFoundException('Test not found');
+    }
+
     return TestDto.fromTestEntity(test);
   }
 
   /**
    * SDK의 설치 상태만 조회합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @param publicId 테스트 public id
    * @returns SDK 설치 상태
-   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자(맴버) 이외의 사용자가 접근하는 경우
    */
-  async getSdkStatus(ownerId: number, publicId: string) {
-    const test = await this.testsRepository.findSdkStatusByPublicIdAndOwner(publicId, ownerId);
+  async getSdkStatus(userId: number, publicId: string) {
+    const test = await this.testsRepository.findSdkStatusByPublicIdAndUserId(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
+
     return { sdkStatus: test.sdkStatus };
   }
 
   /**
    * 테스트를 삭제합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @param publicId 테스트 public id
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
-  async deleteTest(ownerId: number, publicId: string) {
+  async deleteTest(userId: number, publicId: string) {
     // 테스트 삭제
     // 관련된 미션들은 Test 엔티티의 onDelete: 'CASCADE' 옵션에 의해 자동 삭제됨
-    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId);
+    const test = await this.testsRepository.findByPublicIdAndUserId(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
@@ -144,17 +170,18 @@ export class TestsService {
   /**
    * 테스트 상태를 업데이트합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @param publicId 테스트 public id
    * @param status 업데이트할 테스트 상태
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    * @throws BadRequestException 잘못된 상태로 변경하려는 경우
    */
-  async updateTestStatus(ownerId: number, publicId: string, status: TestStatus) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithMissions(publicId, ownerId);
+  async updateTestStatus(userId: number, publicId: string, status: TestStatus) {
+    const test = await this.testsRepository.findByPublicIdAndUserIdWithMissions(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
+
     try {
       test.transitionStatus(status);
     } catch (error) {
@@ -166,13 +193,13 @@ export class TestsService {
   /**
    * SDK 설치를 검증합니다.
    *
-   * @param ownerId 테스트 소유자 id
+   * @param userId 사용자 id
    * @param publicId 테스트 public id
    * @returns SDK 설치 상태
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
-  async verifySdkInstallation(ownerId: number, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwner(publicId, ownerId);
+  async verifySdkInstallation(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndUserId(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
@@ -241,7 +268,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없는 경우
    * @throws BadRequestException 테스트가 게시되지 않은 경우
    */
-  async participateTest(userId: number | undefined, publicId: string) {
+  async participateTest(userId: number | undefined, publicId: string, uaInfo: UAParser.IResult) {
     const test = await this.testsRepository.findByPublicIdWithMissions(publicId);
     if (!test) {
       throw new NotFoundException('Test not found');
@@ -249,7 +276,7 @@ export class TestsService {
     if (test.status !== TestStatus.PUBLISHED) {
       throw new BadRequestException('Test is not published');
     }
-    return this.participantsService.createParticipant(userId, test.id, test.missions);
+    return this.participantsService.createParticipant(userId, test.id, test.missions, uaInfo);
   }
 
   /**
@@ -261,7 +288,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
   async getTestResultSummary(userId: number, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipants(
+    const test = await this.testsRepository.findByPublicIdAndUserIdWithParticipants(
       publicId,
       userId,
     );
@@ -280,10 +307,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
   async getTestParticipantsResults(userId: number, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithAllRelations(
-      publicId,
-      userId,
-    );
+    const test = await this.testsRepository.findByPublicIdAndUserIdWithRelations(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
@@ -299,7 +323,7 @@ export class TestsService {
    * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
    */
   async getTestMainFeedback(userId: number, publicId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipants(
+    const test = await this.testsRepository.findByPublicIdAndUserIdWithParticipants(
       publicId,
       userId,
     );
@@ -319,10 +343,10 @@ export class TestsService {
    * @throws NotFoundException 테스트 또는 참여자를 찾을 수 없거나 소유자가 아닌 경우
    */
   async getTestParticipantDetail(userId: number, publicId: string, participantId: string) {
-    const test = await this.testsRepository.findByPublicIdAndOwnerWithParticipant(
+    const test = await this.testsRepository.findForParticipantReport(
       publicId,
-      userId,
       participantId,
+      userId,
     );
     if (!test) {
       throw new NotFoundException('Test not found');
@@ -331,5 +355,82 @@ export class TestsService {
       throw new NotFoundException('Participant not found');
     }
     return ParticipantResultsDto.fromEntity(test.participants[0], test.missions);
+  }
+
+  /**
+   * 테스트 멤버를 추가합니다.
+   *
+   * @param userId 사용자 ID
+   * @param publicId 테스트 공개 ID
+   * @param memberPublicId 추가할 멤버 공개 ID
+   * @throws NotFoundException 테스트 또는 멤버를 찾을 수 없는 경우
+   * @throws ForbiddenException 소유자가 아닌 사용자가 접근하는 경우
+   * @throws BadRequestException 이미 멤버인 사용자를 추가하려는 경우
+   */
+  async addMember(userId: number, publicId: string, memberPublicId: string) {
+    const test = await this.testsRepository.findByPublicIdWithMembers(publicId);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    if (test.ownerId !== userId) {
+      throw new ForbiddenException('You do not have permission to add members to this test');
+    }
+
+    const findMemberId = await this.usersService.getIdByPublicId(memberPublicId);
+    if (!findMemberId) {
+      throw new NotFoundException('User not found');
+    }
+    if (test.members.some((member) => member.id === findMemberId)) {
+      throw new BadRequestException('User is already a member of this test');
+    }
+
+    test.members.push({ id: findMemberId } as User);
+    await this.testsRepository.save(test);
+  }
+
+  /**
+   * 테스트 멤버를 제거합니다.
+   *
+   * @param userId 사용자 ID
+   * @param publicId 테스트 공개 ID
+   * @param memberId 제거할 멤버 공개 ID
+   * @throws NotFoundException 테스트 또는 멤버를 찾을 수 없는 경우
+   * @throws ForbiddenException 소유자가 아닌 사용자가 접근하는 경우
+   */
+  async removeMember(userId: number, publicId: string, memberId: string) {
+    const test = await this.testsRepository.findByPublicIdWithMembers(publicId);
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    if (test.ownerId !== userId) {
+      throw new ForbiddenException('You do not have permission to remove members from this test');
+    }
+
+    const memberIndex = test.members.findIndex((member) => member.publicId === memberId);
+    if (memberIndex === -1) {
+      throw new NotFoundException('Member not found in this test');
+    }
+
+    test.members.splice(memberIndex, 1);
+    await this.testsRepository.save(test);
+  }
+
+  /**
+   * 테스트의 모든 미션과 각 미션의 결과를 조회합니다.
+   *
+   * @param userId 테스트 소유자 id
+   * @param publicId 테스트 public id
+   * @returns 테스트의 모든 미션과 각 미션의 결과 DTO
+   * @throws NotFoundException 테스트를 찾을 수 없거나 소유자가 아닌 경우
+   */
+  async getTestMissionsResults(userId: number, publicId: string) {
+    const test = await this.testsRepository.findByPublicIdAndUserIdWithMissionsAndResults(
+      publicId,
+      userId,
+    );
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+    return TestMissionsResultsDto.fromTest(test);
   }
 }

@@ -9,6 +9,7 @@ export interface User {
   publicId: string;
   username: string;
   avatarUrl: string;
+  email?: string;
 }
 
 /**
@@ -18,3 +19,6 @@ export interface GithubLoginResponse {
   user: User;
   token: string;
 }
+
+// Export persona types
+export * from './persona';

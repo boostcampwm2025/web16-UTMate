@@ -8,10 +8,16 @@ import {
   ParseEnumPipe,
   Post,
   Put,
+  Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
+import { UAParser } from 'ua-parser-js';
 
 import { CreateTestDto } from './dto/create-test.dto';
+import { AddMemberDto } from './dto/member.dto';
+import { SearchTestQueryDto } from './dto/search-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { TestStatus } from './entities/test.entity';
 import { TestsService } from './tests.service';
@@ -29,6 +35,11 @@ export class TestsController {
   async getTests(@UserId() userId: number) {
     const tests = await this.testsService.getMyTests(userId);
     return tests;
+  }
+
+  @Get('/search')
+  async searchTests(@Query() query: SearchTestQueryDto) {
+    return this.testsService.searchTestsByQuery(query);
   }
 
   @Get('/:id')
@@ -85,8 +96,16 @@ export class TestsController {
 
   @Post('/:id/participants')
   @UseGuards(OptionalJwtAuthGuard)
-  async participateTest(@UserId() userId: number | undefined, @Param('id') publicId: string) {
-    return this.testsService.participateTest(userId, publicId);
+  async participateTest(
+    @UserId() userId: number | undefined,
+    @Param('id') publicId: string,
+    @Req() req: Request,
+  ) {
+    const uaString = req.headers['user-agent'];
+    const parser = new UAParser(uaString);
+    const uaInfo = parser.getResult();
+
+    return this.testsService.participateTest(userId, publicId, uaInfo);
   }
 
   @Get('/:id/result')
@@ -99,6 +118,12 @@ export class TestsController {
   @UseGuards(JwtAuthGuard)
   async getTestParticipantsResults(@UserId() userId: number, @Param('id') publicId: string) {
     return this.testsService.getTestParticipantsResults(userId, publicId);
+  }
+
+  @Get('/:id/result/missions')
+  @UseGuards(JwtAuthGuard)
+  async getTestMissionsResults(@UserId() userId: number, @Param('id') publicId: string) {
+    return this.testsService.getTestMissionsResults(userId, publicId);
   }
 
   @Get('/:id/result/mainfeedback')
@@ -115,5 +140,25 @@ export class TestsController {
     @Param('participantId') participantId: string,
   ) {
     return this.testsService.getTestParticipantDetail(userId, publicId, participantId);
+  }
+
+  @Post('/:id/members')
+  @UseGuards(JwtAuthGuard)
+  async addMember(
+    @UserId() userId: number,
+    @Param('id') publicId: string,
+    @Body() addMemberDto: AddMemberDto,
+  ) {
+    return this.testsService.addMember(userId, publicId, addMemberDto.memberId);
+  }
+
+  @Delete('/:id/members/:memberId')
+  @UseGuards(JwtAuthGuard)
+  async removeMember(
+    @UserId() userId: number,
+    @Param('id') publicId: string,
+    @Param('memberId') memberId: string,
+  ) {
+    return this.testsService.removeMember(userId, publicId, memberId);
   }
 }

@@ -2,6 +2,7 @@ import { Hero } from '@/features/(landing)/components/Hero';
 import { Features } from '@/features/(landing)/components/Features';
 import { CTASection } from '@/features/(landing)/components/CTASection';
 import { GlobalNavigationBar } from '@/widgets/navigation/GlobalNavigationBar';
+import { Footer } from '@/shared/components/Footer';
 
 export default function LandingPage() {
   return (
@@ -12,6 +13,7 @@ export default function LandingPage() {
         <Features />
         <CTASection />
       </main>
+      <Footer />
     </>
   );
 }

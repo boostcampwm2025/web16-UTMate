@@ -52,11 +52,15 @@ export class Participant {
   @Column({ name: 'joined_at', type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   joinedAt: Date;
 
+  @Column({ name: 'ua_info', type: 'json' })
+  uaInfo: UAParser.IResult;
+
   private constructor() {}
 
-  static create(userId: number | undefined, testId: number): Participant {
+  static create(userId: number | undefined, testId: number, uaInfo: UAParser.IResult): Participant {
     const participant = new Participant();
     participant.testId = testId;
+    participant.uaInfo = uaInfo;
 
     // 로그인 사용자인지 비회원인지에 따라 userType 설정
     if (userId) {
@@ -74,6 +78,12 @@ export class Participant {
     }
     this.status = status;
     this.feedback = feedback;
+  }
+
+  markAsDropped() {
+    if (this.status === ParticipantStatus.IN_PROGRESS) {
+      this.status = ParticipantStatus.DROP;
+    }
   }
 
   @BeforeInsert()

@@ -1,6 +1,8 @@
 import { EventType, IncrementalSource } from '@rrweb/types';
 import type { eventWithTime } from '@rrweb/types';
 
+import type { ActivitySegment } from '../types';
+
 export type ScrollDirection = 'Up' | 'Down';
 
 export interface GroupedInteractionLog {
@@ -8,7 +10,12 @@ export interface GroupedInteractionLog {
   count: number;
   endTime?: number;
   scrollDirection?: ScrollDirection;
+  targetInfo?: string; // 클릭/입력한 요소 정보
 }
+
+export type EventLogDisplayItem =
+  | { type: 'rrweb'; data: GroupedInteractionLog; timestamp: number }
+  | { type: 'rageClick' | 'mouseThrashing' | 'idle'; data: ActivitySegment; timestamp: number };
 
 type IncrementalSnapshotEvent = eventWithTime & {
   type: EventType.IncrementalSnapshot;
@@ -44,14 +51,51 @@ function getScrollDirection(prevY: number, currentY: number): ScrollDirection | 
 }
 
 /**
+ * 이벤트에서 target element 정보를 추출합니다.
+ */
+function getTargetInfo(log: IncrementalSnapshotEvent): string | undefined {
+  const source = log.data.source;
+
+  if (source === IncrementalSource.MouseInteraction) {
+    const id = (log.data as any).id;
+    const interactionType = (log.data as any).type;
+    const interactionNames: Record<number, string> = {
+      0: 'MouseUp',
+      1: 'MouseDown',
+      2: 'Click',
+      3: 'ContextMenu',
+      4: 'DblClick',
+      5: 'Focus',
+      6: 'Blur',
+      7: 'TouchStart',
+      8: 'TouchEnd',
+    };
+    const typeName = interactionNames[interactionType] || `Type${interactionType}`;
+    return id ? `요소 #${id} (${typeName})` : undefined;
+  }
+
+  if (source === IncrementalSource.Input) {
+    const id = (log.data as any).id;
+    const text = (log.data as any).text;
+    const truncatedText = text && text.length > 20 ? text.slice(0, 20) + '...' : text;
+    return id ? `요소 #${id}${truncatedText ? ` "${truncatedText}"` : ''}` : undefined;
+  }
+
+  return undefined;
+}
+
+/**
  * 클릭/스크롤/터치/입력 등 "주요 인터랙션" 이벤트만 추출하고,
- * 연속된 스크롤은 방향(Up/Down) 기준으로 그룹화합니다.
+ * 연속된 이벤트를 그룹화합니다.
+ * - 스크롤: 방향(Up/Down) 기준으로 그룹화
+ * - 클릭/입력: 같은 요소에 대해 2초 이내 발생하면 그룹화
  */
 export function groupLogsByType(logs: eventWithTime[]): GroupedInteractionLog[] {
   type InternalGroup = GroupedInteractionLog & { lastScrollY?: number };
 
   const result: InternalGroup[] = [];
   let lastEntry: InternalGroup | undefined;
+  const TIME_THRESHOLD = 2000; // 2초 이내 이벤트는 그룹화
 
   for (const log of logs) {
     if (!isIncrementalSnapshotEvent(log)) continue;
@@ -95,8 +139,28 @@ export function groupLogsByType(logs: eventWithTime[]): GroupedInteractionLog[] 
       continue;
     }
 
-    // 스크롤 외 다른 이벤트는 개별 그룹
-    const newEntry: InternalGroup = { log, count: 1, endTime: log.timestamp };
+    // 클릭/입력/터치 이벤트 처리 (같은 요소 + 짧은 시간 내 발생 시 그룹화)
+    const currentId = (log.data as any).id;
+    const timeDiff = lastEntry
+      ? log.timestamp - (lastEntry.endTime || lastEntry.log.timestamp)
+      : Infinity;
+
+    if (
+      lastEntry &&
+      isIncrementalSnapshotEvent(lastEntry.log) &&
+      lastEntry.log.data.source === source &&
+      (lastEntry.log.data as any).id === currentId &&
+      timeDiff <= TIME_THRESHOLD
+    ) {
+      // 같은 타입, 같은 요소, 짧은 시간 내 이벤트 → 그룹에 합침
+      lastEntry.count += 1;
+      lastEntry.endTime = log.timestamp;
+      continue;
+    }
+
+    // 새로운 그룹 생성 (+ target 정보 추출)
+    const targetInfo = getTargetInfo(log);
+    const newEntry: InternalGroup = { log, count: 1, endTime: log.timestamp, targetInfo };
     result.push(newEntry);
     lastEntry = newEntry;
   }

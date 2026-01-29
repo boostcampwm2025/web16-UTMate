@@ -1,134 +1,134 @@
 'use client';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import Link from 'next/link';
-import { CheckCircle2, XCircle, Clock, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Calendar } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { Badge } from '@/shared/components/ui/badge';
-import { cn } from '@/shared/utils';
+import { Card } from '@/shared/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/components/ui/table';
+import { AnimalAvatar } from '@/shared/components/AnimalAvatar';
 
+import { MissionStatusBadge } from './MissionStatusBadge';
+import { formatTimestamp } from '../utils/format';
 import { getParticipantDetail } from '../apis/client';
-import type { ParticipantMissionResult } from '../types';
+import { formatDate } from '../utils/dates';
+import { generateNicknameFromId } from '@/shared/utils/nickname';
+import { PersonaTag } from './PersonaTag';
 
 interface ParticipantResultDetailProps {
   testId: string;
   participantId: string;
 }
 
-const statusConfig = {
-  PENDING: {
-    label: '대기',
-    icon: Clock,
-    className: 'bg-gray-100 text-gray-700',
-  },
-  SUCCESS: {
-    label: '성공',
-    icon: CheckCircle2,
-    className: 'bg-green-100 text-green-700',
-  },
-  COMPLETED: {
-    label: '완료',
-    icon: CheckCircle2,
-    className: 'bg-green-100 text-green-700',
-  },
-  FAILED: {
-    label: '실패',
-    icon: XCircle,
-    className: 'bg-red-100 text-red-700',
-  },
-  IN_PROGRESS: {
-    label: '진행중',
-    icon: AlertCircle,
-    className: 'bg-blue-100 text-blue-700',
-  },
-  SKIPPED: {
-    label: '건너뜀',
-    icon: AlertCircle,
-    className: 'bg-yellow-100 text-yellow-700',
-  },
-};
-
-function MissionResultCard({
-  testId,
-  missionResult,
-  index,
-}: {
-  testId: string;
-  missionResult: ParticipantMissionResult;
-  index: number;
-}) {
-  const config = statusConfig[missionResult.status] || statusConfig.PENDING;
-  const Icon = config.icon;
-
-  return (
-    <Link href={`/tests/${testId}/result/mission-result/${missionResult.missionResultId}`}>
-      <Card className="transition-shadow hover:shadow-md">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">미션 {index + 1}</CardTitle>
-            <Badge className={cn('gap-1', config.className)}>
-              <Icon className="h-3 w-3" />
-              {config.label}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {missionResult.feedback ? (
-            <p className="text-muted-foreground line-clamp-2 text-sm">{missionResult.feedback}</p>
-          ) : (
-            <p className="text-muted-foreground text-sm italic">피드백 없음</p>
-          )}
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
 export function ParticipantResultDetail({ testId, participantId }: ParticipantResultDetailProps) {
+  const router = useRouter();
   const { data: participant } = useSuspenseQuery({
     queryKey: ['participantDetail', testId, participantId],
     queryFn: () => getParticipantDetail(testId, participantId),
   });
 
-  const completedCount = participant.missionResults.filter(
-    (r) => r.status === 'SUCCESS',
-  ).length;
+  const completedCount = participant.missionResults.filter((r) => r.status === 'SUCCESS').length;
   const totalCount = participant.missionResults.length;
+  const successRate = Math.round((completedCount / totalCount) * 100);
+
+  const handleRowClick = (missionResultId: string) => {
+    router.push(`/tests/${testId}/result/mission-result/${missionResultId}`);
+  };
+
+  const nickname = generateNicknameFromId(participant.participantId);
+  const animalName = nickname.split(' ')[1];
 
   return (
-    <div className="space-y-6">
-      {/* 참여자 정보 헤더 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>참여자 상세 정보</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <div className="text-muted-foreground text-sm">
-              페르소나: {participant.persona}
-            </div>
-            <div className="text-muted-foreground text-sm">
-              완료된 미션: {completedCount} / {totalCount}
+    <div className="space-y-4">
+      {/* Header Section */}
+      <Card className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="ml-6 space-y-3">
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+            <AnimalAvatar name={animalName} />
+            {nickname}
+            <PersonaTag tags={participant.personaTags} />
+          </h2>
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            <div className="flex items-center gap-1.5">
+              <Calendar size={14} />
+              <span>{formatDate(participant.joinedAt)} 참여</span>
             </div>
           </div>
-        </CardContent>
+        </div>
+
+        <div className="flex items-center gap-8 rounded-xl p-6">
+          <div className="text-center">
+            <div className="text-sm font-medium text-gray-500">완료한 미션</div>
+            <div className="mt-1 flex items-baseline justify-center gap-1">
+              <span className="text-2xl font-bold text-gray-900">{completedCount}</span>
+              <span className="text-sm text-gray-400">/ {totalCount}</span>
+            </div>
+          </div>
+          <div className="h-10 w-px bg-gray-200" />
+          <div className="text-center">
+            <div className="text-sm font-medium text-gray-500">성공률</div>
+            <div className="text-primary mt-1 text-2xl font-bold">{successRate}%</div>
+          </div>
+        </div>
       </Card>
 
-      {/* 미션 결과 목록 */}
-      <div>
-        <h3 className="mb-4 text-lg font-semibold">미션별 결과</h3>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {participant.missionResults.map((missionResult, index) => (
-            <MissionResultCard
-              key={missionResult.missionResultId}
-              testId={testId}
-              missionResult={missionResult}
-              index={index}
-            />
-          ))}
-        </div>
-      </div>
+      {/* Mission Results Table */}
+      <Table className="w-full text-left">
+        <TableCaption className="sr-only">미션 목록</TableCaption>
+        <TableHeader>
+          <TableRow className="hover:bg-transparent">
+            <TableHead>미션명</TableHead>
+            <TableHead className="text-center">결과</TableHead>
+            <TableHead>피드백</TableHead>
+            <TableHead className="text-right">소요시간</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {participant.missionResults.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={4} className="text-muted-foreground py-8 text-center">
+                미션 수행 기록이 없습니다.
+              </TableCell>
+            </TableRow>
+          ) : (
+            participant.missionResults.map((missionResult) => (
+              <TableRow
+                key={missionResult.missionResultId}
+                onClick={() => handleRowClick(missionResult.missionResultId)}
+                className="cursor-pointer transition-colors hover:bg-gray-50/50"
+              >
+                <TableCell className="font-medium">{missionResult.missionTitle}</TableCell>
+                <TableCell className="text-center">
+                  <MissionStatusBadge status={missionResult.status} />
+                </TableCell>
+                <TableCell className="max-w-[200px]">
+                  <div
+                    className="text-muted-foreground truncate text-sm"
+                    title={missionResult.feedback || ''}
+                  >
+                    {missionResult.feedback || (
+                      <span className="text-gray-300 italic">피드백 없음</span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  {missionResult.duration != null
+                    ? formatTimestamp(missionResult.duration * 1000)
+                    : '-'}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }

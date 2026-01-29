@@ -15,10 +15,16 @@ export class ParticipantsRepository {
     return repo.save(participant);
   }
 
+  async findById(id: number) {
+    return this.participantsRepository
+      .createQueryBuilder('participant')
+      .where('participant.id = :id', { id })
+      .getOne();
+  }
+
   async findByPublicId(publicId: string) {
     return this.participantsRepository
       .createQueryBuilder('participant')
-      .select('participant.id')
       .where('participant.publicId = :publicId', { publicId })
       .getOne();
   }

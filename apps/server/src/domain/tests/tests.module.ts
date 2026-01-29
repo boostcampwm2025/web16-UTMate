@@ -1,22 +1,26 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { Mission } from './entities/mission.entity';
 import { Test } from './entities/test.entity';
-import { MissionsController } from './missions.controller';
-import { MissionRepository } from './missions.repository';
-import { MissionsService } from './missions.service';
 import { TestsController } from './tests.controller';
 import { TestsRepository } from './tests.repository';
 import { TestsService } from './tests.service';
 
 import { MissionResultModule } from '#domain/mission-result/mission-results.module';
+import { MissionModule } from '#domain/missions/missions.module';
 import { ParticipantsModule } from '#domain/participants/participants.module';
+import { UsersModule } from '#domain/users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Test, Mission]), ParticipantsModule, MissionResultModule],
-  controllers: [TestsController, MissionsController],
-  providers: [TestsService, TestsRepository, MissionsService, MissionRepository],
+  imports: [
+    TypeOrmModule.forFeature([Test]),
+    MissionModule,
+    MissionResultModule,
+    ParticipantsModule,
+    UsersModule,
+  ],
+  controllers: [TestsController],
+  providers: [TestsService, TestsRepository],
   exports: [TestsService],
 })
 export class TestsModule {}

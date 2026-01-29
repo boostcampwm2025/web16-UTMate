@@ -1,13 +1,17 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Queue } from 'bullmq';
 import { DataSource } from 'typeorm';
+import { UAParser } from 'ua-parser-js';
 
 import { CompleteParticipantDto } from './dto/complete-participant.dto';
 import { ParticipantDto } from './dto/participant.dto';
 import { Participant } from './entities/participant.entity';
+import { PARTICIPANT_QUEUE, PARTICIPANT_TIMEOUT } from './const';
 import { ParticipantsRepository } from './participants.repository';
 
 import { MissionResultsService } from '#domain/mission-result/misson-results.service';
-import { Mission } from '#domain/tests/entities/mission.entity';
+import { Mission } from '#domain/missions/entities/mission.entity';
 
 @Injectable()
 export class ParticipantsService {
@@ -15,6 +19,7 @@ export class ParticipantsService {
     @Inject() private readonly participantsRepository: ParticipantsRepository,
     @Inject() private readonly missionResultsService: MissionResultsService,
     @Inject() private readonly dataSource: DataSource,
+    @InjectQueue(PARTICIPANT_QUEUE) private readonly participantQueue: Queue,
   ) {}
 
   /**
@@ -27,10 +32,15 @@ export class ParticipantsService {
    * @param missions 미션 배열
    * @returns 생성된 참가자 정보 및 미션 결과 배열
    */
-  async createParticipant(userId: number | undefined, testId: number, missions: Mission[]) {
+  async createParticipant(
+    userId: number | undefined,
+    testId: number,
+    missions: Mission[],
+    uaInfo: UAParser.IResult,
+  ) {
     return await this.dataSource.transaction(async (manager) => {
       // Participant 생성
-      const participant = Participant.create(userId, testId);
+      const participant = Participant.create(userId, testId, uaInfo);
       const savedParticipant = await this.participantsRepository.save(participant, manager);
 
       // 각 미션에 대해 MissionResult 생성
@@ -38,6 +48,13 @@ export class ParticipantsService {
         missions,
         savedParticipant.id,
         manager,
+      );
+
+      // 참가자 타임아웃 작업 큐에 추가
+      await this.participantQueue.add(
+        'check-timeout',
+        { participantId: participant.id },
+        { delay: PARTICIPANT_TIMEOUT, jobId: `complete-participant-${participant.id}` },
       );
 
       return ParticipantDto.fromEntity(savedParticipant, missionResults);
@@ -73,13 +90,13 @@ export class ParticipantsService {
    * @throws BadRequestException 잘못된 상태로 변경하려는 경우
    */
   async completeParticipant(publicId: string, dto: CompleteParticipantDto) {
-    const paricipants = await this.participantsRepository.findByPublicId(publicId);
-    if (!paricipants) {
+    const participant = await this.participantsRepository.findByPublicId(publicId);
+    if (!participant) {
       throw new NotFoundException('Participant not found');
     }
     try {
-      paricipants.complete(dto.status, dto.feedback);
-      await this.participantsRepository.save(paricipants);
+      participant.complete(dto.status, dto.feedback);
+      await this.participantsRepository.save(participant);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

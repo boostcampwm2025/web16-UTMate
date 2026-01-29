@@ -1,6 +1,6 @@
 'use client';
 
-import { FileText, ListTodo, Code, AlertCircle } from 'lucide-react';
+import { FileText, ListTodo, Code, Settings, AlertCircle } from 'lucide-react';
 import type { FieldErrors } from 'react-hook-form';
 
 import type { TestMission } from '@/features/(test-manage)/types';
@@ -11,8 +11,9 @@ import type { TestFormValues } from '../schemas/testForm';
 
 export enum TestFormStep {
   TEST_INFO = 1,
-  TEST_MISSIONS = 2,
-  TEST_SDK = 3,
+  TEST_SETTINGS = 2,
+  TEST_MISSIONS = 3,
+  TEST_SDK = 4,
 }
 
 interface StepItem {
@@ -28,6 +29,12 @@ const STEPS: StepItem[] = [
     icon: <FileText className="size-5" />,
     title: '테스트 기본 정보',
     description: '기본 정보 입력',
+  },
+  {
+    step: TestFormStep.TEST_SETTINGS,
+    icon: <Settings className="size-5" />,
+    title: '테스트 설정',
+    description: '타겟 사용자 설정',
   },
   {
     step: TestFormStep.TEST_MISSIONS,

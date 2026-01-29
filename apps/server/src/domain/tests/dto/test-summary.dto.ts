@@ -23,6 +23,9 @@ export class TestSummaryDto {
   @IsObject()
   owner: UserSummaryDto;
 
+  @IsObject()
+  members: UserSummaryDto[];
+
   private constructor() {}
 
   static fromTestEntity(test: Test) {
@@ -33,6 +36,7 @@ export class TestSummaryDto {
     dto.sdkStatus = test.sdkStatus;
     dto.url = test.url;
     dto.owner = UserSummaryDto.fromUserEntity(test.owner);
+    dto.members = UserSummaryDto.fromUserEntities(test.members);
     return dto;
   }
 

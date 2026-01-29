@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
 import { Mission } from './entities/mission.entity';
-import { Test } from './entities/test.entity';
 
 @Injectable()
 export class MissionRepository {
@@ -14,9 +13,9 @@ export class MissionRepository {
     return repo.save(mission);
   }
 
-  async findAllByTest(test: Test, manager?: EntityManager) {
+  async findAllByTestId(testId: number, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(Mission) : this.missionRepository;
-    return repo.findBy({ test });
+    return repo.findBy({ testId });
   }
 
   async saveAll(missions: Mission[], manager?: EntityManager) {
@@ -38,8 +37,11 @@ export class MissionRepository {
     return this.missionRepository
       .createQueryBuilder('missions')
       .leftJoinAndSelect('missions.test', 'test')
+      .leftJoinAndSelect('test.members', 'members')
       .leftJoinAndSelect('missions.missionResults', 'missionResults')
       .leftJoinAndSelect('missionResults.participant', 'participant')
+      .leftJoinAndSelect('participant.user', 'user')
+      .leftJoinAndSelect('user.persona', 'persona')
       .where('missions.publicId = :missionId', { missionId })
       .getOne();
   }

@@ -4,13 +4,15 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { Mission } from './mission.entity';
-
+import { AgeRange, Gender, Interest } from '#common/enums';
+import { Mission } from '#domain/missions/entities/mission.entity';
 import { Participant } from '#domain/participants/entities/participant.entity';
 import { User } from '#domain/users/entities/user.entity';
 
@@ -35,6 +37,14 @@ export class Test {
   @Column({ name: 'owner_id' })
   ownerId: number;
 
+  @ManyToMany(() => User, (user) => user.sharedTests)
+  @JoinTable({
+    name: 'test_members',
+    joinColumn: { name: 'test_id' },
+    inverseJoinColumn: { name: 'member_id' },
+  })
+  members: User[];
+
   @Column()
   title: string;
 
@@ -52,6 +62,18 @@ export class Test {
 
   @OneToMany(() => Mission, (mission) => mission.test)
   missions: Mission[];
+
+  @Column({ name: 'is_public', default: false })
+  isPublic: boolean;
+
+  @Column({ name: 'target_genders', type: 'json' })
+  targetGenders: Gender[] = [];
+
+  @Column({ name: 'target_ages', type: 'json' })
+  targetAges: AgeRange[] = [];
+
+  @Column({ name: 'target_interests', type: 'json' })
+  targetInterests: Interest[] = [];
 
   @Column({ type: 'timestamp', nullable: true })
   startDate?: Date;
@@ -77,10 +99,17 @@ export class Test {
     return test;
   }
 
-  update(title: string, description: string, url: string) {
+  updateTestInfo(title: string, description: string, url: string, isPublic: boolean) {
     this.title = title;
     this.description = description;
     this.url = url;
+    this.isPublic = isPublic;
+  }
+
+  updateTargeting(targetGenders: Gender[], targetAges: AgeRange[], targetInterests: Interest[]) {
+    this.targetGenders = targetGenders;
+    this.targetAges = targetAges;
+    this.targetInterests = targetInterests;
   }
 
   transitionStatus(status: TestStatus) {
@@ -98,7 +127,7 @@ export class Test {
     }
   }
 
-  private publish() {
+  publish() {
     if (this.sdkStatus === false) {
       throw new Error('SDK 연결이 확인되지 않아 테스트를 게시할 수 없습니다.');
     }
@@ -113,7 +142,7 @@ export class Test {
     this.status = TestStatus.PUBLISHED;
   }
 
-  private archive() {
+  archive() {
     if (this.status === TestStatus.DRAFT) {
       throw new Error('Draft 상태의 테스트는 Archive 할 수 없습니다.');
     }
