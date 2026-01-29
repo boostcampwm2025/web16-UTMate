@@ -51,13 +51,15 @@ interface TestMissionResultItemProps {
 function TestMissionResultItem({ testId, mission, index }: TestMissionResultItemProps) {
   return (
     <Link href={`/tests/${testId}/result/missions/${mission.id}`}>
-      <Card className="flex cursor-pointer flex-col md:flex-row md:items-center md:gap-4 md:p-2">
-        <CardHeader className="flex-1 space-y-4 p-4 md:p-6">
+      <Card className="flex cursor-pointer flex-col md:p-2">
+        <CardHeader className="p-4 md:p-6 md:pb-2">
           <CardTitle className="flex items-center gap-2 text-lg font-bold">
             {mission.name}
           </CardTitle>
+        </CardHeader>
 
-          <div className="flex flex-col gap-3 text-sm">
+        <CardContent className="flex flex-col gap-6 p-4 md:flex-row md:items-start md:p-6 md:pt-2">
+          <div className="flex flex-1 flex-col gap-3 text-sm">
             <div className="flex flex-col gap-1.5">
               <div className="text-muted-foreground flex items-center gap-1.5 font-medium">
                 <FileText className="h-4 w-4" />
@@ -84,9 +86,8 @@ function TestMissionResultItem({ testId, mission, index }: TestMissionResultItem
               </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="my-auto">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+
+          <div className="grid min-w-fit grid-cols-2 gap-4 md:grid-cols-4">
             <div className="flex items-center gap-2">
               <div className="text-muted-foreground text-sm">성공률</div>
               <div className="text-base font-semibold">{mission.successRate}%</div>
