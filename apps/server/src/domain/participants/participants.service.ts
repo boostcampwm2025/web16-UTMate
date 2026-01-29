@@ -11,7 +11,7 @@ import { PARTICIPANT_QUEUE, PARTICIPANT_TIMEOUT } from './const';
 import { ParticipantsRepository } from './participants.repository';
 
 import { MissionResultsService } from '#domain/mission-result/misson-results.service';
-import { Mission } from '#domain/tests/entities/mission.entity';
+import { Mission } from '#domain/missions/entities/mission.entity';
 
 @Injectable()
 export class ParticipantsService {

@@ -1,10 +1,10 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
-import { Mission } from '../entities/mission.entity';
 import { Test } from '../entities/test.entity';
 
 import { MissionResult } from '#domain/mission-result/entities/mission-result.entity';
 import { MissionResultStatus } from '#domain/mission-result/enums';
+import { Mission } from '#domain/missions/entities/mission.entity';
 import { Participant } from '#domain/participants/entities/participant.entity';
 
 export class ParticipantMissionResultDto {

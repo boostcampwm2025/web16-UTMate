@@ -3,7 +3,7 @@ import { IsArray, IsBoolean, IsEnum, IsString, ValidateNested } from 'class-vali
 
 import { Test, TestStatus } from '../entities/test.entity';
 
-import { MissionDto } from './mission.dto';
+import { MissionDto } from '#domain/missions/dto/mission.dto';
 
 export class TestDto {
   @IsString()
