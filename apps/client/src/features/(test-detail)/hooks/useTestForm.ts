@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import type { TestDetail } from '@/features/(test-manage)/types';
 import { updateTest } from '@/shared/api/test';
 import type { UpdateTestMission } from '@/shared/api/test';
+import type { Interest } from '@/features/(auth)/types';
 
 import { TestFormStep } from '../components/TestFormSidebar';
 import { testFormSchema, type TestFormValues } from '../schemas/testForm';
@@ -22,6 +23,19 @@ export function useTestForm(initialData: TestDetail) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 타겟 페르소나 상태 (initialData에서 초기값 설정)
+  // 성별과 연령대는 전체 선택이 기본값, 관심사는 빈 배열(선택사항)
+  const [targetGender, setTargetGender] = useState<string[]>(
+    initialData.targetGender || ['MALE', 'FEMALE'],
+  );
+  const [targetAgeGroup, setTargetAgeGroup] = useState<string[]>(
+    initialData.targetAgeGroup || ['10', '20', '30', '40', '50', '60+'],
+  );
+  const [targetInterests, setTargetInterests] = useState<Interest[]>(
+    initialData.targetInterests || [],
+  );
+  const [isPublic, setIsPublic] = useState<boolean>(initialData.isPublic);
 
   // react-hook-form 설정
   const form = useForm<TestFormValues>({
@@ -39,6 +53,11 @@ export function useTestForm(initialData: TestDetail) {
           missionUrl: mission.missionUrl || 'https://', // 빈 값이면 https:// 기본값
           estimatedDuration: mission.estimatedDuration,
         })) || [],
+      // 타겟 페르소나 설정
+      isPublic: initialData.isPublic,
+      targetGender: initialData.targetGender || ['MALE', 'FEMALE'],
+      targetAgeGroup: initialData.targetAgeGroup || ['10', '20', '30', '40', '50', '60+'],
+      targetInterests: initialData.targetInterests || [],
     },
     mode: 'onChange',
   });
@@ -124,6 +143,13 @@ export function useTestForm(initialData: TestDetail) {
     }, 100);
   };
 
+  // === Target Persona Handlers ===
+  const handleToggleInterest = (interest: Interest) => {
+    setTargetInterests((prev) =>
+      prev.includes(interest) ? prev.filter((i) => i !== interest) : [...prev, interest],
+    );
+  };
+
   // === Step Navigation ===
   const handleNextStep = async () => {
     let isValid = false;
@@ -170,6 +196,12 @@ export function useTestForm(initialData: TestDetail) {
         description: data.description,
         url: data.url,
         missions: missionsWithOrder,
+        // 타겟 페르소나 설정 추가
+        isPublic,
+        // 성별/연령대는 필수이므로 항상 전송, 관심사는 선택사항이므로 비어있으면 undefined
+        targetGender,
+        targetAgeGroup,
+        targetInterests: targetInterests.length > 0 ? targetInterests : undefined,
       });
 
       await minLoadingTime;
@@ -235,6 +267,16 @@ export function useTestForm(initialData: TestDetail) {
 
       // Form
       save: handleSave,
+
+      // Target Persona
+      targetGender,
+      setTargetGender,
+      targetAgeGroup,
+      setTargetAgeGroup,
+      targetInterests,
+      toggleInterest: handleToggleInterest,
+      isPublic,
+      setIsPublic,
     },
   };
 }
