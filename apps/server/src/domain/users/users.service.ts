@@ -1,14 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
+import { CreatePersonaDto, PersonaResponseDto, UpdatePersonaDto } from './dto/persona.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { UserSummaryDto } from './dto/user-summary.dto';
+import { Persona } from './entities/persona.entity';
+import { PersonaRepository } from './persona.repository';
 import { UsersRepository } from './users.repository';
 
 import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly personaRepository: PersonaRepository,
+  ) {}
 
   /**
    * OAuthUserDto를 기반으로 사용자를 등록하거나 업데이트합니다.
@@ -83,5 +89,80 @@ export class UsersService {
       throw new BadRequestException('존재하는 사용자가 없습니다.');
     }
     return UserSummaryDto.fromUserEntity(findUser);
+  }
+
+  /**
+   * 사용자의 페르소나를 조회합니다.
+   *
+   * @param userId 사용자 id
+   * @returns 페르소나 정보 또는 null
+   */
+  async getPersona(userId: number): Promise<PersonaResponseDto> {
+    const persona = await this.personaRepository.findByUserId(userId);
+    if (!persona) {
+      throw new NotFoundException('Persona not found.');
+    }
+
+    return {
+      gender: persona.gender,
+      ageGroup: persona.ageGroup,
+      interests: persona.interests,
+    };
+  }
+
+  /**
+   * 사용자의 페르소나를 생성합니다.
+   *
+   * @param userId 사용자 id
+   * @param dto 페르소나 생성 DTO
+   * @returns 생성된 페르소나 정보
+   */
+  async createPersona(userId: number, dto: CreatePersonaDto): Promise<PersonaResponseDto> {
+    // 이미 페르소나가 존재하는지 확인
+    const existingPersona = await this.personaRepository.findByUserId(userId);
+    if (existingPersona) {
+      throw new BadRequestException('Persona already exists. Use PUT to update.');
+    }
+
+    const persona = new Persona();
+    persona.userId = userId;
+    persona.gender = dto.gender;
+    persona.ageGroup = dto.ageGroup;
+    persona.interests = dto.interests;
+
+    const saved = await this.personaRepository.save(persona);
+
+    return {
+      gender: saved.gender,
+      ageGroup: saved.ageGroup,
+      interests: saved.interests,
+    };
+  }
+
+  /**
+   * 사용자의 페르소나를 전체 수정합니다.
+   *
+   * @param userId 사용자 id
+   * @param dto 페르소나 업데이트 DTO
+   * @returns 업데이트된 페르소나 정보
+   */
+  async updatePersona(userId: number, dto: UpdatePersonaDto): Promise<PersonaResponseDto> {
+    const persona = await this.personaRepository.findByUserId(userId);
+    if (!persona) {
+      throw new NotFoundException('Persona not found. Use POST to create.');
+    }
+
+    // DTO에 있는 필드만 업데이트
+    if (dto.gender !== undefined) persona.gender = dto.gender;
+    if (dto.ageGroup !== undefined) persona.ageGroup = dto.ageGroup;
+    if (dto.interests !== undefined) persona.interests = dto.interests;
+
+    const updated = await this.personaRepository.save(persona);
+
+    return {
+      gender: updated.gender,
+      ageGroup: updated.ageGroup,
+      interests: updated.interests,
+    };
   }
 }

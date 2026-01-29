@@ -3,14 +3,14 @@ import {
   BeforeInsert,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { Test } from './test.entity';
-
 import { MissionResult } from '#domain/mission-result/entities/mission-result.entity';
+import { Test } from '#domain/tests/entities/test.entity';
 
 @Entity('missions')
 export class Mission {
@@ -21,7 +21,11 @@ export class Mission {
   publicId: string;
 
   @ManyToOne(() => Test, (test) => test.missions, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'test_id' })
   test: Test;
+
+  @Column({ name: 'test_id' })
+  testId: number;
 
   @Column()
   order: number;
@@ -44,25 +48,7 @@ export class Mission {
   @OneToMany(() => MissionResult, (missionResult) => missionResult.mission)
   missionResults: MissionResult[];
 
-  private constructor() {}
-
-  static createMission(
-    order: number,
-    name: string,
-    description: string,
-    url: string,
-    estimatedDuration: number,
-    test: Test,
-  ): Mission {
-    const mission = new Mission();
-    mission.order = order;
-    mission.name = name;
-    mission.description = description;
-    mission.missionUrl = url;
-    mission.estimatedDuration = estimatedDuration;
-    mission.test = test;
-    return mission;
-  }
+  constructor() {}
 
   update(order: number, name: string, description: string, url: string) {
     this.order = order;

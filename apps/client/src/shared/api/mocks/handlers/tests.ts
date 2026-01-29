@@ -66,6 +66,10 @@ const mockTests: Test[] = [
     sdkStatus: true,
     owner: mockUsers[0],
     members: mockUsers,
+    isPublic: false,
+    targetAges: [],
+    targetGenders: [],
+    targetInterests: [],
   },
   {
     publicId: '2',
@@ -76,6 +80,10 @@ const mockTests: Test[] = [
     sdkStatus: false,
     owner: mockUsers[0],
     members: mockUsers,
+    isPublic: false,
+    targetAges: [],
+    targetGenders: [],
+    targetInterests: [],
   },
   {
     publicId: '3',
@@ -86,6 +94,10 @@ const mockTests: Test[] = [
     sdkStatus: true,
     owner: mockUsers[0],
     members: mockUsers,
+    isPublic: false,
+    targetAges: [],
+    targetGenders: [],
+    targetInterests: [],
   },
   {
     publicId: '4',
@@ -96,6 +108,10 @@ const mockTests: Test[] = [
     sdkStatus: false,
     owner: mockUsers[0],
     members: mockUsers,
+    isPublic: false,
+    targetAges: [],
+    targetGenders: [],
+    targetInterests: [],
   },
   {
     publicId: '5',
@@ -106,6 +122,10 @@ const mockTests: Test[] = [
     sdkStatus: true,
     owner: mockUsers[0],
     members: mockUsers,
+    isPublic: false,
+    targetAges: [],
+    targetGenders: [],
+    targetInterests: [],
   },
 ];
 
@@ -160,6 +180,10 @@ export const testsHandlers = [
       sdkStatus: false,
       owner: mockUsers[0],
       members: [],
+      isPublic: false,
+      targetAges: [],
+      targetGenders: [],
+      targetInterests: [],
     };
 
     mockTests.push(newTest);

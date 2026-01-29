@@ -20,7 +20,7 @@ import { SDK_AUTH_REDIS } from '#common/redis/redis.module';
 import { S3StorageService } from '#common/storage/s3-storage.service';
 import { StorageService } from '#common/storage/storage.service';
 import { AnalyzerService } from '#domain/analyzer/analyzer.service';
-import { Mission } from '#domain/tests/entities/mission.entity';
+import { Mission } from '#domain/missions/entities/mission.entity';
 
 @Injectable()
 export class MissionResultsService {

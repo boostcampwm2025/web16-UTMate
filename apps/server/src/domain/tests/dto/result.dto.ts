@@ -1,10 +1,10 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
-import { Mission } from '../entities/mission.entity';
 import { Test } from '../entities/test.entity';
 
 import { MissionResult } from '#domain/mission-result/entities/mission-result.entity';
 import { MissionResultStatus } from '#domain/mission-result/enums';
+import { Mission } from '#domain/missions/entities/mission.entity';
 import { Participant } from '#domain/participants/entities/participant.entity';
 
 export class ParticipantMissionResultDto {
@@ -49,15 +49,25 @@ export class ParticipantMissionResultDto {
 
 export class ParticipantResultsDto {
   participantId: string;
-  persona: string;
+  personaTags: string[] = [];
   joinedAt: Date;
   missionResults: ParticipantMissionResultDto[];
 
   static fromEntity(participant: Participant, missions: Mission[]) {
     const dto = new ParticipantResultsDto();
     dto.participantId = participant.publicId;
-    // TODO : 참가자 페르소나 기능 구현 시 수정 필요
-    dto.persona = 'GUEST';
+    if (participant.userType === 'REGISTERED' && participant.user) {
+      if (participant.user.persona) {
+        dto.personaTags.push(participant.user.persona.gender);
+        dto.personaTags.push(participant.user.persona.ageGroup);
+        dto.personaTags.push(...participant.user.persona.interests);
+      } else {
+        dto.personaTags.push('미설정');
+      }
+    } else {
+      dto.personaTags.push('GUEST');
+    }
+
     dto.joinedAt = participant.joinedAt;
     dto.missionResults = ParticipantMissionResultDto.fromEntities(
       missions,
@@ -74,6 +84,7 @@ export class ParticipantResultsDto {
 export class MainFeedbackDto {
   participantId: string;
   content: string;
+  personaTags: string[] = [];
   createdAt: Date;
 
   static fromEntity(participant: Participant) {
@@ -83,6 +94,17 @@ export class MainFeedbackDto {
     const dto = new MainFeedbackDto();
     dto.participantId = participant.publicId;
     dto.content = participant.feedback;
+    if (participant.userType === 'REGISTERED' && participant.user) {
+      if (participant.user.persona) {
+        dto.personaTags.push(participant.user.persona.gender);
+        dto.personaTags.push(participant.user.persona.ageGroup);
+        dto.personaTags.push(...participant.user.persona.interests);
+      } else {
+        dto.personaTags.push('미설정');
+      }
+    } else {
+      dto.personaTags.push('GUEST');
+    }
     dto.createdAt = participant.joinedAt;
     return dto;
   }
@@ -102,7 +124,7 @@ export class MissionResultOverviewDto {
 
   // 참가자 정보
   participantId: string;
-  persona: string;
+  personaTags: string[] = [];
 
   static fromEntity(missionResult: MissionResult) {
     const dto = new MissionResultOverviewDto();
@@ -112,7 +134,17 @@ export class MissionResultOverviewDto {
     dto.feedback = missionResult.feedback;
 
     dto.participantId = missionResult.participant.publicId;
-    dto.persona = 'GUEST'; // TODO: 참가자 페르소나 기능 구현 시 수정 필요
+    if (missionResult.participant.userType === 'REGISTERED' && missionResult.participant.user) {
+      if (missionResult.participant.user.persona) {
+        dto.personaTags.push(missionResult.participant.user.persona.gender);
+        dto.personaTags.push(missionResult.participant.user.persona.ageGroup);
+        dto.personaTags.push(...missionResult.participant.user.persona.interests);
+      } else {
+        dto.personaTags.push('미설정');
+      }
+    } else {
+      dto.personaTags.push('GUEST');
+    }
     return dto;
   }
 

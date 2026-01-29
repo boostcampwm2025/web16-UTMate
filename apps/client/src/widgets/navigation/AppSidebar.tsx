@@ -50,17 +50,10 @@ const navItems: NavItem[] = [
     icon: FileText,
   },
   {
-    title: '사전 예약',
-    href: '/pre-register',
-    icon: Calendar,
-    badge: 'New',
-  },
-  {
     title: '테스트 참여',
-    href: '/explore',
+    href: '/search',
     icon: Users,
-    disabled: true,
-    badge: 'Coming Soon',
+    badge: 'New',
   },
   {
     title: '리워드',
@@ -120,13 +113,13 @@ export function AppSidebar() {
                       <Link href={item.href}>
                         <Icon />
                         <span>{item.title}</span>
+                        {item.badge && (
+                          <SidebarMenuBadge className="bg-primary/10 text-primary">
+                            {item.badge}
+                          </SidebarMenuBadge>
+                        )}
                       </Link>
                     </SidebarMenuButton>
-                    {item.badge && (
-                      <SidebarMenuBadge className="bg-primary/10 text-primary">
-                        {item.badge}
-                      </SidebarMenuBadge>
-                    )}
                   </SidebarMenuItem>
                 );
               })}

@@ -17,6 +17,7 @@ import { AnimalAvatar } from '@/shared/components/AnimalAvatar';
 import { formatDistanceToNow } from '../utils/dates';
 import { getTestParticipantsResults } from '../apis/client';
 import type { ParticipantResult } from '../types';
+import { PersonaTag } from './PersonaTag';
 
 export function TestParticipantsResults({ testId }: { testId: string }) {
   const { data: participants } = useSuspenseQuery({
@@ -61,6 +62,7 @@ function ParticipantItem({
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
             <AnimalAvatar name={animalName} />
             {nickname}
+            <PersonaTag tags={participant.personaTags} />
           </CardTitle>
           <CardDescription className="mt-1">
             <p className="tex-xs text-muted-foreground mt-1">
