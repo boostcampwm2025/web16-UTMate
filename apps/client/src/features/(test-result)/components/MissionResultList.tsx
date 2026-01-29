@@ -17,6 +17,7 @@ import { generateNicknameFromId } from '@/shared/utils/nickname';
 import { MissionStatusBadge } from './MissionStatusBadge';
 import { formatTimestamp } from '../utils/format';
 import type { MissionDetail } from '../types';
+import { PersonaTag } from './PersonaTag';
 
 interface MissionResultListProps {
   testId: string;
@@ -62,18 +63,7 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
                 <TableCell className="flex items-center gap-2 font-medium">
                   <AnimalAvatar name={animalName} />
                   {nickname}
-                  {missionResult.personaTags.length > 0 && (
-                    <span className="flex gap-1">
-                      {missionResult.personaTags.map((tag, idx) => (
-                        <span
-                          key={idx}
-                          className="bg-muted text-muted-foreground border-muted-foreground/10 rounded-full border px-2 py-0.5 text-xs"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </span>
-                  )}
+                  <PersonaTag tags={missionResult.personaTags} />
                 </TableCell>
 
                 <TableCell className="text-center">
