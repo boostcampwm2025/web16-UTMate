@@ -85,7 +85,7 @@ export function InterestFilter({ selectedInterests, onInterestToggle }: Interest
               key={interest}
               variant="outline"
               className={cn(
-                'cursor-pointer px-2 py-1 text-sm font-medium transition-colors',
+                'bg-card cursor-pointer px-2 py-1 text-sm font-medium transition-colors',
                 isSelected && 'bg-primary text-primary-foreground',
               )}
               onClick={() => onInterestToggle(interest)}

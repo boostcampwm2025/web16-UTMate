@@ -101,13 +101,8 @@ export function TestSearchPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-7xl p-6">
+    <main className="h-full w-full bg-gray-50 p-6">
       <div className="flex flex-col space-y-4">
-        <div className="mb-6">
-          <h1 className="mb-2 text-3xl font-bold tracking-tight">테스트 찾기</h1>
-          <p className="text-muted-foreground">당신을 기다리고 있는 UT를 찾아보세요.</p>
-        </div>
-
         {/* Filters */}
         <section className="w-full">
           <SearchFilter
@@ -121,7 +116,7 @@ export function TestSearchPage() {
         </section>
 
         {/* Main Content */}
-        <main className="w-full">
+        <div className="w-full">
           {isLoading ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(6)].map((_, i) => (
@@ -158,13 +153,13 @@ export function TestSearchPage() {
               )}
             </>
           )}
-        </main>
+        </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent className="p-6 sm:max-w-[600px]">
             {selectedTest && <SearchResultDetail test={selectedTest} />}
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </main>
   );
 }
