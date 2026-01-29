@@ -146,7 +146,10 @@ export class MissionResultsService {
     if (!missionResults) {
       throw new NotFoundException('미션 결과를 찾을 수 없습니다.');
     }
-    if (missionResults.participant.test.ownerId !== userId) {
+    if (
+      missionResults.participant.test.ownerId !== userId &&
+      !missionResults.participant.test.members.some((member) => member.id === userId)
+    ) {
       throw new NotFoundException('미션 결과를 찾을 수 없습니다.');
     }
     if (
