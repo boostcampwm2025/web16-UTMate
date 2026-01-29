@@ -5,15 +5,9 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { getTestMissionsResults } from '../apis/client';
 import type { MissionDetail } from '../types';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/shared/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Clock, FileText, Globe } from 'lucide-react';
-import { formatDuration } from '../utils/format';
+import { formatDurationFromMilliSeconds } from '../utils/format';
 
 export function TestMissionResultList({ testId }: { testId: string }) {
   const { data: missionsData } = useSuspenseQuery({
@@ -95,7 +89,7 @@ function TestMissionResultItem({ testId, mission, index }: TestMissionResultItem
             <MetricCard label="결과 수" value={`${mission.missionResults.length}개`} />
             <MetricCard
               label="평균 소요시간"
-              value={`${formatDuration(mission.averageDuration)}`}
+              value={`${formatDurationFromMilliSeconds(mission.averageDuration)}`}
             />
           </div>
         </CardContent>
