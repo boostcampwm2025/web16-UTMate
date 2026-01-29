@@ -50,17 +50,10 @@ const navItems: NavItem[] = [
     icon: FileText,
   },
   {
-    title: '사전 예약',
-    href: '/pre-register',
-    icon: Calendar,
-    badge: 'New',
-  },
-  {
     title: '테스트 참여',
-    href: '/explore',
+    href: '/search',
     icon: Users,
-    disabled: true,
-    badge: 'Coming Soon',
+    badge: 'New',
   },
   {
     title: '리워드',
