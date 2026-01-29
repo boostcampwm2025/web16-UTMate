@@ -33,9 +33,9 @@ export enum Interest {
   INTERIOR = '인테리어',
 }
 
-export type Gender = 'MALE' | 'FEMALE';
+export type Gender = '남성' | '여성';
 
-export type AgeGroup = '10' | '20' | '30' | '40' | '50' | '60+';
+export type AgeGroup = '10대' | '20대' | '30대' | '40대' | '50대' | '60대 이상';
 
 export interface PersonaData {
   gender: Gender;

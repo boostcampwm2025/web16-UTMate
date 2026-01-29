@@ -32,7 +32,6 @@ export function TestSearchPage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['tests', { gender, ageGroup, interests, page }],
     queryFn: () => {
-      console.log('Fetching searchTests with:', { gender, age: ageGroup, interests, page });
       return searchTests({
         gender,
         age: ageGroup,

@@ -7,8 +7,8 @@ import type { PersonaData } from '@/features/(auth)/types/persona';
 export const personaHandlers = [
   http.get(`${CLIENT_BASE_URL}/users/persona`, () => {
     const mockPersona: PersonaData = {
-      gender: 'MALE',
-      ageGroup: '20',
+      gender: '남성',
+      ageGroup: '20대',
       interests: [Interest.IT, Interest.GAMING, Interest.SELF_IMPROVEMENT],
       description: '안녕하세요! 개발과 게임을 좋아하는 20대 남성입니다.',
     };

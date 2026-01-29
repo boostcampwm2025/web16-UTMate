@@ -32,8 +32,12 @@ import {
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
 import { getCurrentUser, deleteUser, savePersona, getPersona } from '@/features/(auth)/apis/client';
-import type { User, PersonaData, Interest } from '@/features/(auth)/types';
-import { INTEREST_OPTIONS, GENDER_OPTIONS, AGE_GROUP_OPTIONS } from '@/features/(auth)/constants/interests';
+import type { User, PersonaData, Interest, Gender } from '@/features/(auth)/types';
+import {
+  INTEREST_OPTIONS,
+  GENDER_OPTIONS,
+  AGE_GROUP_OPTIONS,
+} from '@/features/(auth)/constants/interests';
 
 /**
  * 마이페이지 - 프로필 정보 및 페르소나 설정
@@ -49,8 +53,8 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [persona, setPersona] = useState<PersonaData>({
-    gender: 'MALE',
-    ageGroup: '20',
+    gender: '남성',
+    ageGroup: '20대',
     interests: [],
     description: '',
   });
@@ -61,10 +65,7 @@ export default function ProfilePage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [userData, personaData] = await Promise.all([
-          getCurrentUser(),
-          getPersona(),
-        ]);
+        const [userData, personaData] = await Promise.all([getCurrentUser(), getPersona()]);
         setUser(userData);
         if (personaData) {
           setPersona(personaData);
@@ -164,9 +165,7 @@ export default function ProfilePage() {
             </Avatar>
             <div className="space-y-1">
               <h3 className="text-2xl font-semibold">{user.username}</h3>
-              {user.email && (
-                <p className="text-muted-foreground text-sm">{user.email}</p>
-              )}
+              {user.email && <p className="text-muted-foreground text-sm">{user.email}</p>}
             </div>
           </div>
 
@@ -205,7 +204,7 @@ export default function ProfilePage() {
               <Label htmlFor="gender">성별</Label>
               <Select
                 value={persona.gender}
-                onValueChange={(value) => setPersona({ ...persona, gender: value as 'MALE' | 'FEMALE' })}
+                onValueChange={(value) => setPersona({ ...persona, gender: value as Gender })}
               >
                 <SelectTrigger id="gender">
                   <SelectValue placeholder="성별을 선택하세요" />

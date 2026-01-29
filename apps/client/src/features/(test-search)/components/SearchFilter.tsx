@@ -45,8 +45,8 @@ export function SearchFilter({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">모두</SelectItem>
-                <SelectItem value="MALE">남성</SelectItem>
-                <SelectItem value="FEMALE">여성</SelectItem>
+                <SelectItem value="남성">남성</SelectItem>
+                <SelectItem value="여성">여성</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -64,12 +64,12 @@ export function SearchFilter({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">모두</SelectItem>
-                <SelectItem value="10">10대</SelectItem>
-                <SelectItem value="20">20대</SelectItem>
-                <SelectItem value="30">30대</SelectItem>
-                <SelectItem value="40">40대</SelectItem>
-                <SelectItem value="50">50대</SelectItem>
-                <SelectItem value="60+">60대 이상</SelectItem>
+                <SelectItem value="10대">10대</SelectItem>
+                <SelectItem value="20대">20대</SelectItem>
+                <SelectItem value="30대">30대</SelectItem>
+                <SelectItem value="40대">40대</SelectItem>
+                <SelectItem value="50대">50대</SelectItem>
+                <SelectItem value="60대 이상">60대 이상</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -67,8 +67,9 @@ const mockTests: Test[] = [
     owner: mockUsers[0],
     members: mockUsers,
     isPublic: false,
-    targetAgeGroup: [],
-    targetGender: [],
+    targetAges: [],
+    targetGenders: [],
+    targetInterests: [],
   },
   {
     publicId: '2',
@@ -80,8 +81,9 @@ const mockTests: Test[] = [
     owner: mockUsers[0],
     members: mockUsers,
     isPublic: false,
-    targetAgeGroup: [],
-    targetGender: [],
+    targetAges: [],
+    targetGenders: [],
+    targetInterests: [],
   },
   {
     publicId: '3',
@@ -93,8 +95,9 @@ const mockTests: Test[] = [
     owner: mockUsers[0],
     members: mockUsers,
     isPublic: false,
-    targetAgeGroup: [],
-    targetGender: [],
+    targetAges: [],
+    targetGenders: [],
+    targetInterests: [],
   },
   {
     publicId: '4',
@@ -106,8 +109,9 @@ const mockTests: Test[] = [
     owner: mockUsers[0],
     members: mockUsers,
     isPublic: false,
-    targetAgeGroup: [],
-    targetGender: [],
+    targetAges: [],
+    targetGenders: [],
+    targetInterests: [],
   },
   {
     publicId: '5',
@@ -119,8 +123,9 @@ const mockTests: Test[] = [
     owner: mockUsers[0],
     members: mockUsers,
     isPublic: false,
-    targetAgeGroup: [],
-    targetGender: [],
+    targetAges: [],
+    targetGenders: [],
+    targetInterests: [],
   },
 ];
 
@@ -176,8 +181,9 @@ export const testsHandlers = [
       owner: mockUsers[0],
       members: [],
       isPublic: false,
-      targetAgeGroup: [],
-      targetGender: [],
+      targetAges: [],
+      targetGenders: [],
+      targetInterests: [],
     };
 
     mockTests.push(newTest);

@@ -28,7 +28,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
   1: [
     {
       participantId: 'tester-1',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-02T10:00:00.000Z',
       missionResults: [
         {
@@ -68,7 +68,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
     },
     {
       participantId: 'tester-2',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-02T11:30:00.000Z',
       missionResults: [
         {
@@ -108,7 +108,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
     },
     {
       participantId: 'tester-3',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-03T09:00:00.000Z',
       missionResults: [
         {
@@ -155,7 +155,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
     },
     {
       participantId: 'tester-4',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-03T14:00:00.000Z',
       missionResults: [
         {
@@ -205,7 +205,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
   3: [
     {
       participantId: 'tester-5',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-05T12:00:00.000Z',
       missionResults: [
         {
@@ -226,7 +226,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
   5: [
     {
       participantId: 'tester-6',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-06T08:00:00.000Z',
       missionResults: [
         {
@@ -256,21 +256,25 @@ const createMainFeedbacksWithRelativeTime = (): MainFeedback[] => {
       participantId: 'tester-1',
       content: '메인 페이지의 디자인이 직관적이어서 사용하기 편리했습니다.',
       createdAt: new Date(now - 1 * HOUR).toISOString(),
+      personaTags: ['GUEST'],
     },
     {
       participantId: 'tester-2',
       content: '검색 필터 기능이 좀 더 다양했으면 좋겠습니다.',
       createdAt: new Date(now - 10 * HOUR).toISOString(),
+      personaTags: ['GUEST'],
     },
     {
       participantId: 'tester-3',
       content: '전반적인 로딩 속도가 조금 느린 것 같아 개선이 필요해 보입니다.',
       createdAt: new Date(now - 3 * DAY).toISOString(),
+      personaTags: ['GUEST'],
     },
     {
       participantId: 'tester-4',
       content: '메인 페이지의 디자인이 직관적이어서 사용하기 편리했습니다.',
       createdAt: new Date(now - 30 * DAY).toISOString(),
+      personaTags: ['GUEST'],
     },
   ];
 };
@@ -282,6 +286,7 @@ const mockMainFeedbacks: Record<number, MainFeedback[]> = {
       participantId: 'tester-5',
       content: '미션 난이도가 적당해서 테스트하기 수월했습니다.',
       createdAt: '2026-03-02',
+      personaTags: ['GUEST'],
     },
   ],
   4: [],
@@ -290,6 +295,7 @@ const mockMainFeedbacks: Record<number, MainFeedback[]> = {
       participantId: 'tester-6',
       content: '전체적으로 만족스러운 테스트 경험이었습니다.',
       createdAt: '2026-03-02',
+      personaTags: ['GUEST'],
     },
   ],
 };
@@ -308,7 +314,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       feedback: '매우 만족스러웠습니다.',
       duration: 300,
       participantId: 'tester-1',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-2',
@@ -321,7 +327,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       feedback: '좋아요',
       duration: 150,
       participantId: 'tester-2',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-3',
@@ -333,7 +339,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 200,
       participantId: 'tester-3',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-4',
@@ -345,7 +351,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 100,
       participantId: 'tester-4',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
   ],
   2: [
@@ -360,7 +366,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       feedback: '무난했습니다.',
       duration: 120,
       participantId: 'tester-1',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-2',
@@ -373,7 +379,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       feedback: '어디로 가야할지 모르겠어요.',
       duration: 450,
       participantId: 'tester-2',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-3',
@@ -385,7 +391,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 180,
       participantId: 'tester-3',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-4',
@@ -397,7 +403,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 90,
       participantId: 'tester-4',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
   ],
   3: [
@@ -412,7 +418,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       feedback: '생각보다 오래 걸렸네요.',
       duration: 600,
       participantId: 'tester-1',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-2',
@@ -424,7 +430,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 50,
       participantId: 'tester-3',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-3',
@@ -436,7 +442,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 0,
       participantId: 'tester-4',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
   ],
   4: [
@@ -451,7 +457,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       feedback: '겨우 완료했습니다.',
       duration: 500,
       participantId: 'tester-2',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-2',
@@ -463,7 +469,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 30,
       participantId: 'tester-3',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-3',
@@ -475,7 +481,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 0,
       participantId: 'tester-4',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
   ],
 };
@@ -502,7 +508,7 @@ const mockMissionDetail: Record<string, MissionDetail> = {
         duration: 300000,
         feedback: '매우 만족스러웠습니다.',
         participantId: 'tester-1',
-        persona: 'GUEST',
+        personaTags: ['GUEST'],
       },
       {
         id: 'mission-result-2',
@@ -510,7 +516,7 @@ const mockMissionDetail: Record<string, MissionDetail> = {
         duration: 150000,
         feedback: '좋아요',
         participantId: 'tester-2',
-        persona: 'GUEST',
+        personaTags: ['GUEST'],
       },
       {
         id: 'mission-result-3',
@@ -518,7 +524,7 @@ const mockMissionDetail: Record<string, MissionDetail> = {
         duration: 200000,
         feedback: undefined,
         participantId: 'tester-3',
-        persona: 'GUEST',
+        personaTags: ['GUEST'],
       },
       {
         id: 'mission-result-4',
@@ -526,7 +532,7 @@ const mockMissionDetail: Record<string, MissionDetail> = {
         duration: 100000,
         feedback: undefined,
         participantId: 'tester-4',
-        persona: 'GUEST',
+        personaTags: ['GUEST'],
       },
     ],
   },
@@ -679,7 +685,7 @@ export const resultHandlers = [
         duration: r.duration,
         feedback: r.feedback || undefined,
         participantId: r.participantId,
-        persona: r.persona,
+        personaTags: r.personaTags,
       }));
 
       return {
