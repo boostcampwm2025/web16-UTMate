@@ -1,8 +1,16 @@
+'use client';
+
 import { useState } from 'react';
-import { UserSummary } from '../types';
-import { addMemberToTest, findUserByUsername, removeMemberFromTest } from '../api/client';
+
+import { Plus, Minus } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
+import { Avatar, AvatarImage } from '@/shared/components/ui/avatar';
+import { Badge } from '@/shared/components/ui/badge';
+
+import { addMemberToTest, findUserByUsername, removeMemberFromTest } from '../api/client';
+
+import type { UserSummary } from '../types';
 
 interface MemberModalProps {
   testId: string;
@@ -63,81 +71,99 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') handleSearch();
+  };
+
   return (
-    <div className="rounded-xl bg-white p-6">
+    <div className="mt-4 flex flex-col space-y-2">
       {/* 검색 영역 */}
       <div className="mb-2 flex gap-2">
         <Input
           type="text"
           placeholder="닉네임 또는 이메일 입력"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleSearch();
-          }}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
         />
-        <Button onClick={handleSearch}>검색</Button>
+        <Button className="h-10" onClick={handleSearch}>
+          검색
+        </Button>
       </div>
-      {error && <div className="mb-6 text-xs text-red-500">{error}</div>}
+      {error && <div className="text-destructive text-sm">{error}</div>}
       {/* 검색 결과 */}
-      {searchResult && <div className="mb-2 text-base font-bold">검색 결과</div>}
+      {searchResult && <div className="text-base font-semibold">검색 결과</div>}
       {searchResult && (
-        <div key={searchResult.publicId} className="mt-2">
-          <div className="flex items-center gap-4 rounded-lg bg-gray-50 px-4 py-3">
-            <img
-              src={searchResult.avatarUrl || '/default-avatar.png'}
-              alt={searchResult.username}
-              className="h-14 w-14 rounded-full border-2 border-gray-200 bg-white"
-            />
+        <div key={searchResult.publicId}>
+          <div className="flex items-center gap-4 rounded-lg bg-gray-100 px-4 py-3">
+            <Avatar className="size-14">
+              <AvatarImage src={searchResult.avatarUrl} alt={searchResult.username} />
+            </Avatar>
             <div className="flex-1">
-              <div className="text-xl font-bold">{searchResult.username}</div>
+              <div className="text-lg font-semibold">{searchResult.username}</div>
             </div>
-            <Button onClick={() => handleAdd(searchResult)}>추가</Button>
+            <Button
+              variant="outline"
+              className="h-10 rounded-full"
+              onClick={() => handleAdd(searchResult)}
+              aria-label={`${searchResult.username}님을 멤버로 추가`}
+            >
+              <Plus className="size-4" />
+            </Button>
           </div>
         </div>
       )}
       {/* 기존 멤버 목록 */}
       <div className="mb-6">
-        <div className="mb-2 text-base font-bold">기존 멤버 목록</div>
         <div className="space-y-3">
           {/* 소유자 */}
-          <div className="flex items-center gap-4 rounded-lg bg-gray-50 px-4 py-3">
-            <img
-              src={owner.avatarUrl || '/default-avatar.png'}
-              alt={owner.username}
-              className="h-14 w-14 rounded-full border-2 border-gray-200 bg-white"
-            />
-            <div className="flex-1">
-              <div className="text-xl font-bold">{owner.username}</div>
-              <div className="mt-1 flex gap-2">
-                <span className="rounded bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700">
+          <div>
+            <div className="mb-2 text-base font-semibold">기존 멤버 목록</div>
+            <div className="flex items-center gap-4 rounded-lg bg-gray-100 px-4 py-3">
+              <Avatar className="size-14">
+                <AvatarImage src={owner.avatarUrl} alt={owner.username} />
+              </Avatar>
+              <div className="flex-1">
+                <div className="text-lg font-semibold text-gray-800">{owner.username}</div>
+                <Badge variant="outline" className="bg-white">
                   소유자
-                </span>
+                </Badge>
               </div>
             </div>
           </div>
           {/* 멤버들 */}
-          {memberList.map((m) => (
-            <div
-              key={m.publicId}
-              className="flex items-center gap-4 rounded-lg bg-gray-50 px-4 py-3"
-            >
-              <img
-                src={m.avatarUrl || '/default-avatar.png'}
-                alt={m.username}
-                className="h-14 w-14 rounded-full border-2 border-gray-200 bg-white"
-              />
-              <div className="flex-1">
-                <div className="text-xl font-bold">{m.username}</div>
-                <div className="mt-1 flex gap-2">
-                  <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
-                    편집자
-                  </span>
+          <ul>
+            {memberList.map((m) => (
+              <li
+                key={m.publicId}
+                className="flex items-center gap-4 rounded-lg bg-gray-50 px-4 py-3"
+              >
+                <Avatar className="size-14">
+                  <AvatarImage src={m.avatarUrl} alt={m.username} />
+                </Avatar>
+                <div className="flex-1">
+                  <div className="text-xl font-bold text-gray-800">{m.username}</div>
+                  <div className="mt-1 flex gap-2">
+                    <Badge variant="outline" className="bg-white">
+                      편집자
+                    </Badge>
+                  </div>
                 </div>
-              </div>
-              <Button onClick={() => handleRemove(m)}>제거</Button>
-            </div>
-          ))}
+                <Button
+                  variant="outline"
+                  className="h-10 rounded-full"
+                  onClick={() => handleRemove(m)}
+                  aria-label={`${m.username}님을 멤버에서 제거`}
+                >
+                  <Minus className="size-4" />
+                </Button>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
