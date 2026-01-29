@@ -70,7 +70,9 @@ export class TestsRepository {
     const queryBuilder = this.getRepo(manager)
       .createQueryBuilder('tests')
       .where('tests.status = :status', { status: TestStatus.PUBLISHED })
-      .andWhere('tests.isPublic = :isPublic', { isPublic: true });
+      .andWhere('tests.isPublic = :isPublic', { isPublic: true })
+      .leftJoinAndSelect('tests.missions', 'missions')
+      .leftJoinAndSelect('tests.participants', 'participants');
 
     if (query.gender) {
       queryBuilder.andWhere(':gender MEMBER OF (tests.target_genders)', { gender: query.gender });

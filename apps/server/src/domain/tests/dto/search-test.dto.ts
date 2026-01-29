@@ -42,7 +42,7 @@ export class SearchTestResultDto {
   totalTimeMinutes: number;
   participantsCount: number;
 
-  tags: string[];
+  tags: string[] = [];
 
   constructor() {}
 
