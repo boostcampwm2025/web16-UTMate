@@ -14,6 +14,7 @@ import { TestStatusBadge } from '@/shared/components/TestStatusBadge';
 import { TestStatus } from '@/features/(test-manage)/types';
 
 import { getTestResultSummary } from '../apis/client';
+import { formatDate } from '../utils/dates';
 
 export function TestBasicInfo({ testId }: { testId: string }) {
   const { data: testSummary } = useSuspenseQuery({
@@ -24,17 +25,28 @@ export function TestBasicInfo({ testId }: { testId: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg font-bold gap-2 flex items-center">{testSummary.title}<TestStatusBadge status={testSummary.status} /></CardTitle>
-        <CardDescription className="text-sm text-muted-foreground">{testSummary.description}</CardDescription>
+        <CardTitle className="flex items-center gap-2 text-lg font-bold">
+          {testSummary.title}
+          <TestStatusBadge status={testSummary.status} />
+        </CardTitle>
+        <CardDescription className="text-muted-foreground text-sm">
+          {testSummary.description}
+        </CardDescription>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-2">
         <div className="flex items-center gap-2">
-          <UsersIcon className="w-4 h-4" />
-          <span className="text-sm text-muted-foreground">{testSummary.status === TestStatus.PUBLISHED ? '지금까지' : '총'} {testSummary.totalParticipants}명이 참여했어요.</span>
+          <UsersIcon className="h-4 w-4" />
+          <span className="text-muted-foreground text-sm">
+            {testSummary.status === TestStatus.PUBLISHED ? '지금까지' : '총'}{' '}
+            {testSummary.totalParticipants}명이 참여했어요.
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          <CalendarIcon className="w-4 h-4"/>
-          <span className="text-sm text-muted-foreground">{testSummary.startDate} {testSummary.endDate ? `~ ${testSummary.endDate}` : ''}</span>
+          <CalendarIcon className="h-4 w-4" />
+          <span className="text-muted-foreground text-sm">
+            {testSummary.startDate && formatDate(testSummary.startDate)}
+            {testSummary.endDate && `~ ${formatDate(testSummary.endDate)}`}
+          </span>
         </div>
       </CardContent>
     </Card>
