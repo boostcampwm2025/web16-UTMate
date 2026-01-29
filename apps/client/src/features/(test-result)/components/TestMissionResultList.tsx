@@ -58,8 +58,8 @@ function TestMissionResultItem({ testId, mission, index }: TestMissionResultItem
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="flex flex-col gap-6 p-4 md:flex-row md:items-start md:p-6 md:pt-2">
-          <div className="flex flex-1 flex-col gap-3 text-sm">
+        <CardContent className="grid grid-cols-1 gap-6 p-4 md:grid-cols-12 md:items-start md:p-6 md:pt-2">
+          <div className="flex flex-col gap-3 text-sm md:col-span-7 lg:col-span-5">
             <div className="flex flex-col gap-1.5">
               <div className="text-muted-foreground flex items-center gap-1.5 font-medium">
                 <FileText className="h-4 w-4" />
@@ -74,7 +74,9 @@ function TestMissionResultItem({ testId, mission, index }: TestMissionResultItem
                   <Clock className="h-4 w-4" />
                   예상 소요 시간
                 </div>
-                <p className="pl-5 font-medium">{mission.estimatedDuration}분</p>
+                <p className="text-muted-foreground pl-5 font-medium">
+                  {mission.estimatedDuration}분
+                </p>
               </div>
 
               <div className="flex flex-col gap-1.5">
@@ -87,28 +89,31 @@ function TestMissionResultItem({ testId, mission, index }: TestMissionResultItem
             </div>
           </div>
 
-          <div className="grid min-w-fit grid-cols-2 gap-4 md:grid-cols-4">
-            <div className="flex items-center gap-2">
-              <div className="text-muted-foreground text-sm">성공률</div>
-              <div className="text-base font-semibold">{mission.successRate}%</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="text-muted-foreground text-sm">이탈율</div>
-              <div className="text-base font-semibold">{mission.dropRate}%</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="text-muted-foreground text-sm">결과 수</div>
-              <div className="text-base font-semibold">{mission.missionResults.length}개</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="text-muted-foreground text-sm">평균 소요시간</div>
-              <div className="text-base font-semibold">
-                {formatDuration(mission.averageDuration)}
-              </div>
-            </div>
+          <div className="grid grid-cols-2 gap-4 md:col-span-5 md:grid-cols-4 lg:col-span-7">
+            <MetricCard label="성공률" value={`${mission.successRate}%`} />
+            <MetricCard label="이탈율" value={`${mission.dropRate}%`} />
+            <MetricCard label="결과 수" value={`${mission.missionResults.length}개`} />
+            <MetricCard
+              label="평균 소요시간"
+              value={`${formatDuration(mission.averageDuration)}`}
+            />
           </div>
         </CardContent>
       </Card>
     </Link>
   );
 }
+
+interface MetricCardProps {
+  label: string;
+  value: string;
+}
+
+export const MetricCard = ({ label, value }: MetricCardProps) => {
+  return (
+    <div className="flex min-w-20 flex-col items-start justify-center rounded-2xl bg-gray-50 p-4 text-left transition-colors hover:bg-gray-100">
+      <div className="mb-2 text-sm font-medium text-gray-500">{label}</div>
+      <div className="text-xl font-semibold text-gray-700">{value}</div>
+    </div>
+  );
+};
