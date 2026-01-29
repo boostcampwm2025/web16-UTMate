@@ -23,9 +23,9 @@ export interface Test {
   members: UserSummary[];
   // 타겟 페르소나 설정
   isPublic: boolean; // 공개/비공개 (필수)
-  targetGender: string[]; // 필수 - 전체 선택 시 모든 성별
-  targetAgeGroup: string[]; // 필수 - 전체 선택 시 모든 연령대
-  targetInterests?: Interest[]; // 선택사항 - 비어있으면 모든 관심사 대상
+  targetGenders: string[]; // 필수 - 전체 선택 시 모든 성별
+  targetAges: string[]; // 필수 - 전체 선택 시 모든 연령대
+  targetInterests: Interest[]; // 선택사항 - 비어있으면 모든 관심사 대상
 }
 
 export interface TestMission {

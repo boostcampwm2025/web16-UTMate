@@ -42,18 +42,18 @@ export const INTEREST_OPTIONS: Array<{ key: Interest; label: string }> = [
  * 성별 옵션
  */
 export const GENDER_OPTIONS = [
-  { value: 'MALE' as const, label: '남성' },
-  { value: 'FEMALE' as const, label: '여성' },
+  { value: '남성' as const, label: '남성' },
+  { value: '여성' as const, label: '여성' },
 ];
 
 /**
  * 연령대 옵션
  */
 export const AGE_GROUP_OPTIONS = [
-  { value: '10' as const, label: '10대' },
-  { value: '20' as const, label: '20대' },
-  { value: '30' as const, label: '30대' },
-  { value: '40' as const, label: '40대' },
-  { value: '50' as const, label: '50대' },
-  { value: '60+' as const, label: '60대 이상' },
+  { value: '10대' as const, label: '10대' },
+  { value: '20대' as const, label: '20대' },
+  { value: '30대' as const, label: '30대' },
+  { value: '40대' as const, label: '40대' },
+  { value: '50대' as const, label: '50대' },
+  { value: '60대 이상' as const, label: '60대 이상' },
 ];
