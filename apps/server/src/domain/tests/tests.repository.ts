@@ -216,6 +216,8 @@ export class TestsRepository {
   ) {
     return this.createAccessibleQuery(userId, manager)
       .leftJoinAndSelect('tests.participants', 'participants')
+      .leftJoinAndSelect('participants.user', 'participantUser')
+      .leftJoinAndSelect('participantUser.persona', 'participantPersona')
       .andWhere('tests.publicId = :publicId', { publicId })
       .getOne();
   }
@@ -235,6 +237,8 @@ export class TestsRepository {
       .leftJoinAndSelect('tests.missions', 'missions')
       .leftJoinAndSelect('tests.participants', 'participants')
       .leftJoinAndSelect('participants.missionResults', 'missionResults')
+      .leftJoinAndSelect('participants.user', 'participantUser')
+      .leftJoinAndSelect('participantUser.persona', 'participantPersona')
       .andWhere('tests.publicId = :publicId', { publicId })
       .getOne();
   }
@@ -261,6 +265,8 @@ export class TestsRepository {
       .leftJoinAndSelect('tests.missions', 'missions')
       .leftJoinAndSelect('tests.participants', 'participants')
       .leftJoinAndSelect('participants.missionResults', 'missionResults')
+      .leftJoinAndSelect('participants.user', 'participantUser')
+      .leftJoinAndSelect('participantUser.persona', 'participantPersona')
       .andWhere('tests.publicId = :testPublicId', { testPublicId })
       .andWhere('participants.publicId = :participantPublicId', { participantPublicId })
       .getOne();

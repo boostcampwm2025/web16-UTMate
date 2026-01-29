@@ -12,10 +12,10 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-import { SearchUserDto } from './dto/search-user.dto';
 import { CreatePersonaDto, PersonaResponseDto, UpdatePersonaDto } from './dto/persona.dto';
+import { SearchUserDto } from './dto/search-user.dto';
 import { UsersService } from './users.service';
 
 import { UserId } from '#domain/auth/decorator/param.decorator';

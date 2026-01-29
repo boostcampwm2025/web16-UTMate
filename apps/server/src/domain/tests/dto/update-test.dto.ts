@@ -20,11 +20,11 @@ export class UpdateTestDto {
 
   @IsArray()
   @IsEnum(Gender, { each: true })
-  targetGender: Gender[] = [];
+  targetGenders: Gender[] = [];
 
   @IsArray()
   @IsEnum(AgeRange, { each: true })
-  targetAgeRange: AgeRange[] = [];
+  targetAges: AgeRange[] = [];
 
   @IsArray()
   @IsEnum(Interest, { each: true })

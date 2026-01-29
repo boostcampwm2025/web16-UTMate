@@ -26,12 +26,8 @@ export function useTestForm(initialData: TestDetail) {
 
   // 타겟 페르소나 상태 (initialData에서 초기값 설정)
   // 성별과 연령대는 전체 선택이 기본값, 관심사는 빈 배열(선택사항)
-  const [targetGender, setTargetGender] = useState<string[]>(
-    initialData.targetGender || ['MALE', 'FEMALE'],
-  );
-  const [targetAgeGroup, setTargetAgeGroup] = useState<string[]>(
-    initialData.targetAgeGroup || ['10', '20', '30', '40', '50', '60+'],
-  );
+  const [targetGenders, setTargetGenders] = useState<string[]>(initialData.targetGenders || []);
+  const [targetAges, setTargetAges] = useState<string[]>(initialData.targetAges || []);
   const [targetInterests, setTargetInterests] = useState<Interest[]>(
     initialData.targetInterests || [],
   );
@@ -50,13 +46,13 @@ export function useTestForm(initialData: TestDetail) {
           order: mission.order,
           name: mission.name,
           description: mission.description,
-          missionUrl: mission.missionUrl || 'https://', // 빈 값이면 https:// 기본값
+          missionUrl: mission.missionUrl || initialData.url || 'https://', // 빈 값이면 https:// 기본값
           estimatedDuration: mission.estimatedDuration,
         })) || [],
       // 타겟 페르소나 설정
-      isPublic: initialData.isPublic,
-      targetGender: initialData.targetGender || ['MALE', 'FEMALE'],
-      targetAgeGroup: initialData.targetAgeGroup || ['10', '20', '30', '40', '50', '60+'],
+      isPublic: initialData.isPublic || false,
+      targetGenders: initialData.targetGenders || [],
+      targetAges: initialData.targetAges || [],
       targetInterests: initialData.targetInterests || [],
     },
     mode: 'onChange',
@@ -74,6 +70,7 @@ export function useTestForm(initialData: TestDetail) {
 
   const watchedTitle = watch('title');
   const watchedMissions = watch('missions');
+  const watchUrl = watch('url');
 
   // === Mission Handlers ===
   const handleAddMission = () => {
@@ -86,7 +83,7 @@ export function useTestForm(initialData: TestDetail) {
       order: fields.length,
       name: '',
       description: '',
-      missionUrl: 'https://', // 기본값으로 https:// 설정
+      missionUrl: watchUrl || 'https://', // 기본값으로 테스트 URL 설정
       estimatedDuration: 0,
     });
     setSelectedMissionIndex(fields.length);
@@ -199,9 +196,9 @@ export function useTestForm(initialData: TestDetail) {
         // 타겟 페르소나 설정 추가
         isPublic,
         // 성별/연령대는 필수이므로 항상 전송, 관심사는 선택사항이므로 비어있으면 undefined
-        targetGender,
-        targetAgeGroup,
-        targetInterests: targetInterests.length > 0 ? targetInterests : undefined,
+        targetGenders,
+        targetAges,
+        targetInterests,
       });
 
       await minLoadingTime;
@@ -269,10 +266,10 @@ export function useTestForm(initialData: TestDetail) {
       save: handleSave,
 
       // Target Persona
-      targetGender,
-      setTargetGender,
-      targetAgeGroup,
-      setTargetAgeGroup,
+      targetGender: targetGenders,
+      setTargetGender: setTargetGenders,
+      targetAgeGroup: targetAges,
+      setTargetAgeGroup: setTargetAges,
       targetInterests,
       toggleInterest: handleToggleInterest,
       isPublic,

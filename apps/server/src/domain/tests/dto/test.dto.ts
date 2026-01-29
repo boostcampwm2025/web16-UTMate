@@ -3,6 +3,7 @@ import { IsArray, IsBoolean, IsEnum, IsString, ValidateNested } from 'class-vali
 
 import { Test, TestStatus } from '../entities/test.entity';
 
+import { AgeRange, Gender, Interest } from '#common/enums';
 import { MissionDto } from '#domain/missions/dto/mission.dto';
 
 export class TestDto {
@@ -29,6 +30,21 @@ export class TestDto {
   @Type(() => MissionDto)
   missions: MissionDto[];
 
+  @IsBoolean()
+  isPublic: boolean;
+
+  @IsArray()
+  @IsEnum(Gender, { each: true })
+  targetGenders: Gender[];
+
+  @IsArray()
+  @IsEnum(AgeRange, { each: true })
+  targetAges: AgeRange[];
+
+  @IsArray()
+  @IsEnum(Interest, { each: true })
+  targetInterests: Interest[];
+
   constructor() {}
 
   static fromTestEntity(test: Test) {
@@ -40,6 +56,12 @@ export class TestDto {
     dto.url = test.url;
     dto.sdkStatus = test.sdkStatus;
     dto.missions = MissionDto.fromMissionEntities(test.missions);
+
+    // 타겟 페르소나 설정
+    dto.isPublic = test.isPublic;
+    dto.targetGenders = test.targetGenders;
+    dto.targetAges = test.targetAges;
+    dto.targetInterests = test.targetInterests;
     return dto;
   }
 }

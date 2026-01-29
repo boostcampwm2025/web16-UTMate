@@ -66,7 +66,7 @@ export class TestsService {
         throw new NotFoundException('Test not found');
       }
       test.updateTestInfo(dto.title, dto.description, dto.url, dto.isPublic);
-      test.updateTargeting(dto.targetGender, dto.targetAgeRange, dto.targetInterests);
+      test.updateTargeting(dto.targetGenders, dto.targetAges, dto.targetInterests);
       await this.testsRepository.save(test, manager);
 
       // 미션 업데이트

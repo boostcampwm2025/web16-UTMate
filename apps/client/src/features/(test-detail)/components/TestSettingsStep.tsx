@@ -2,7 +2,13 @@
 
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { Label } from '@/shared/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -10,7 +16,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
-import { INTEREST_OPTIONS, GENDER_OPTIONS, AGE_GROUP_OPTIONS } from '@/features/(auth)/constants/interests';
+import {
+  INTEREST_OPTIONS,
+  GENDER_OPTIONS,
+  AGE_GROUP_OPTIONS,
+} from '@/features/(auth)/constants/interests';
 import type { Interest } from '@/features/(auth)/types';
 import type { TestFormValues } from '../schemas/testForm';
 
@@ -86,7 +96,7 @@ export function TestSettingsStep({
       <div>
         <h2 className="text-2xl font-bold">테스트 설정</h2>
         <p className="text-muted-foreground mt-2">
-          테스트에 참여할 타겟 사용자 페르소나를 설정하세요. 설정하지 않으면 모든 사용자가 참여할 수 있습니다.
+          테스트에 참여할 타겟 사용자 페르소나를 설정하세요.
         </p>
       </div>
 
@@ -121,7 +131,9 @@ export function TestSettingsStep({
               비공개
             </button>
           </div>
-          <p className={`mt-3 text-sm ${isPublic ? 'text-muted-foreground' : 'font-semibold text-blue-600'}`}>
+          <p
+            className={`mt-3 text-sm ${isPublic ? 'text-muted-foreground' : 'font-semibold text-blue-600'}`}
+          >
             {isPublic
               ? '모든 사용자가 이 테스트를 검색하고 참여할 수 있습니다.'
               : '링크를 공유한 사용자만 이 테스트에 참여할 수 있습니다.'}
@@ -173,12 +185,12 @@ export function TestSettingsStep({
               onClick={handleAgeGroupSelectAll}
               disabled={!isPublic}
               className={`cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-colors ${
-                targetAgeGroup.length === 0 || targetAgeGroup.length === AGE_GROUP_OPTIONS.length
+                targetAgeGroup.length === AGE_GROUP_OPTIONS.length
                   ? 'border-primary bg-primary text-primary-foreground'
                   : 'border-input hover:bg-accent'
               } ${!isPublic ? 'cursor-not-allowed' : ''}`}
             >
-              {targetAgeGroup.length === AGE_GROUP_OPTIONS.length ? '모두선택취소' : '모두선택'}
+              {targetAgeGroup.length === AGE_GROUP_OPTIONS.length ? '모두 취소' : '모두 선택'}
             </button>
             {AGE_GROUP_OPTIONS.map((option) => (
               <button
@@ -206,20 +218,6 @@ export function TestSettingsStep({
           <CardDescription>타겟 사용자의 관심사를 선택하세요 (복수 선택 가능)</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-3">
-            <button
-              type="button"
-              onClick={handleInterestSelectAll}
-              disabled={!isPublic}
-              className={`cursor-pointer rounded-full border-2 px-6 py-2 text-sm font-medium transition-colors ${
-                targetInterests.length === 0 || targetInterests.length === INTEREST_OPTIONS.length
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-input hover:bg-accent'
-              } ${!isPublic ? 'cursor-not-allowed' : ''}`}
-            >
-              {targetInterests.length === INTEREST_OPTIONS.length ? '모두선택취소' : '모두선택'}
-            </button>
-          </div>
           <div className="flex flex-wrap gap-2">
             {INTEREST_OPTIONS.map((option) => (
               <button
@@ -238,11 +236,13 @@ export function TestSettingsStep({
             ))}
           </div>
           <p className="text-muted-foreground mt-3 text-sm">
-            선택한 관심사: {targetInterests.length === 0 ? '모두 (선택하지 않을 시 전체선택)' : `${targetInterests.length}개`}
+            선택한 관심사:{' '}
+            {targetInterests.length === 0
+              ? '관심사를 선택하지 않을 시 매칭에 어려움이 있을 수 있습니다.'
+              : `${targetInterests.length}개`}
           </p>
         </CardContent>
       </Card>
-
     </div>
   );
 }

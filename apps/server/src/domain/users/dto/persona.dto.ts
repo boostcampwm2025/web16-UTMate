@@ -1,7 +1,7 @@
-import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-import { AgeGroup, Gender, Interest } from '../entities/persona.entity';
+import { AgeRange, Gender, Interest } from '#common/enums';
 
 export class CreatePersonaDto {
   @ApiProperty({ enum: Gender, description: '성별' })
@@ -9,10 +9,10 @@ export class CreatePersonaDto {
   @IsNotEmpty()
   gender: Gender;
 
-  @ApiProperty({ enum: AgeGroup, description: '연령대' })
-  @IsEnum(AgeGroup)
+  @ApiProperty({ enum: AgeRange, description: '연령대' })
+  @IsEnum(AgeRange)
   @IsNotEmpty()
-  ageGroup: AgeGroup;
+  ageGroup: AgeRange;
 
   @ApiProperty({
     enum: Interest,
@@ -37,10 +37,10 @@ export class UpdatePersonaDto {
   @IsOptional()
   gender?: Gender;
 
-  @ApiProperty({ enum: AgeGroup, description: '연령대', required: false })
-  @IsEnum(AgeGroup)
+  @ApiProperty({ enum: AgeRange, description: '연령대', required: false })
+  @IsEnum(AgeRange)
   @IsOptional()
-  ageGroup?: AgeGroup;
+  ageGroup?: AgeRange;
 
   @ApiProperty({
     enum: Interest,
@@ -63,8 +63,8 @@ export class PersonaResponseDto {
   @ApiProperty({ enum: Gender })
   gender: Gender;
 
-  @ApiProperty({ enum: AgeGroup })
-  ageGroup: AgeGroup;
+  @ApiProperty({ enum: AgeRange })
+  ageGroup: AgeRange;
 
   @ApiProperty({ enum: Interest, isArray: true })
   interests: Interest[];

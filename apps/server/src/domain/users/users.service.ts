@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
+import { CreatePersonaDto, PersonaResponseDto, UpdatePersonaDto } from './dto/persona.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { UserSummaryDto } from './dto/user-summary.dto';
-import { CreatePersonaDto, PersonaResponseDto, UpdatePersonaDto } from './dto/persona.dto';
-import { UsersRepository } from './users.repository';
-import { PersonaRepository } from './persona.repository';
 import { Persona } from './entities/persona.entity';
+import { PersonaRepository } from './persona.repository';
+import { UsersRepository } from './users.repository';
 
 import { OAuthUserDto } from '#domain/users/dto/oauth-user.dto';
 
@@ -97,17 +97,16 @@ export class UsersService {
    * @param userId 사용자 id
    * @returns 페르소나 정보 또는 null
    */
-  async getPersona(userId: number): Promise<PersonaResponseDto | null> {
+  async getPersona(userId: number): Promise<PersonaResponseDto> {
     const persona = await this.personaRepository.findByUserId(userId);
     if (!persona) {
-      return null;
+      throw new NotFoundException('Persona not found.');
     }
 
     return {
       gender: persona.gender,
       ageGroup: persona.ageGroup,
       interests: persona.interests,
-      description: persona.description || undefined,
     };
   }
 
@@ -130,7 +129,6 @@ export class UsersService {
     persona.gender = dto.gender;
     persona.ageGroup = dto.ageGroup;
     persona.interests = dto.interests;
-    persona.description = dto.description || null;
 
     const saved = await this.personaRepository.save(persona);
 
@@ -138,7 +136,6 @@ export class UsersService {
       gender: saved.gender,
       ageGroup: saved.ageGroup,
       interests: saved.interests,
-      description: saved.description || undefined,
     };
   }
 
@@ -159,7 +156,6 @@ export class UsersService {
     if (dto.gender !== undefined) persona.gender = dto.gender;
     if (dto.ageGroup !== undefined) persona.ageGroup = dto.ageGroup;
     if (dto.interests !== undefined) persona.interests = dto.interests;
-    if (dto.description !== undefined) persona.description = dto.description;
 
     const updated = await this.personaRepository.save(persona);
 
@@ -167,7 +163,6 @@ export class UsersService {
       gender: updated.gender,
       ageGroup: updated.ageGroup,
       interests: updated.interests,
-      description: updated.description || undefined,
     };
   }
 }
