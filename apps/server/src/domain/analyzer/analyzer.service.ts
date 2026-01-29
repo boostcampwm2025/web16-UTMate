@@ -96,7 +96,7 @@ export class AnalyzerService {
       ) {
         const gap = event.timestamp - lastInteractionTime;
         if (gap >= IDLE_THRESHOLD) {
-          idleTimes.push({ timestamp: event.timestamp, duration: gap });
+          idleTimes.push({ timestamp: lastInteractionTime, duration: gap });
         }
         lastInteractionTime = event.timestamp;
       }
