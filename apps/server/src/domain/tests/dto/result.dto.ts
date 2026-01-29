@@ -49,15 +49,25 @@ export class ParticipantMissionResultDto {
 
 export class ParticipantResultsDto {
   participantId: string;
-  persona: string;
+  personaTags: string[] = [];
   joinedAt: Date;
   missionResults: ParticipantMissionResultDto[];
 
   static fromEntity(participant: Participant, missions: Mission[]) {
     const dto = new ParticipantResultsDto();
     dto.participantId = participant.publicId;
-    // TODO : 참가자 페르소나 기능 구현 시 수정 필요
-    dto.persona = 'GUEST';
+    if (participant.userType === 'REGISTERED' && participant.user) {
+      if (participant.user.persona) {
+        dto.personaTags.push(participant.user.persona.gender);
+        dto.personaTags.push(participant.user.persona.ageGroup);
+        dto.personaTags.push(...participant.user.persona.interests);
+      } else {
+        dto.personaTags.push('미설정');
+      }
+    } else {
+      dto.personaTags.push('GUEST');
+    }
+
     dto.joinedAt = participant.joinedAt;
     dto.missionResults = ParticipantMissionResultDto.fromEntities(
       missions,

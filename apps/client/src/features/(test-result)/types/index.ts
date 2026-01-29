@@ -26,7 +26,7 @@ export interface ParticipantMissionResult {
 
 export interface ParticipantResult {
   participantId: string;
-  persona: string;
+  personaTags: string[];
   joinedAt: string;
   missionResults: ParticipantMissionResult[];
 }
