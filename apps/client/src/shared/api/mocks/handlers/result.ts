@@ -18,7 +18,7 @@ const mockTestSummaries: TestResultSummary[] = [
     title: 'Notion 서비스 사용성 테스트',
     status: TestStatus.PUBLISHED,
     description: 'Notion의 새로운 기능을 사용자들이 어떻게 활용하는지 확인하기 위한 테스트입니다.',
-    startDate: '2024-01-01',
+    startDate: '2026-01-22T14:01:21.000Z',
     endDate: undefined,
     totalParticipants: 3,
   },
