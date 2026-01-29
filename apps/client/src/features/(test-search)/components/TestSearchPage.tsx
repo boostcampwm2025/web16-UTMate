@@ -1,19 +1,26 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 
+import { Interest } from '@/features/(auth)/types/persona';
+import type { Gender, AgeGroup } from '@/features/(auth)/types/persona';
+import { Dialog, DialogContent } from '@/shared/components/ui/dialog';
+
+import { SearchResultDetail } from './SearchResultDetail';
 import { searchTests } from '../api/client';
 import { SearchFilter } from './SearchFilter';
-import { Gender, AgeGroup, Interest } from '@/features/(auth)/types/persona';
-import { TestSearchResultCard } from './TestSearchResultCard';
+import { TestSearchResultItem } from './TestSearchResultItem';
 import { NumberlessPaginationWithText } from './NumberlessPagiantion';
+import type { SearchTestResult } from '../types';
 
 export function TestSearchPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [selectedTest, setSelectedTest] = useState<SearchTestResult | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Extract params from URL
   const gender = (searchParams.get('gender') as Gender) || undefined;
@@ -34,13 +41,6 @@ export function TestSearchPage() {
         limit: 9,
       });
     },
-  });
-
-  console.log('TestSearchPage render state:', {
-    searchParams: searchParams.toString(),
-    gender,
-    ageGroup,
-    dataCount: data?.tests.length,
   });
 
   // URL Update Helper
@@ -96,6 +96,11 @@ export function TestSearchPage() {
     router.push(`${pathname}?${createQueryString('page', newPage.toString())}`);
   };
 
+  const handleTestClick = (test: SearchTestResult) => {
+    setSelectedTest(test);
+    setIsOpen(true);
+  };
+
   return (
     <div className="container mx-auto max-w-7xl p-6">
       <div className="flex flex-col space-y-4">
@@ -119,7 +124,7 @@ export function TestSearchPage() {
         {/* Main Content */}
         <main className="w-full">
           {isLoading ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-muted h-[300px] animate-pulse rounded-lg" />
               ))}
@@ -135,9 +140,13 @@ export function TestSearchPage() {
             </div>
           ) : (
             <>
-              <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {data?.tests.map((test) => (
-                  <TestSearchResultCard key={test.id} test={test} />
+                  <TestSearchResultItem
+                    key={test.id}
+                    test={test}
+                    onClick={() => handleTestClick(test)}
+                  />
                 ))}
               </div>
 
@@ -151,6 +160,11 @@ export function TestSearchPage() {
             </>
           )}
         </main>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogContent className="p-6 sm:max-w-[600px]">
+            {selectedTest && <SearchResultDetail test={selectedTest} />}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
