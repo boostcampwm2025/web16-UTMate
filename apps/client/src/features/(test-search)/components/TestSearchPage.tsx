@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useQueryState, parseAsString, parseAsArrayOf, parseAsInteger } from 'nuqs';
 
 import { Interest } from '@/features/(auth)/types/persona';
 import type { Gender, AgeGroup } from '@/features/(auth)/types/persona';
@@ -16,83 +16,48 @@ import { NumberlessPaginationWithText } from './NumberlessPagiantion';
 import type { SearchTestResult } from '../types';
 
 export function TestSearchPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [selectedTest, setSelectedTest] = useState<SearchTestResult | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Extract params from URL
-  const gender = (searchParams.get('gender') as Gender) || undefined;
-  const ageGroup = (searchParams.get('age') as AgeGroup) || undefined;
-  const interests = searchParams.getAll('interests') as Interest[];
-  const page = Number(searchParams.get('page')) || 1;
+  const [gender, setGender] = useQueryState('gender', parseAsString);
+  const [ageGroup, setAgeGroup] = useQueryState('age', parseAsString);
+  const [interests, setInterests] = useQueryState(
+    'interests',
+    parseAsArrayOf(parseAsString).withDefault([]),
+  );
+  const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
 
-  // Fetch Data
-  const { data, isLoading, isError } = useQuery({
+  const { data, isPending, isError } = useQuery({
     queryKey: ['tests', { gender, ageGroup, interests, page }],
     queryFn: () => {
       return searchTests({
-        gender,
-        age: ageGroup,
-        interests,
+        gender: (gender as Gender) || undefined,
+        age: (ageGroup as AgeGroup) || undefined,
+        interests: interests as Interest[],
         page,
         limit: 9,
       });
     },
   });
 
-  // URL Update Helper
-  const createQueryString = useCallback(
-    (name: string, value: string | null) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value === null) {
-        params.delete(name);
-      } else {
-        params.set(name, value);
-      }
-      // Reset page to 1 on filter change
-      if (name !== 'page') {
-        params.set('page', '1');
-      }
-      return params.toString();
-    },
-    [searchParams],
-  );
-
-  const toggleInterestParam = useCallback(
-    (interest: Interest) => {
-      const params = new URLSearchParams(searchParams.toString());
-      const currentInterests = params.getAll('interests');
-
-      params.delete('interests');
-      if (currentInterests.includes(interest.toString())) {
-        currentInterests
-          .filter((i) => i !== interest.toString())
-          .forEach((i) => params.append('interests', i));
-      } else {
-        [...currentInterests, interest].forEach((i) => params.append('interests', i));
-      }
-      params.set('page', '1');
-      return params.toString();
-    },
-    [searchParams],
-  );
-
   const handleGenderChange = (value: Gender | undefined) => {
-    router.push(`${pathname}?${createQueryString('gender', value ?? null)}`);
+    setGender(value || null).then(() => setPage(1));
   };
 
   const handleAgeGroupChange = (value: AgeGroup | undefined) => {
-    router.push(`${pathname}?${createQueryString('age', value ?? null)}`);
+    setAgeGroup(value || null).then(() => setPage(1));
   };
 
   const handleInterestToggle = (interest: Interest) => {
-    router.push(`${pathname}?${toggleInterestParam(interest)}`);
+    const newInterests = interests.includes(interest.toString())
+      ? interests.filter((i) => i !== interest.toString())
+      : [...interests, interest.toString()];
+
+    setInterests(newInterests).then(() => setPage(1));
   };
 
   const handlePageChange = (newPage: number) => {
-    router.push(`${pathname}?${createQueryString('page', newPage.toString())}`);
+    setPage(newPage);
   };
 
   const handleTestClick = (test: SearchTestResult) => {
@@ -101,28 +66,28 @@ export function TestSearchPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-7xl p-6">
+    <main className="h-full w-full bg-gray-50 p-6">
       <div className="flex flex-col space-y-4">
-        <div className="mb-6">
-          <h1 className="mb-2 text-3xl font-bold tracking-tight">테스트 찾기</h1>
+        <div className="w-full">
+          <h2 className="text-2xl font-semibold text-gray-800">테스트 탐색</h2>
           <p className="text-muted-foreground">당신을 기다리고 있는 UT를 찾아보세요.</p>
         </div>
 
         {/* Filters */}
-        <section className="w-full">
+        <div className="w-full">
           <SearchFilter
-            gender={gender}
-            ageGroup={ageGroup}
-            selectedInterests={interests}
+            gender={(gender as Gender) || undefined}
+            ageGroup={(ageGroup as AgeGroup) || undefined}
+            selectedInterests={interests as Interest[]}
             onGenderChange={handleGenderChange}
             onAgeGroupChange={handleAgeGroupChange}
             onInterestToggle={handleInterestToggle}
           />
-        </section>
+        </div>
 
         {/* Main Content */}
-        <main className="w-full">
-          {isLoading ? (
+        <div className="w-full">
+          {isPending ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-muted h-[300px] animate-pulse rounded-lg" />
@@ -158,13 +123,13 @@ export function TestSearchPage() {
               )}
             </>
           )}
-        </main>
+        </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent className="p-6 sm:max-w-[600px]">
             {selectedTest && <SearchResultDetail test={selectedTest} />}
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </main>
   );
 }
