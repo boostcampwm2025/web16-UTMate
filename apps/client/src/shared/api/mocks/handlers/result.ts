@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse, delay } from 'msw';
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import type {
   TestResultSummary,
@@ -726,6 +726,9 @@ export const resultHandlers = [
   http.get(`${CLIENT_BASE_URL}/mission-results/:id`, ({ params }) => {
     const { id } = params;
 
+    // 의도적인 딜레이
+    delay(800);
+
     // 모킹 데이터 생성
     const mockDetail: MissionResultDetail = {
       id: id as string,
@@ -761,6 +764,9 @@ export const resultHandlers = [
   http.get(
     'https://kr.object.ncloudstorage.com/mock-bucket/Ey_FDxlnOwx_IGT14hjoW.log.jsonl.gz',
     async () => {
+      // 의도적인 딜레이
+      delay(800);
+
       const logContent = `{"type":0,"data":{},"timestamp":1768917821307}
 {"type":1,"data":{},"timestamp":1768917821308}
 {"type":4,"data":{"href":"https://jammin94.github.io/jamjam94.github.io/?participant-id=Ey_FDxlnOwx_IGT14hjoW&mission-id=7f_kqNJLp6921oNp_8h2G","width":1200,"height":799},"timestamp":1768917821308}
