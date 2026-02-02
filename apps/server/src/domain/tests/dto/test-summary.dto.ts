@@ -1,6 +1,7 @@
 import { IsBoolean, IsEnum, IsObject, IsString } from 'class-validator';
 
-import { Test, TestStatus } from '../entities/test.entity';
+import { Test } from '../entities/test.entity';
+import { TestStatus } from '../enums';
 
 import { UserSummaryDto } from '#domain/users/dto/user-summary.dto';
 
@@ -35,6 +36,17 @@ export class TestSummaryDto {
     dto.status = test.status;
     dto.sdkStatus = test.sdkStatus;
     dto.url = test.url;
+
+    if (test.status === TestStatus.DEMO) {
+      dto.owner = new UserSummaryDto();
+
+      // 데모 테스트의 소유자는 고정값으로 설정
+      // TODO : avatarUrl 설정
+      dto.owner.avatarUrl = 'https://utmate.me/images/icons/penguin.webp';
+      dto.owner.username = 'UTMate Demo';
+      dto.members = [];
+      return;
+    }
     dto.owner = UserSummaryDto.fromUserEntity(test.owner);
     dto.members = UserSummaryDto.fromUserEntities(test.members);
     return dto;

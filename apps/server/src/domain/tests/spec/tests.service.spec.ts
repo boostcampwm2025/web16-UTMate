@@ -8,7 +8,8 @@ import { Participant } from '../../participants/entities/participant.entity';
 import { ParticipantsService } from '../../participants/participants.service';
 import { User } from '../../users/entities/user.entity';
 import { SearchTestQueryDto } from '../dto/search-test.dto';
-import { Test as TestEntity, TestStatus } from '../entities/test.entity';
+import { Test as TestEntity } from '../entities/test.entity';
+import { TestStatus } from '../enums';
 import { TestsRepository } from '../tests.repository';
 import { TestsService } from '../tests.service';
 

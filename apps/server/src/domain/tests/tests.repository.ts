@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, EntityManager, ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { SearchTestQueryDto } from './dto/search-test.dto';
-import { Test, TestStatus } from './entities/test.entity';
+import { Test } from './entities/test.entity';
+import { TestStatus } from './enums';
 
 @Injectable()
 export class TestsRepository {

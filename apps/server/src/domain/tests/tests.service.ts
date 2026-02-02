@@ -14,7 +14,8 @@ import { TestDto } from './dto/test.dto';
 import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
-import { Test, TestStatus } from './entities/test.entity';
+import { Test } from './entities/test.entity';
+import { TestStatus } from './enums';
 import { TestsRepository } from './tests.repository';
 
 import { ENV_KEYS } from '#common/config/env.constants';
