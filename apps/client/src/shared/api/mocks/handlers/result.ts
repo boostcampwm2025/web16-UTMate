@@ -256,7 +256,7 @@ const createMainFeedbacksWithRelativeTime = (): MainFeedback[] => {
       participantId: 'tester-1',
       content: '메인 페이지의 디자인이 직관적이어서 사용하기 편리했습니다.',
       createdAt: new Date(now - 1 * HOUR).toISOString(),
-      personaTags: ['GUEST'],
+      personaTags: ['남성', '20대', '교육', '외국어', 'IT'],
     },
     {
       participantId: 'tester-2',
@@ -314,7 +314,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       feedback: '매우 만족스러웠습니다.',
       duration: 21808,
       participantId: 'tester-1',
-      personaTags: ['GUEST'],
+      personaTags: ['남성', '20대', '교육', '외국어', 'IT'],
     },
     {
       missionResultId: 'mission-result-2',
