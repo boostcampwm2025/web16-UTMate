@@ -1,3 +1,4 @@
 dist
 /uploads
 s3
+coverage
