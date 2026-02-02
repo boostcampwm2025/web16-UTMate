@@ -543,12 +543,9 @@ export const resultHandlers = [
   http.get(`${CLIENT_BASE_URL}/tests/:testId/result`, ({ params }) => {
     const { testId } = params;
 
-    console.log('[MSW] Intercepted request for testId:', testId);
-
     const summary = mockTestSummaries.find((s) => s.id === Number(testId));
 
     if (!summary) {
-      console.warn(`[MSW] Summary not found for testId: ${testId}`);
       return new HttpResponse(null, {
         status: 404,
         statusText: 'Summary not found',
@@ -581,13 +578,10 @@ export const resultHandlers = [
   http.get(`${CLIENT_BASE_URL}/missions/:missionId/result`, ({ params }) => {
     const { missionId } = params;
 
-    console.log('[MSW] Intercepted request for missionId:', missionId);
-
     // mission-1 같은 문자열 ID 처리
     if (typeof missionId === 'string' && missionId.startsWith('mission-')) {
       const missionDetail = mockMissionDetail[missionId];
       if (missionDetail) {
-        console.log('[MSW] Returning mission detail:', missionDetail);
         return HttpResponse.json(missionDetail);
       }
     }
@@ -596,12 +590,10 @@ export const resultHandlers = [
     const numericId = Number(missionId);
     if (!isNaN(numericId)) {
       const results = mockMissionResults[numericId] || [];
-      console.log('[MSW] Returning results:', results);
       return HttpResponse.json(results);
     }
 
     // 찾을 수 없는 경우
-    console.warn(`[MSW] Mission detail not found for missionId: ${missionId}`);
     return new HttpResponse(null, {
       status: 404,
       statusText: 'Mission detail not found',
@@ -709,19 +701,12 @@ export const resultHandlers = [
       missions,
     };
 
-    console.log('[MSW] Intercepted request for testId:', testId);
-    console.log('[MSW] Returning missions results:', response);
-
     return HttpResponse.json(response);
   }),
   // GET /tests/:testId/result/participants/:participantId - 특정 참여자 상세 조회
   http.get(`${CLIENT_BASE_URL}/tests/:testId/result/participants/:participantId`, ({ params }) => {
     const { testId, participantId } = params;
     const testIdNum = Number(testId);
-
-    console.log(
-      `[MSW] Intercepted request for participant detail: testId=${testId}, participantId=${participantId}`,
-    );
 
     const participants = mockParticipantResults[testIdNum];
     if (!participants) {
@@ -740,7 +725,6 @@ export const resultHandlers = [
   // GET /mission-results/:id - 미션 결과 상세 조회
   http.get(`${CLIENT_BASE_URL}/mission-results/:id`, ({ params }) => {
     const { id } = params;
-    console.log('[MSW] Intercepted request for mission result detail:', id);
 
     // 모킹 데이터 생성
     const mockDetail: MissionResultDetail = {
