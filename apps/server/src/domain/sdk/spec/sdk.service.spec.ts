@@ -1,27 +1,49 @@
 import { Readable } from 'stream';
 
+import { UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import Redis from 'ioredis';
 
 import { SdkService } from '../sdk.service';
 
+import { SDK_AUTH_REDIS } from '#common/redis/redis.module';
 import { StorageService } from '#common/storage/storage.service';
 import { TestsService } from '#domain/tests/tests.service';
 
 describe('SdkService', () => {
   let service: SdkService;
-  let storageService: { save: jest.Mock };
-  let testsService: { verifySdkInstallationBySDK: jest.Mock };
+  let storageService: StorageService;
+  let testsService: TestsService;
+  let sdkAuthRedis: Redis;
+
+  const mockStorageService = {
+    save: jest.fn(),
+  };
+
+  const mockTestsService = {
+    verifySdkInstallationBySDK: jest.fn(),
+  };
+
+  const mockSdkAuthRedis = {
+    get: jest.fn(),
+  };
+
   beforeEach(async () => {
-    storageService = { save: jest.fn() };
-    testsService = { verifySdkInstallationBySDK: jest.fn() };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SdkService,
-        { provide: StorageService, useValue: storageService },
-        { provide: TestsService, useValue: testsService },
+        { provide: StorageService, useValue: mockStorageService },
+        { provide: TestsService, useValue: mockTestsService },
+        { provide: SDK_AUTH_REDIS, useValue: mockSdkAuthRedis },
       ],
     }).compile();
+
     service = module.get<SdkService>(SdkService);
+    storageService = module.get<StorageService>(StorageService);
+    testsService = module.get<TestsService>(TestsService);
+    sdkAuthRedis = module.get(SDK_AUTH_REDIS);
+
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -29,39 +51,82 @@ describe('SdkService', () => {
   });
 
   describe('saveReplayLog', () => {
-    it('세션 또는 미션 정보가 없으면 UnauthorizedException을 던진다', async () => {
+    it('Bearer 토큰이 없으면 UnauthorizedException을 던져야 한다', async () => {
       const mockStream = new Readable();
-      await expect(service.saveReplayLog('', 'mission', mockStream)).rejects.toThrow(
-        '세션 또는 미션 정보가 없습니다.',
+
+      await expect(service.saveReplayLog('InvalidToken', mockStream)).rejects.toThrow(
+        UnauthorizedException,
       );
-      await expect(service.saveReplayLog('session', '', mockStream)).rejects.toThrow(
-        '세션 또는 미션 정보가 없습니다.',
+      await expect(service.saveReplayLog('InvalidToken', mockStream)).rejects.toThrow(
+        '유효하지 않은 SDK 인증 정보입니다.',
       );
     });
 
-    it('정상적으로 로그를 저장한다', async () => {
-      const sessionId = 'session1';
-      const missionId = 'mission1';
-      // Readable stream mock
-      const stream = {
-        pipe: jest.fn().mockReturnValue('decompressedStream'),
-      } as unknown as Readable;
-      storageService.save.mockResolvedValue(undefined);
+    it('Redis에 인증 정보가 없으면 UnauthorizedException을 던져야 한다', async () => {
+      const mockStream = new Readable();
 
-      await service.saveReplayLog(sessionId, missionId, stream);
-      expect(stream.pipe).toHaveBeenCalled();
-      expect(storageService.save).toHaveBeenCalledWith(
-        `replay_log/missions/${missionId}/${sessionId}.log.jsonl`,
-        'decompressedStream',
+      mockSdkAuthRedis.get.mockResolvedValue(null);
+
+      await expect(service.saveReplayLog('Bearer invalid-token', mockStream)).rejects.toThrow(
+        UnauthorizedException,
       );
+      await expect(service.saveReplayLog('Bearer invalid-token', mockStream)).rejects.toThrow(
+        '유효하지 않은 SDK 인증 정보입니다.',
+      );
+    });
+
+    it('정상적으로 리플레이 로그를 저장해야 한다', async () => {
+      const missionResultPublicId = 'mission-result-123';
+      const mockStream = {
+        pipe: jest.fn().mockReturnValue({} as Readable),
+      } as unknown as Readable;
+
+      mockSdkAuthRedis.get.mockResolvedValue('valid-auth-data');
+      mockStorageService.save.mockResolvedValue(undefined);
+
+      await service.saveReplayLog(`Bearer ${missionResultPublicId}`, mockStream);
+
+      expect(sdkAuthRedis.get).toHaveBeenCalledWith(missionResultPublicId);
+      expect(mockStream.pipe).toHaveBeenCalled();
+      expect(storageService.save).toHaveBeenCalledWith(
+        `replay_logs/${missionResultPublicId}.log.jsonl`,
+        expect.anything(),
+      );
+    });
+
+    it('스트림을 gunzip으로 압축 해제해야 한다', async () => {
+      const missionResultPublicId = 'mission-result-456';
+      const mockStream = {
+        pipe: jest.fn().mockReturnValue({} as Readable),
+      } as unknown as Readable;
+
+      mockSdkAuthRedis.get.mockResolvedValue('valid-auth-data');
+      mockStorageService.save.mockResolvedValue(undefined);
+
+      await service.saveReplayLog(`Bearer ${missionResultPublicId}`, mockStream);
+
+      // pipe가 호출되었는지 확인 (gunzip 체인)
+      expect(mockStream.pipe).toHaveBeenCalled();
     });
   });
 
   describe('verifySdkInstallation', () => {
-    it('테스트 서비스의 verifySdkInstallationBySDK를 호출한다', async () => {
-      testsService.verifySdkInstallationBySDK.mockResolvedValue(undefined);
-      await service.verifySdkInstallation('testId');
-      expect(testsService.verifySdkInstallationBySDK).toHaveBeenCalledWith('testId');
+    it('TestsService의 verifySdkInstallationBySDK를 호출해야 한다', async () => {
+      const testPublicId = 'test-123';
+
+      mockTestsService.verifySdkInstallationBySDK.mockResolvedValue(undefined);
+
+      await service.verifySdkInstallation(testPublicId);
+
+      expect(testsService.verifySdkInstallationBySDK).toHaveBeenCalledWith(testPublicId);
+    });
+
+    it('TestsService에서 예외가 발생하면 전파해야 한다', async () => {
+      const testPublicId = 'invalid-test';
+
+      mockTestsService.verifySdkInstallationBySDK.mockRejectedValue(new Error('Test not found'));
+
+      await expect(service.verifySdkInstallation(testPublicId)).rejects.toThrow('Test not found');
     });
   });
 });
