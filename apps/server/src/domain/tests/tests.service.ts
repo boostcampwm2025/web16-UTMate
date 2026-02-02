@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { OnEvent } from '@nestjs/event-emitter';
 import { DataSource } from 'typeorm';
 
 import { MainFeedbackDto, ParticipantResultsDto, TestMissionsResultsDto } from './dto/result.dto';
@@ -433,5 +434,15 @@ export class TestsService {
       throw new NotFoundException('Test not found');
     }
     return TestMissionsResultsDto.fromTest(test);
+  }
+
+  @OnEvent('user.registered')
+  async handleUserRegisteredEvent(user: User) {
+    // 데모 테스트에 가입한 사용자 추가
+    const demoTest = await this.testsRepository.findDemoTest();
+    if (!demoTest) {
+      return;
+    }
+    await this.testsRepository.addMemberToTests(demoTest.id, user.id);
   }
 }

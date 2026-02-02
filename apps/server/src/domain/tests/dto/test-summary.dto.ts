@@ -45,7 +45,7 @@ export class TestSummaryDto {
       dto.owner.avatarUrl = 'https://utmate.me/images/icons/penguin.webp';
       dto.owner.username = 'UTMate Demo';
       dto.members = [];
-      return;
+      return dto;
     }
     dto.owner = UserSummaryDto.fromUserEntity(test.owner);
     dto.members = UserSummaryDto.fromUserEntities(test.members);
