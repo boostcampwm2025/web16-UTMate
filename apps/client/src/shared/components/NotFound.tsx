@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Signpost } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui/button';
@@ -33,7 +34,14 @@ export function NotFound({
           </div>
         </div>
         <div className="relative w-full max-w-[300px] md:max-w-[500px]">
-          <img src="/not-found.webp" alt="404 Illustration" />
+          <Image
+            src="/not-found.webp"
+            alt="404 Illustration"
+            width={500}
+            height={500}
+            priority={false}
+            className="h-auto w-full"
+          />
         </div>
       </div>
     </div>
