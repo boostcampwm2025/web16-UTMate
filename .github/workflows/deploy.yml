@@ -89,6 +89,11 @@ jobs:
             ${{ vars.DOCKER_COMPOSE_CONTENT }}
             COMPOSE_EOF
 
+            # Prometheus 설정 파일 복사
+            cat > prometheus.yml << 'PROM_EOF'
+            ${{ vars.PROMETHEUS_CONFIG_CONTENT }}
+            PROM_EOF
+
             # GitHub Container Registry 로그인
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
