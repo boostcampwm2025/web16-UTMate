@@ -126,7 +126,7 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
             />
 
             <MetricCard
-              label="평균 마우스 스래싱"
+              label="평균 마우스 스레싱"
               value={`${missionLogs.averageMouseThrashingCount.toFixed(1)}회`}
               description={
                 <MetricExplanation
