@@ -730,6 +730,7 @@ export const resultHandlers = [
     delay(800);
 
     // 모킹 데이터 생성
+    const BASE_TIME = 1768917821307;
     const mockDetail: MissionResultDetail = {
       id: id as string,
       status: 'SUCCESS',
@@ -742,18 +743,18 @@ export const resultHandlers = [
       rageClickCount: 3,
       mouseThrashingCount: 1,
       analysisData: {
-        startTime: 1000,
-        endTime: 16600,
+        startTime: BASE_TIME + 1000,
+        endTime: BASE_TIME + 16600,
         timeToFirstInteraction: 1500,
         idleTime: [
-          { timestamp: 2000, duration: 1000 },
-          { timestamp: 8000, duration: 1300 },
+          { timestamp: BASE_TIME + 2500, duration: 1000 },
+          { timestamp: BASE_TIME + 8000, duration: 1300 },
         ],
         rageClickCount: [
-          { timestamp: 5000, duration: 0, count: 2 },
-          { timestamp: 12000, duration: 0, count: 1 },
+          { timestamp: BASE_TIME + 1500, duration: 0, count: 2 },
+          { timestamp: BASE_TIME + 3500, duration: 0, count: 1 },
         ],
-        mouseThrashingCount: [{ timestamp: 9000, duration: 500, count: 1 }],
+        mouseThrashingCount: [{ timestamp: BASE_TIME + 4200, duration: 500, count: 1 }],
       },
     };
 
