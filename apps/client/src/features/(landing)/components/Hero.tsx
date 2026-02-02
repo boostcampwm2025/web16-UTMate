@@ -46,13 +46,13 @@ export function Hero() {
           {/* CTA 버튼 */}
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button asChild size="lg" className="w-full sm:w-auto">
-              <Link href="/workspace">
+              <Link href="/workspace" aria-label="워크스페이스로 이동하여 테스트 제작 시작하기">
                 <Rocket className="mr-2 size-4" />
                 제작자로 시작하기
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
-              <Link href="/search">참여자로 시작하기</Link>
+              <Link href="/search" aria-label="테스트 탐색 페이지로 이동하여 테스트 참여하기">참여자로 시작하기</Link>
             </Button>
           </div>
 

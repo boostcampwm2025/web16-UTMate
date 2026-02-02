@@ -31,13 +31,13 @@ export async function GlobalNavigationBar() {
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="flex h-16 items-center justify-between gap-4 px-4 lg:px-6">
         {/* 로고/서비스명 */}
-        <Link href="/workspace" className="flex items-center gap-2">
+        <Link href="/workspace" className="flex items-center gap-2" aria-label="UTMate 홈으로 이동">
           <Logo size="lg" />
         </Link>
 
         {/* 사용자 프로필 드롭다운 */}
         {user && <UserProfileDropdown user={user} />}
-        {!user && <Link href="/login"><Button>로그인</Button></Link>}
+        {!user && <Link href="/login" aria-label="로그인 페이지로 이동"><Button>로그인</Button></Link>}
       </div>
     </header>
   );

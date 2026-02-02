@@ -32,7 +32,7 @@ export function CTASection() {
             variant="secondary"
             className="w-full max-w-xs bg-white text-primary hover:bg-white/90"
           >
-            <Link href="/login">
+            <Link href="/login" aria-label="로그인 페이지로 이동하여 무료로 시작하기">
               무료로 시작하기
             </Link>
           </Button>
