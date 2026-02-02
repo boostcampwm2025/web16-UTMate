@@ -189,7 +189,12 @@ export const testsHandlers = [
     mockTests.push(newTest);
     mockMissions[newTestId] = [];
 
-    return HttpResponse.json(newTest, { status: 201 });
+    return HttpResponse.json(
+      {
+        testId: newTestId,
+      },
+      { status: 201 },
+    );
   }),
 
   // PUT /tests/:id - 테스트 수정
