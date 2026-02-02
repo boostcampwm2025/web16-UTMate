@@ -104,6 +104,15 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
                 key={missionResult.missionResultId}
                 onClick={() => handleRowClick(missionResult.missionResultId)}
                 className="cursor-pointer transition-colors hover:bg-gray-50/50"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleRowClick(missionResult.missionResultId);
+                  }
+                }}
+                aria-label={`${missionResult.missionTitle} 미션 결과 상세 보기`}
               >
                 <TableCell className="font-medium">{missionResult.missionTitle}</TableCell>
                 <TableCell className="text-center">
