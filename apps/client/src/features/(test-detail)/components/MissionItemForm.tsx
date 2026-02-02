@@ -6,7 +6,7 @@ import type {
   UseFormSetValue,
 } from 'react-hook-form';
 import { useWatch } from 'react-hook-form';
-import { CheckCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, Trash2 } from 'lucide-react';
 
 import {
   Field,
@@ -17,9 +17,10 @@ import {
 } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
+import { Button } from '@/shared/components/ui/button';
+import { useDialogStore } from '@/shared/stores/useDialogStore';
 
 import type { TestFormValues } from '../schemas/testForm';
-import { MissionItemDeleteButton } from './MissionItemDeleteButton';
 
 interface MissionItemFormProps {
   field: FieldArrayWithId<TestFormValues, 'missions', 'id'>;
@@ -40,6 +41,7 @@ export function MissionItemForm({
   errors,
   onDeleteMission,
 }: MissionItemFormProps) {
+  const { confirm } = useDialogStore();
   const missionUrl = useWatch({
     control,
     name: `missions.${missionIndex}.missionUrl`,
@@ -58,8 +60,17 @@ export function MissionItemForm({
   const hasUrlError = !!errors.missions?.[missionIndex]?.missionUrl;
   const isValidUrl = missionUrl && !hasUrlError;
 
-  const handleDeleteMission = () => {
-    onDeleteMission(field.publicId || '');
+  const handleDeleteMission = async () => {
+    const confirmed = await confirm(
+      '미션을 삭제하시겠습니까?',
+      '이 작업은 되돌릴 수 없습니다.',
+      null,
+      { isAlert: true, confirmText: '삭제' },
+    );
+
+    if (confirmed) {
+      onDeleteMission(field.publicId || '');
+    }
   };
 
   const missionErrors = errors.missions?.[missionIndex];
@@ -72,10 +83,15 @@ export function MissionItemForm({
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold text-gray-700">미션 {missionIndex + 1}</h3>
-        <MissionItemDeleteButton
-          publicId={field.publicId || ''}
-          onDeleteMission={handleDeleteMission}
-        />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="group text-red-600 hover:bg-red-50 hover:text-red-700"
+          onClick={handleDeleteMission}
+        >
+          <Trash2 className="size-4" />
+          <span className="ml-1 hidden group-hover:inline">삭제</span>
+        </Button>
       </div>
 
       <FieldGroup>
