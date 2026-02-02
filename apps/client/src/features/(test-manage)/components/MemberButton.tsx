@@ -34,9 +34,14 @@ export function MemberButton({ testId, owner, members }: MemberButtonProps) {
   return (
     <div className="flex justify-center -space-x-2" onClick={handleClick}>
       {allMembers.slice(0, 4).map((user, idx) => (
-        <Avatar key={user.publicId} className="size-9">
-          <AvatarImage src={user.avatarUrl} alt={user.username} />
-        </Avatar>
+        <Tooltip key={user.publicId}>
+          <TooltipTrigger asChild>
+            <Avatar className="size-9">
+              <AvatarImage src={user.avatarUrl} alt={user.username} />
+            </Avatar>
+          </TooltipTrigger>
+          <TooltipContent>{user.username}</TooltipContent>
+        </Tooltip>
       ))}
       <Tooltip>
         <TooltipTrigger asChild>
