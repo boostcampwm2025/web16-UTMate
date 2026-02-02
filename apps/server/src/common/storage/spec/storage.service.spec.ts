@@ -2,18 +2,17 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Readable } from 'stream';
 
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { StorageService } from '#common/storage/storage.service';
 
 describe('StorageService', () => {
   let service: StorageService;
-  // 테스트용 가상 프로젝트 루트 (이 안에 uploads 폴더가 생성됨)
   const testRoot = path.join(process.cwd(), 'test-temp-root');
   const expectedUploadDir = path.join(testRoot, 'uploads');
 
   beforeEach(async () => {
-    // process.cwd()가 테스트 루트를 가리키도록 모킹
     jest.spyOn(process, 'cwd').mockReturnValue(testRoot);
 
     const module: TestingModule = await Test.createTestingModule({
@@ -24,7 +23,6 @@ describe('StorageService', () => {
   });
 
   afterEach(() => {
-    // 테스트 루트 폴더 전체 정리
     if (fs.existsSync(testRoot)) {
       fs.rmSync(testRoot, { recursive: true, force: true });
     }
@@ -35,25 +33,74 @@ describe('StorageService', () => {
     expect(service).toBeDefined();
   });
 
-  it('파일을 지정된 경로에 저장해야 한다', async () => {
-    const filename = 'test-folder/test-file.txt';
-    const content = Readable.from(['hello world']);
+  describe('save', () => {
+    it('파일을 지정된 경로에 저장해야 한다', async () => {
+      const filename = 'test.txt';
+      const content = Readable.from(['hello world']);
 
-    const savedPath = await service.save(filename, content);
+      await service.save(filename, content);
 
-    // 저장된 경로가 expectedUploadDir(uploads 폴더) 내부인지 확인
-    expect(savedPath).toBe(path.join(expectedUploadDir, filename));
-    expect(fs.existsSync(savedPath)).toBe(true);
-    expect(fs.readFileSync(savedPath, 'utf-8')).toBe('hello world');
+      const savedPath = path.join(expectedUploadDir, filename);
+      expect(fs.existsSync(savedPath)).toBe(true);
+      expect(fs.readFileSync(savedPath, 'utf-8')).toBe('hello world');
+    });
+
+    it('디렉토리가 없으면 자동으로 생성해야 한다', async () => {
+      const filename = 'nested/folder/file.txt';
+      const content = Readable.from(['test']);
+
+      await service.save(filename, content);
+
+      const savedPath = path.join(expectedUploadDir, filename);
+      expect(fs.existsSync(savedPath)).toBe(true);
+    });
   });
 
-  it('디렉토리가 없으면 자동으로 생성해야 한다', async () => {
-    const filename = 'deep/nested/folder/file.txt';
-    const content = Readable.from(['test']);
+  describe('getReadStreamByFilename', () => {
+    it('파일을 찾을 수 없으면 NotFoundException을 던져야 한다', async () => {
+      await expect(service.getReadStreamByFilename('non-existent.txt')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
 
-    await service.save(filename, content);
+  describe('getBufferByFilename', () => {
+    it('파일을 찾을 수 없으면 NotFoundException을 던져야 한다', async () => {
+      await expect(service.getBufferByFilename('non-existent.txt')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
 
-    const savedPath = path.join(expectedUploadDir, filename);
-    expect(fs.existsSync(savedPath)).toBe(true);
+    it('파일을 찾으면 버퍼를 반환해야 한다', async () => {
+      const filename = 'buffer.txt';
+      const testContent = 'buffer test';
+      const content = Readable.from([testContent]);
+      await service.save(filename, content);
+
+      // 충분한 시간을 주고 파일이 저장되었는지 확인
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const buffer = await service.getBufferByFilename(filename);
+      expect(buffer).toBeInstanceOf(Buffer);
+      expect(buffer.toString()).toBe(testContent);
+    });
+  });
+
+  describe('deleteByFilename', () => {
+    it('파일을 찾을 수 없으면 NotFoundException을 던져야 한다', async () => {
+      await expect(service.deleteByFilename('non-existent.txt')).rejects.toThrow(NotFoundException);
+    });
+
+    it('파일을 삭제해야 한다', async () => {
+      const filename = 'delete.txt';
+      const content = Readable.from(['delete me']);
+      await service.save(filename, content);
+
+      const filePath = path.join(expectedUploadDir, filename);
+      expect(fs.existsSync(filePath)).toBe(true);
+
+      await service.deleteByFilename(filename);
+      expect(fs.existsSync(filePath)).toBe(false);
+    });
   });
 });

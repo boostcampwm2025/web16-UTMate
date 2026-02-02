@@ -44,7 +44,7 @@ describe('S3StorageService', () => {
   });
 
   describe('getPresignedUrl', () => {
-    it('getSignedUrl을 호출하고 presigned url을 반환한다', async () => {
+    it('기본 expiresIn 값(3600초)으로 presigned url을 생성해야 한다', async () => {
       const fileName = 'test.jsonl.gz';
       const url = await service.getPresignedUrl(fileName);
       expect(getSignedUrl).toHaveBeenCalledWith(s3Client, expect.any(GetObjectCommand), {
@@ -52,14 +52,34 @@ describe('S3StorageService', () => {
       });
       expect(url).toBe('mocked-url');
     });
+
+    it('커스텀 expiresIn 값으로 presigned url을 생성해야 한다', async () => {
+      const fileName = 'test.jsonl.gz';
+      const expiresIn = 7200;
+      const url = await service.getPresignedUrl(fileName, expiresIn);
+      expect(getSignedUrl).toHaveBeenCalledWith(s3Client, expect.any(GetObjectCommand), {
+        expiresIn: 7200,
+      });
+      expect(url).toBe('mocked-url');
+    });
   });
 
   describe('deleteFromS3', () => {
-    it('S3에서 파일을 삭제한다', async () => {
+    it('S3에서 파일을 삭제해야 한다', async () => {
       s3Client.send.mockResolvedValue({});
       const fileName = 'test.jsonl.gz';
       await service.deleteFromS3(fileName);
       expect(s3Client.send).toHaveBeenCalledWith(expect.any(DeleteObjectCommand));
+    });
+
+    it('DeleteObjectCommand를 올바른 파라미터로 생성해야 한다', async () => {
+      s3Client.send.mockResolvedValue({});
+      const fileName = 'test.jsonl.gz';
+      await service.deleteFromS3(fileName);
+
+      const command = s3Client.send.mock.calls[0][0];
+      expect(command).toBeInstanceOf(DeleteObjectCommand);
+      expect(command.input.Key).toBe(fileName);
     });
   });
 });
