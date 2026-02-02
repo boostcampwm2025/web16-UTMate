@@ -3,7 +3,7 @@
 import { Info, Link, Clock } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { formatDuration } from '../utils/format';
+import { formatDurationFromMilliSeconds } from '../utils/format';
 import { MetricCard } from './MetricCard';
 import type { MissionDetail } from '../types';
 
@@ -45,7 +45,7 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
                 <Clock size={16} /> 예상 소요 시간
               </h3>
               <div className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-900">
-                {formatDuration(missionLogs.estimatedDuration)}
+                {formatDurationFromMilliSeconds(missionLogs.estimatedDuration)}
               </div>
             </div>
             <div>
@@ -94,11 +94,7 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
             />
             <MetricCard
               label="평균 소요 시간"
-              value={formatDuration(
-                missionLogs.averageDuration != null
-                  ? missionLogs.averageDuration / 1000 / 60
-                  : null,
-              )}
+              value={formatDurationFromMilliSeconds(missionLogs.averageDuration)}
               description={
                 <MetricExplanation
                   formula="∑(완료 미션 소요 시간) ÷ 완료 미션 수"
@@ -109,11 +105,7 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
 
             <MetricCard
               label="평균 유휴 시간"
-              value={formatDuration(
-                missionLogs.averageIdleTime != null
-                  ? missionLogs.averageIdleTime / 1000 / 60
-                  : null,
-              )}
+              value={formatDurationFromMilliSeconds(missionLogs.averageIdleTime)}
               description={
                 <MetricExplanation
                   formula="∑(10초 이상 무동작 시간) ÷ 전체 미션 수"
