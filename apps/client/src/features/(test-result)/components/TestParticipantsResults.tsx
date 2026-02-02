@@ -27,7 +27,7 @@ export function TestParticipantsResults({ testId }: { testId: string }) {
 
   return (
     <div>
-      <h3 className="mb-4 ml-2 text-xl font-semibold">참여자 목록</h3>
+      <h2 className="mb-4 ml-2 text-xl font-semibold">참여자 목록</h2>
       <div className="flex flex-col gap-4">
         {participants.map((participant) => (
           <ParticipantItem
@@ -56,7 +56,7 @@ function ParticipantItem({
   const animalName = nickname.split(' ')[1];
 
   return (
-    <Link href={`/tests/${testId}/result/participants/${participant.participantId}`}>
+    <Link href={`/tests/${testId}/result/participants/${participant.participantId}`} aria-label={`${nickname} 참여자 상세 결과 보기`}>
       <Card className="hover:bg-accent/50 flex cursor-pointer flex-col transition-all md:flex-row">
         <CardHeader className="flex-1">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
