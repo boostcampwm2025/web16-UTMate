@@ -69,7 +69,7 @@ export function TestSearchPage() {
     <main className="h-full w-full bg-gray-50 p-6">
       <div className="flex flex-col space-y-4">
         <div className="w-full">
-          <h2 className="text-2xl font-semibold text-gray-800">테스트 탐색</h2>
+          <h1 className="text-2xl font-semibold text-gray-800">테스트 탐색</h1>
           <p className="text-muted-foreground">당신을 기다리고 있는 UT를 찾아보세요.</p>
         </div>
 
