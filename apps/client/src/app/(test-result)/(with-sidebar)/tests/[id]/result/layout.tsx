@@ -43,7 +43,7 @@ export default async function TestResultLayout({
       {/* Top Header */}
       <header className="flex h-16 shrink-0 items-center justify-start gap-3 border-b bg-background px-6">
         <Button variant="outline" size="icon" asChild>
-          <Link href="/workspace">
+          <Link href="/workspace" aria-label="워크스페이스로 돌아가기">
             <ArrowLeft />
           </Link>
         </Button>
