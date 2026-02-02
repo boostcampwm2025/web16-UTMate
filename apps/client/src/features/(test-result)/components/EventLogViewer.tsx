@@ -94,15 +94,15 @@ export function EventLogViewer({ logs, analysisData, onLogClick }: EventLogViewe
     <div className="flex h-full w-full flex-col space-y-4 p-4">
       {/* 1. 상단 요약 카드 */}
       {summary && summary.total > 0 && (
-        <div className="flex flex-col gap-2 rounded-lg border p-3">
+        <div className="flex flex-col gap-2 p-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <span>발견된 문제점</span>
+            <span>발견된 이상현상</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {summary.rage > 0 && (
               <Badge
                 variant="outline"
-                className="gap-1.5 border-red-200 bg-red-50 py-1 text-red-600"
+                className="gap-1.5 border px-2 py-1 font-medium text-red-600"
               >
                 <Angry className="h-3 w-3" />
                 레이지 클릭 {summary.rage}회
@@ -111,7 +111,7 @@ export function EventLogViewer({ logs, analysisData, onLogClick }: EventLogViewe
             {summary.thrashing > 0 && (
               <Badge
                 variant="outline"
-                className="gap-1.5 border-orange-200 bg-orange-50 py-1 text-orange-600"
+                className="gap-1.5 border px-2 py-1 font-medium text-orange-600"
               >
                 <Activity className="h-3 w-3" />
                 마우스 흔들기 {summary.thrashing}회
@@ -120,7 +120,7 @@ export function EventLogViewer({ logs, analysisData, onLogClick }: EventLogViewe
             {summary.idle > 0 && (
               <Badge
                 variant="outline"
-                className="gap-1.5 border-blue-200 bg-blue-50 py-1 text-blue-600"
+                className="gap-1.5 border px-2 py-1 font-medium text-blue-600"
               >
                 <Hourglass className="h-3 w-3" />
                 유휴 시간 {summary.idle}회
@@ -131,7 +131,7 @@ export function EventLogViewer({ logs, analysisData, onLogClick }: EventLogViewe
       )}
 
       {/* 2. 필터 탭 */}
-      <div className="grid w-full grid-cols-3 gap-1 border-b pb-2">
+      <div className="grid w-full grid-cols-3 gap-1">
         <Button
           variant="ghost"
           size="sm"
