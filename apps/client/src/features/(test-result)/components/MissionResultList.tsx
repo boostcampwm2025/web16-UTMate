@@ -59,6 +59,15 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
                 key={missionResult.id}
                 onClick={() => handleRowClick(missionResult.id)}
                 className="cursor-pointer transition-colors hover:bg-gray-50/50"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleRowClick(missionResult.id);
+                  }
+                }}
+                aria-label={`${nickname} 참여자의 미션 결과 상세 보기`}
               >
                 <TableCell className="flex items-center gap-2 font-medium">
                   <AnimalAvatar name={animalName} />
