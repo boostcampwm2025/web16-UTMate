@@ -11,8 +11,6 @@
     "db:restart": "docker compose -f docker-compose.dev.yml down && docker compose -f docker-compose.dev.yml up -d"
   },
   "devDependencies": {
-    "chrome-launcher": "^1.2.1",
-    "lighthouse": "^12.8.2",
     "turbo": "latest"
   },
   "pnpm": {
