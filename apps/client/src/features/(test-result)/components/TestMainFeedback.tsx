@@ -35,6 +35,7 @@ export function TestMainFeedback({ testId }: TestMainFeedbackProps) {
                 key={feedback.participantId}
                 href={`/tests/${testId}/result/participants/${feedback.participantId}`}
                 className="hover:bg-accent hover:text-accent-foreground block rounded-lg p-2 transition-all duration-200"
+                aria-label={`${generateNicknameFromId(feedback.participantId)} 참여자 결과 보기`}
               >
                 <MainFeedbackItem feedback={feedback} />
               </Link>
