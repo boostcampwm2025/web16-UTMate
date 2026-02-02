@@ -19,7 +19,7 @@ export class UsersRepository {
   async findSummary(id: number) {
     return this.usersRepository
       .createQueryBuilder('users')
-      .select(['users.publicId', 'users.username', 'users.avatarUrl'])
+      .select(['users.publicId', 'users.username', 'users.avatarUrl', 'users.email'])
       .where('users.id = :id', { id })
       .getOne();
   }

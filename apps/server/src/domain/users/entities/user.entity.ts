@@ -5,9 +5,12 @@ import {
   Entity,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+
+import { Persona } from './persona.entity';
 
 import { Test } from '#domain/tests/entities/test.entity';
 
@@ -44,6 +47,9 @@ export class User {
 
   @ManyToMany(() => Test, (test) => test.members)
   sharedTests: Test[];
+
+  @OneToOne(() => Persona, (persona) => persona.user, { nullable: true })
+  persona: Persona;
 
   @Column({ name: 'created_at', type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

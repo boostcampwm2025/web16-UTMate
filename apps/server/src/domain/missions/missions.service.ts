@@ -1,22 +1,15 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
-import { MissionOverviewDto } from './dto/result.dto';
 import { UpdateMissionDto } from './dto/update-mission.dto';
 import { Mission } from './entities/mission.entity';
-import { Test } from './entities/test.entity';
 import { MissionRepository } from './missions.repository';
 
-import { MissionResultsService } from '#domain/mission-result/misson-results.service';
-import { ParticipantsService } from '#domain/participants/participants.service';
+import { MissionOverviewDto } from '#domain/tests/dto/result.dto';
 
 @Injectable()
 export class MissionsService {
-  constructor(
-    @Inject() private readonly missionRepository: MissionRepository,
-    @Inject() private readonly participantsService: ParticipantsService,
-    @Inject() private readonly missionResultsService: MissionResultsService,
-  ) {}
+  constructor(@Inject() private readonly missionRepository: MissionRepository) {}
 
   /**
    * 미션들에 대한 업데이트를 처리합니다.
@@ -24,16 +17,19 @@ export class MissionsService {
    * updateMissionDtos에 publicId가 없는 경우 새로운 미션으로 간주하여 추가합니다.
    * 기존에 존재하는 미션 중 updateMissionDtos에 포함되지 않은 미션은 삭제합니다.
    *
-   * @param test 테스트 엔티티( 미션들이 속한 테스트 )
+   * @param testId 테스트 id
    * @param updateMissionDtos 업데이트할 미션 DTO 배열
    * @param manager 트랜잭션 매니저(Optional) : 트랜잭션 내에서 호출할 경우 전달
    */
-  async updateMissions(test: Test, updateMissionDtos: UpdateMissionDto[], manager?: EntityManager) {
-    const missions = await this.missionRepository.findAllByTest(test, manager);
-
+  async updateMissions(
+    testId: number,
+    updateMissionDtos: UpdateMissionDto[],
+    manager?: EntityManager,
+  ) {
+    const missions = await this.missionRepository.findAllByTestId(testId, manager);
     const saveMissions = updateMissionDtos
       .filter((dto) => !dto.publicId)
-      .map((dto) => dto.toUserEntity(test));
+      .map((dto) => dto.toMissionEntity(testId));
 
     const deleteMissions: Mission[] = [];
 

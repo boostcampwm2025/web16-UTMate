@@ -9,15 +9,16 @@ import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
 import { MainFeedbackDto, ParticipantResultsDto, TestMissionsResultsDto } from './dto/result.dto';
+import { SearchTestQueryDto, SearchTestResponseDto } from './dto/search-test.dto';
 import { TestDto } from './dto/test.dto';
 import { TestResultSummaryDto } from './dto/test-result-summary.dto';
 import { TestSummaryDto } from './dto/test-summary.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { Test, TestStatus } from './entities/test.entity';
-import { MissionsService } from './missions.service';
 import { TestsRepository } from './tests.repository';
 
 import { ENV_KEYS } from '#common/config/env.constants';
+import { MissionsService } from '#domain/missions/missions.service';
 import { ParticipantsService } from '#domain/participants/participants.service';
 import { User } from '#domain/users/entities/user.entity';
 import { UsersService } from '#domain/users/users.service';
@@ -53,10 +54,10 @@ export class TestsService {
    *
    * @param userId 사용자 id
    * @param publicId 테스트 public id
-   * @param updateTestDto 업데이트할 테스트 DTO
+   * @param dto 업데이트할 테스트 DTO
    * @throws NotFoundException 테스트를 찾을 수 없거나 테스트에 접근할 권한이 없는 경우
    */
-  async updateTest(userId: number, publicId: string, updateTestDto: UpdateTestDto) {
+  async updateTest(userId: number, publicId: string, dto: UpdateTestDto) {
     // 트랜잭션 시작
     await this.dataSource.transaction(async (manager) => {
       // 테스트 업데이트
@@ -64,16 +65,29 @@ export class TestsService {
       if (!test) {
         throw new NotFoundException('Test not found');
       }
-      test.update(updateTestDto.title, updateTestDto.description, updateTestDto.url);
+      test.updateTestInfo(dto.title, dto.description, dto.url, dto.isPublic);
+      test.updateTargeting(dto.targetGenders, dto.targetAges, dto.targetInterests);
       await this.testsRepository.save(test, manager);
 
       // 미션 업데이트
-      if (updateTestDto.missions) {
-        await this.missionsService.updateMissions(test, updateTestDto.missions, manager);
+      if (dto.missions) {
+        await this.missionsService.updateMissions(test.id, dto.missions, manager);
       }
 
       return { success: true };
     });
+  }
+
+  /**
+   * 검색 쿼리에 따라 테스트를 검색합니다.
+   *
+   * @param query 검색 쿼리 DTO
+   * @returns 검색된 테스트 DTO와 총 페이지 수
+   */
+  async searchTestsByQuery(query: SearchTestQueryDto) {
+    const [tests, count] = await this.testsRepository.searchTestsByQuery(query);
+    const totalPage = Math.ceil(count / query.limit);
+    return SearchTestResponseDto.fromTestEntities(tests, totalPage);
   }
 
   /**

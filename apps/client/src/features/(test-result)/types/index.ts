@@ -26,7 +26,7 @@ export interface ParticipantMissionResult {
 
 export interface ParticipantResult {
   participantId: string;
-  persona: string;
+  personaTags: string[];
   joinedAt: string;
   missionResults: ParticipantMissionResult[];
 }
@@ -34,6 +34,7 @@ export interface ParticipantResult {
 // 주요 피드백 관련 타입 추가
 export interface MainFeedback {
   participantId: string;
+  personaTags: string[];
   content: string;
   createdAt: string;
 }
@@ -41,7 +42,7 @@ export interface MainFeedback {
 // 특정 미션의 결과 (participant 정보 포함)
 export interface MissionResultWithParticipant extends ParticipantMissionResult {
   participantId: string;
-  persona: string;
+  personaTags: string[];
 }
 
 export interface ActivitySegment {
@@ -95,7 +96,7 @@ export type MissionResults = {
   duration?: number;
   feedback?: string;
   participantId: string;
-  persona: string;
+  personaTags: string[];
 };
 // 참여자 상세 조회는 ParticipantResult와 동일한 구조
 export type ParticipantDetail = ParticipantResult;

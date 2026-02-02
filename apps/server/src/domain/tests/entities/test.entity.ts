@@ -11,8 +11,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { Mission } from './mission.entity';
-
+import { AgeRange, Gender, Interest } from '#common/enums';
+import { Mission } from '#domain/missions/entities/mission.entity';
 import { Participant } from '#domain/participants/entities/participant.entity';
 import { User } from '#domain/users/entities/user.entity';
 
@@ -63,6 +63,18 @@ export class Test {
   @OneToMany(() => Mission, (mission) => mission.test)
   missions: Mission[];
 
+  @Column({ name: 'is_public', default: false })
+  isPublic: boolean;
+
+  @Column({ name: 'target_genders', type: 'json' })
+  targetGenders: Gender[] = [];
+
+  @Column({ name: 'target_ages', type: 'json' })
+  targetAges: AgeRange[] = [];
+
+  @Column({ name: 'target_interests', type: 'json' })
+  targetInterests: Interest[] = [];
+
   @Column({ type: 'timestamp', nullable: true })
   startDate?: Date;
 
@@ -87,10 +99,17 @@ export class Test {
     return test;
   }
 
-  update(title: string, description: string, url: string) {
+  updateTestInfo(title: string, description: string, url: string, isPublic: boolean) {
     this.title = title;
     this.description = description;
     this.url = url;
+    this.isPublic = isPublic;
+  }
+
+  updateTargeting(targetGenders: Gender[], targetAges: AgeRange[], targetInterests: Interest[]) {
+    this.targetGenders = targetGenders;
+    this.targetAges = targetAges;
+    this.targetInterests = targetInterests;
   }
 
   transitionStatus(status: TestStatus) {

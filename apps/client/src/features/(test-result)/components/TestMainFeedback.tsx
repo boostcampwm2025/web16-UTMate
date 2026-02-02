@@ -10,6 +10,7 @@ import { generateNicknameFromId } from '@/shared/utils/nickname';
 import { getTestMainFeedback } from '../apis/client';
 import { formatDistanceToNow } from '../utils/dates';
 import type { MainFeedback } from '../types';
+import { PersonaTag } from './PersonaTag';
 
 interface TestMainFeedbackProps {
   testId: string;
@@ -59,8 +60,12 @@ function MainFeedbackItem({ feedback }: MainFeedbackItemProps) {
 
       {/* 피드백 내용 */}
       <div className="min-w-0 flex-1">
-        <div className="mb-1 flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-900">{nickname}</span>
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-900">{nickname}</span>
+            <PersonaTag tags={feedback.personaTags} />
+          </div>
+
           <span className="text-muted-foreground text-xs">
             {formatDistanceToNow(feedback.createdAt)}
           </span>

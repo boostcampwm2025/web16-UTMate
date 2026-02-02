@@ -1,6 +1,7 @@
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import type { ApiErrorResponse } from '@/shared/types/api';
 import type { TestDetail } from '@/features/(test-manage)/types';
+import type { Interest } from '@/features/(auth)/types';
 import { ApiError } from '@/shared/constants/api';
 export interface UpdateTestMission {
   publicId?: string;
@@ -16,6 +17,11 @@ interface UpdateTestParams {
   description: string;
   url: string;
   missions: UpdateTestMission[];
+  // 타겟 페르소나 설정
+  isPublic: boolean;
+  targetGenders: string[]; // 필수
+  targetAges: string[]; // 필수
+  targetInterests: Interest[]; // 선택사항
 }
 
 export const updateTest = async (publicId: string, data: UpdateTestParams): Promise<void> => {

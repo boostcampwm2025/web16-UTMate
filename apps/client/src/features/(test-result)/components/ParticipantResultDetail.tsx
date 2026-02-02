@@ -15,12 +15,13 @@ import {
   TableRow,
 } from '@/shared/components/ui/table';
 import { AnimalAvatar } from '@/shared/components/AnimalAvatar';
+import { generateNicknameFromId } from '@/shared/utils/nickname';
 
 import { MissionStatusBadge } from './MissionStatusBadge';
-import { formatTimestamp } from '../utils/format';
 import { getParticipantDetail } from '../apis/client';
 import { formatDate } from '../utils/dates';
-import { generateNicknameFromId } from '@/shared/utils/nickname';
+import { PersonaTag } from './PersonaTag';
+import { formatDurationFromMilliSeconds } from '../utils/format';
 
 interface ParticipantResultDetailProps {
   testId: string;
@@ -53,6 +54,7 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
           <h2 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
             <AnimalAvatar name={animalName} />
             {nickname}
+            <PersonaTag tags={participant.personaTags} />
           </h2>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <div className="flex items-center gap-1.5">
@@ -118,8 +120,8 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
                   </div>
                 </TableCell>
                 <TableCell className="text-right font-medium">
-                  {missionResult.duration != null
-                    ? formatTimestamp(missionResult.duration * 1000)
+                  {missionResult.duration
+                    ? formatDurationFromMilliSeconds(missionResult.duration)
                     : '-'}
                 </TableCell>
               </TableRow>

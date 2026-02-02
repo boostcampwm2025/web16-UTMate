@@ -7,6 +7,7 @@ import { SaveButton } from './SaveButton';
 import { StepNavigation } from './StepNavigation';
 import { TestFormSidebar, TestFormStep } from './TestFormSidebar';
 import { TestInfoStep } from './TestInfoStep';
+import { TestSettingsStep } from './TestSettingsStep';
 import { TestMissionsStep } from './TestMissionsStep';
 import { TestSdkStep } from './TestSdkStep';
 import { useTestForm } from '../hooks/useTestForm';
@@ -74,6 +75,21 @@ export function TestForm({ initialData }: TestFormProps) {
             <div className="mx-auto max-w-4xl px-8 py-8">
               {step === TestFormStep.TEST_INFO && (
                 <TestInfoStep register={register} errors={errors} />
+              )}
+
+              {step === TestFormStep.TEST_SETTINGS && (
+                <TestSettingsStep
+                  register={register}
+                  errors={errors}
+                  targetGender={handlers.targetGender}
+                  targetAgeGroup={handlers.targetAgeGroup}
+                  targetInterests={handlers.targetInterests}
+                  onTargetGenderChange={handlers.setTargetGender}
+                  onTargetAgeGroupChange={handlers.setTargetAgeGroup}
+                  onToggleInterest={handlers.toggleInterest}
+                  isPublic={handlers.isPublic}
+                  onIsPublicChange={handlers.setIsPublic}
+                />
               )}
 
               {step === TestFormStep.TEST_MISSIONS && (

@@ -11,8 +11,8 @@ import {
 import { MissionResultStatus } from '../enums';
 
 import { AnalyzerResult } from '#domain/analyzer/dto/analyzer.dto';
+import { Mission } from '#domain/missions/entities/mission.entity';
 import { Participant } from '#domain/participants/entities/participant.entity';
-import { Mission } from '#domain/tests/entities/mission.entity';
 
 @Entity('mission_results')
 export class MissionResult {

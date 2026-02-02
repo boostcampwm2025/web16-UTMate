@@ -18,7 +18,7 @@ const mockTestSummaries: TestResultSummary[] = [
     title: 'Notion 서비스 사용성 테스트',
     status: TestStatus.PUBLISHED,
     description: 'Notion의 새로운 기능을 사용자들이 어떻게 활용하는지 확인하기 위한 테스트입니다.',
-    startDate: '2024-01-01',
+    startDate: '2026-01-22T14:01:21.000Z',
     endDate: undefined,
     totalParticipants: 3,
   },
@@ -28,7 +28,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
   1: [
     {
       participantId: 'tester-1',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-02T10:00:00.000Z',
       missionResults: [
         {
@@ -40,7 +40,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           status: 'SUCCESS',
           createdAt: '2026-01-02',
           feedback: '매우 만족스러웠습니다.',
-          duration: 300,
+          duration: 30000,
         },
         {
           missionResultId: 'mission-result-2',
@@ -51,7 +51,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           status: 'SUCCESS',
           createdAt: '2026-0-02',
           feedback: '무난했습니다.',
-          duration: 120,
+          duration: 68903,
         },
         {
           missionResultId: 'mission-result-3',
@@ -62,13 +62,13 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           status: 'SUCCESS',
           createdAt: '2026-03-02',
           feedback: '생각보다 오래 걸렸네요.',
-          duration: 600,
+          duration: 68903,
         },
       ],
     },
     {
       participantId: 'tester-2',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-02T11:30:00.000Z',
       missionResults: [
         {
@@ -80,7 +80,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           status: 'SUCCESS',
           createdAt: '2026-03-02',
           feedback: '좋아요',
-          duration: 150,
+          duration: 68903,
         },
         {
           missionResultId: 'mission-result-2',
@@ -91,7 +91,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           status: 'FAILED',
           createdAt: '2026-03-02',
           feedback: '어디로 가야할지 모르겠어요.',
-          duration: 450,
+          duration: 68903,
         },
         {
           missionResultId: 'mission-result-3',
@@ -102,13 +102,13 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           status: 'SUCCESS',
           createdAt: '2026-03-02',
           feedback: '겨우 완료했습니다.',
-          duration: 500,
+          duration: 68903,
         },
       ],
     },
     {
       participantId: 'tester-3',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-03T09:00:00.000Z',
       missionResults: [
         {
@@ -119,7 +119,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           missionDescription: '웹사이트의 메인 페이지를 둘러보고 주요 기능을 확인해주세요.',
           status: 'SUCCESS',
           createdAt: '2026-03-02',
-          duration: 200,
+          duration: 68903,
         },
         {
           missionResultId: 'mission-result-2',
@@ -129,7 +129,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           missionDescription: '검색 기능을 사용하여 원하는 정보를 찾아보세요.',
           status: 'SUCCESS',
           createdAt: '2026-03-02',
-          duration: 180,
+          duration: 68903,
         },
         {
           missionResultId: 'mission-result-3',
@@ -139,7 +139,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           missionDescription: '새로운 플래너를 작성하고 저장해주세요.',
           status: 'PENDING',
           createdAt: '2026-03-02',
-          duration: 50,
+          duration: 68903,
         },
         {
           missionResultId: 'mission-result-4',
@@ -149,13 +149,13 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           missionDescription: '상품 상세 페이지의 정보를 확인하세요.',
           status: 'PENDING',
           createdAt: '2026-03-02',
-          duration: 30,
+          duration: 68903,
         },
       ],
     },
     {
       participantId: 'tester-4',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-03T14:00:00.000Z',
       missionResults: [
         {
@@ -166,7 +166,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           missionDescription: '웹사이트의 메인 페이지를 둘러보고 주요 기능을 확인해주세요.',
           status: 'SUCCESS',
           createdAt: '2026-03-02',
-          duration: 100,
+          duration: 3200,
         },
         {
           missionResultId: 'mission-result-2',
@@ -176,7 +176,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           missionDescription: '검색 기능을 사용하여 원하는 정보를 찾아보세요.',
           status: 'SUCCESS',
           createdAt: '2026-03-02',
-          duration: 90,
+          duration: 3400,
         },
         {
           missionResultId: 'mission-result-3',
@@ -205,7 +205,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
   3: [
     {
       participantId: 'tester-5',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-05T12:00:00.000Z',
       missionResults: [
         {
@@ -217,7 +217,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           status: 'SUCCESS',
           createdAt: '2026-03-02',
           feedback: '플래너 작성이 쉬웠습니다.',
-          duration: 200,
+          duration: 3000,
         },
       ],
     },
@@ -226,7 +226,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
   5: [
     {
       participantId: 'tester-6',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
       joinedAt: '2026-01-06T08:00:00.000Z',
       missionResults: [
         {
@@ -238,7 +238,7 @@ const mockParticipantResults: Record<number, ParticipantResult[]> = {
           status: 'SUCCESS',
           createdAt: '2026-03-02',
           feedback: '테스트 완료',
-          duration: 150,
+          duration: 3000,
         },
       ],
     },
@@ -256,21 +256,25 @@ const createMainFeedbacksWithRelativeTime = (): MainFeedback[] => {
       participantId: 'tester-1',
       content: '메인 페이지의 디자인이 직관적이어서 사용하기 편리했습니다.',
       createdAt: new Date(now - 1 * HOUR).toISOString(),
+      personaTags: ['GUEST'],
     },
     {
       participantId: 'tester-2',
       content: '검색 필터 기능이 좀 더 다양했으면 좋겠습니다.',
       createdAt: new Date(now - 10 * HOUR).toISOString(),
+      personaTags: ['GUEST'],
     },
     {
       participantId: 'tester-3',
       content: '전반적인 로딩 속도가 조금 느린 것 같아 개선이 필요해 보입니다.',
       createdAt: new Date(now - 3 * DAY).toISOString(),
+      personaTags: ['GUEST'],
     },
     {
       participantId: 'tester-4',
       content: '메인 페이지의 디자인이 직관적이어서 사용하기 편리했습니다.',
       createdAt: new Date(now - 30 * DAY).toISOString(),
+      personaTags: ['GUEST'],
     },
   ];
 };
@@ -282,6 +286,7 @@ const mockMainFeedbacks: Record<number, MainFeedback[]> = {
       participantId: 'tester-5',
       content: '미션 난이도가 적당해서 테스트하기 수월했습니다.',
       createdAt: '2026-03-02',
+      personaTags: ['GUEST'],
     },
   ],
   4: [],
@@ -290,6 +295,7 @@ const mockMainFeedbacks: Record<number, MainFeedback[]> = {
       participantId: 'tester-6',
       content: '전체적으로 만족스러운 테스트 경험이었습니다.',
       createdAt: '2026-03-02',
+      personaTags: ['GUEST'],
     },
   ],
 };
@@ -306,9 +312,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       status: 'SUCCESS',
       createdAt: '2026-03-02',
       feedback: '매우 만족스러웠습니다.',
-      duration: 300,
+      duration: 21808,
       participantId: 'tester-1',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-2',
@@ -319,9 +325,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       status: 'SUCCESS',
       createdAt: '2026-03-02',
       feedback: '좋아요',
-      duration: 150,
+      duration: 21808,
       participantId: 'tester-2',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-3',
@@ -331,9 +337,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       missionDescription: '웹사이트의 메인 페이지를 둘러보고 주요 기능을 확인해주세요.',
       status: 'SUCCESS',
       createdAt: '2026-03-02',
-      duration: 200,
+      duration: 21808,
       participantId: 'tester-3',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-4',
@@ -343,9 +349,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       missionDescription: '웹사이트의 메인 페이지를 둘러보고 주요 기능을 확인해주세요.',
       status: 'SUCCESS',
       createdAt: '2026-03-02',
-      duration: 100,
+      duration: 21808,
       participantId: 'tester-4',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
   ],
   2: [
@@ -358,9 +364,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       status: 'SUCCESS',
       createdAt: '2026-03-02',
       feedback: '무난했습니다.',
-      duration: 120,
+      duration: 21808,
       participantId: 'tester-1',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-2',
@@ -371,9 +377,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       status: 'FAILED',
       createdAt: '2026-03-02',
       feedback: '어디로 가야할지 모르겠어요.',
-      duration: 450,
+      duration: 21808,
       participantId: 'tester-2',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-3',
@@ -383,9 +389,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       missionDescription: '검색 기능을 사용하여 원하는 정보를 찾아보세요.',
       status: 'SUCCESS',
       createdAt: '2026-03-02',
-      duration: 180,
+      duration: 21808,
       participantId: 'tester-3',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-4',
@@ -395,9 +401,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       missionDescription: '검색 기능을 사용하여 원하는 정보를 찾아보세요.',
       status: 'SUCCESS',
       createdAt: '2026-03-02',
-      duration: 90,
+      duration: 21808,
       participantId: 'tester-4',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
   ],
   3: [
@@ -410,9 +416,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       status: 'SUCCESS',
       createdAt: '2026-03-02',
       feedback: '생각보다 오래 걸렸네요.',
-      duration: 600,
+      duration: 21808,
       participantId: 'tester-1',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-2',
@@ -424,7 +430,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 50,
       participantId: 'tester-3',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-3',
@@ -436,7 +442,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 0,
       participantId: 'tester-4',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
   ],
   4: [
@@ -449,9 +455,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       status: 'SUCCESS',
       createdAt: '2026-03-02',
       feedback: '겨우 완료했습니다.',
-      duration: 500,
+      duration: 21808,
       participantId: 'tester-2',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-2',
@@ -461,9 +467,9 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       missionDescription: '상품 상세 페이지의 정보를 확인하세요.',
       status: 'PENDING',
       createdAt: '2026-03-02',
-      duration: 30,
+      duration: 21808,
       participantId: 'tester-3',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
     {
       missionResultId: 'mission-result-3',
@@ -475,7 +481,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       createdAt: '2026-03-02',
       duration: 0,
       participantId: 'tester-4',
-      persona: 'GUEST',
+      personaTags: ['GUEST'],
     },
   ],
 };
@@ -502,7 +508,7 @@ const mockMissionDetail: Record<string, MissionDetail> = {
         duration: 300000,
         feedback: '매우 만족스러웠습니다.',
         participantId: 'tester-1',
-        persona: 'GUEST',
+        personaTags: ['GUEST'],
       },
       {
         id: 'mission-result-2',
@@ -510,7 +516,7 @@ const mockMissionDetail: Record<string, MissionDetail> = {
         duration: 150000,
         feedback: '좋아요',
         participantId: 'tester-2',
-        persona: 'GUEST',
+        personaTags: ['GUEST'],
       },
       {
         id: 'mission-result-3',
@@ -518,7 +524,7 @@ const mockMissionDetail: Record<string, MissionDetail> = {
         duration: 200000,
         feedback: undefined,
         participantId: 'tester-3',
-        persona: 'GUEST',
+        personaTags: ['GUEST'],
       },
       {
         id: 'mission-result-4',
@@ -526,7 +532,7 @@ const mockMissionDetail: Record<string, MissionDetail> = {
         duration: 100000,
         feedback: undefined,
         participantId: 'tester-4',
-        persona: 'GUEST',
+        personaTags: ['GUEST'],
       },
     ],
   },
@@ -679,7 +685,7 @@ export const resultHandlers = [
         duration: r.duration,
         feedback: r.feedback || undefined,
         participantId: r.participantId,
-        persona: r.persona,
+        personaTags: r.personaTags,
       }));
 
       return {

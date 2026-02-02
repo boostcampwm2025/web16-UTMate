@@ -31,8 +31,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
-import { getCurrentUser, deleteUser } from '@/features/(auth)/apis/client';
-import type { User } from '@/features/(auth)/types';
+import { getCurrentUser, deleteUser, savePersona, getPersona } from '@/features/(auth)/apis/client';
+import type { User, PersonaData, Interest, Gender } from '@/features/(auth)/types';
+import {
+  INTEREST_OPTIONS,
+  GENDER_OPTIONS,
+  AGE_GROUP_OPTIONS,
+} from '@/features/(auth)/constants/interests';
 
 /**
  * 마이페이지 - 프로필 정보 및 페르소나 설정
@@ -43,44 +48,37 @@ import type { User } from '@/features/(auth)/types';
  * - 회원 탈퇴
  */
 
-interface PersonaData {
-  ageGroup: string;
-  gender: string;
-  occupation: string;
-  jobLevel: string;
-  techLevel: string;
-  description: string;
-}
-
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [persona, setPersona] = useState<PersonaData>({
-    ageGroup: '',
-    gender: '',
-    occupation: '',
-    jobLevel: '',
-    techLevel: '',
+    gender: '남성',
+    ageGroup: '20대',
+    interests: [],
     description: '',
   });
+  const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    async function fetchUser() {
+    async function fetchData() {
       try {
-        const userData = await getCurrentUser();
+        const [userData, personaData] = await Promise.all([getCurrentUser(), getPersona()]);
         setUser(userData);
+        if (personaData) {
+          setPersona(personaData);
+        }
       } catch (error) {
-        console.error('사용자 정보 조회 실패:', error);
+        console.error('데이터 조회 실패:', error);
         router.push('/login');
       } finally {
         setIsLoading(false);
       }
     }
 
-    fetchUser();
+    fetchData();
   }, [router]);
 
   const handleDeleteAccount = async () => {
@@ -97,10 +95,31 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSavePersona = () => {
-    // TODO: 페르소나 저장 API 연동
-    console.log('페르소나 저장:', persona);
-    alert('페르소나가 저장되었습니다.');
+  const handleSavePersona = async () => {
+    if (persona.interests.length === 0) {
+      alert('최소 1개 이상의 관심사를 선택해주세요.');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await savePersona(persona);
+      alert('페르소나가 저장되었습니다.');
+    } catch (error) {
+      console.error('페르소나 저장 실패:', error);
+      alert('페르소나 저장에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const toggleInterest = (interest: Interest) => {
+    setPersona((prev) => ({
+      ...prev,
+      interests: prev.interests.includes(interest)
+        ? prev.interests.filter((i) => i !== interest)
+        : [...prev.interests, interest],
+    }));
   };
 
   if (isLoading) {
@@ -146,7 +165,7 @@ export default function ProfilePage() {
             </Avatar>
             <div className="space-y-1">
               <h3 className="text-2xl font-semibold">{user.username}</h3>
-              <p className="text-muted-foreground text-sm">email: {'나중에 고칠 예정'}</p>
+              {user.email && <p className="text-muted-foreground text-sm">{user.email}</p>}
             </div>
           </div>
 
@@ -158,8 +177,13 @@ export default function ProfilePage() {
               <Input id="username" value={user.username} disabled />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="publicId">이메일</Label>
-              <Input id="publicId" value={'나중에 고칠 예정'} disabled />
+              <Label htmlFor="email">이메일</Label>
+              <Input
+                id="email"
+                value={user.email || '이메일 정보가 없습니다'}
+                disabled
+                className={!user.email ? 'text-muted-foreground' : ''}
+              />
             </div>
           </div>
         </CardContent>
@@ -175,111 +199,69 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
-            {/* 연령대 */}
-            <div className="grid gap-2">
-              <Label htmlFor="ageGroup">연령대</Label>
-              <Select
-                value={persona.ageGroup}
-                onValueChange={(value) => setPersona({ ...persona, ageGroup: value })}
-              >
-                <SelectTrigger id="ageGroup">
-                  <SelectValue placeholder="연령대를 선택하세요" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10s">10대</SelectItem>
-                  <SelectItem value="20s">20대</SelectItem>
-                  <SelectItem value="30s">30대</SelectItem>
-                  <SelectItem value="40s">40대</SelectItem>
-                  <SelectItem value="50s">50대</SelectItem>
-                  <SelectItem value="60s">60대 이상</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* 성별 */}
             <div className="grid gap-2">
               <Label htmlFor="gender">성별</Label>
               <Select
                 value={persona.gender}
-                onValueChange={(value) => setPersona({ ...persona, gender: value })}
+                onValueChange={(value) => setPersona({ ...persona, gender: value as Gender })}
               >
                 <SelectTrigger id="gender">
                   <SelectValue placeholder="성별을 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="male">남성</SelectItem>
-                  <SelectItem value="female">여성</SelectItem>
+                  {GENDER_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
-            {/* 직종 */}
+            {/* 연령대 */}
             <div className="grid gap-2">
-              <Label htmlFor="occupation">직종</Label>
+              <Label htmlFor="ageGroup">연령대</Label>
               <Select
-                value={persona.occupation}
-                onValueChange={(value) => setPersona({ ...persona, occupation: value })}
+                value={persona.ageGroup}
+                onValueChange={(value) => setPersona({ ...persona, ageGroup: value as any })}
               >
-                <SelectTrigger id="occupation">
-                  <SelectValue placeholder="직종을 선택하세요" />
+                <SelectTrigger id="ageGroup">
+                  <SelectValue placeholder="연령대를 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="student">학생</SelectItem>
-                  <SelectItem value="it">IT/소프트웨어 개발</SelectItem>
-                  <SelectItem value="design">디자인/기획</SelectItem>
-                  <SelectItem value="marketing">마케팅/홍보</SelectItem>
-                  <SelectItem value="sales">영업/세일즈</SelectItem>
-                  <SelectItem value="education">교육</SelectItem>
-                  <SelectItem value="healthcare">의료/헬스케어</SelectItem>
-                  <SelectItem value="finance">금융/회계</SelectItem>
-                  <SelectItem value="service">서비스업</SelectItem>
-                  <SelectItem value="manufacturing">제조/생산</SelectItem>
-                  <SelectItem value="other">기타</SelectItem>
+                  {AGE_GROUP_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            {/* 직급 */}
-            <div className="grid gap-2">
-              <Label htmlFor="jobLevel">직급/경력</Label>
-              <Select
-                value={persona.jobLevel}
-                onValueChange={(value) => setPersona({ ...persona, jobLevel: value })}
-              >
-                <SelectTrigger id="jobLevel">
-                  <SelectValue placeholder="직급/경력을 선택하세요" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="intern">인턴</SelectItem>
-                  <SelectItem value="junior">신입 (1-3년)</SelectItem>
-                  <SelectItem value="mid">중급 (4-7년)</SelectItem>
-                  <SelectItem value="senior">고급 (8-12년)</SelectItem>
-                  <SelectItem value="expert">전문가 (13년 이상)</SelectItem>
-                  <SelectItem value="manager">관리자</SelectItem>
-                  <SelectItem value="executive">임원</SelectItem>
-                  <SelectItem value="na">해당 없음</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* 관심사 */}
+          <div className="grid gap-3">
+            <Label>관심사 (복수 선택 가능)</Label>
+            <div className="flex flex-wrap gap-2 rounded-lg border p-4">
+              {INTEREST_OPTIONS.map((option) => (
+                <button
+                  key={option.key}
+                  type="button"
+                  onClick={() => toggleInterest(option.key)}
+                  className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                    persona.interests.includes(option.key)
+                      ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
+                      : 'border-input bg-background hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
-
-            {/* 기술 이해도 */}
-            <div className="grid gap-2 md:col-span-2">
-              <Label htmlFor="techLevel">기술 이해도</Label>
-              <Select
-                value={persona.techLevel}
-                onValueChange={(value) => setPersona({ ...persona, techLevel: value })}
-              >
-                <SelectTrigger id="techLevel">
-                  <SelectValue placeholder="기술 이해도를 선택하세요" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="beginner">초급 - 기본적인 컴퓨터 사용만 가능</SelectItem>
-                  <SelectItem value="intermediate">중급 - 일반적인 소프트웨어 활용 가능</SelectItem>
-                  <SelectItem value="advanced">고급 - 신기술에 관심이 많고 빠르게 습득</SelectItem>
-                  <SelectItem value="expert">전문가 - 기술 분야 전문 지식 보유</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <p className="text-muted-foreground text-xs">
+              최소 1개 이상 선택해주세요. 선택한 관심사: {persona.interests.length}개
+            </p>
           </div>
 
           <Separator />
@@ -300,7 +282,9 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          <Button onClick={handleSavePersona}>페르소나 저장</Button>
+          <Button onClick={handleSavePersona} disabled={isSaving}>
+            {isSaving ? '저장 중...' : '페르소나 저장'}
+          </Button>
         </CardContent>
       </Card>
 
