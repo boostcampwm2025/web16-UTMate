@@ -14,20 +14,20 @@
 
 ---
 
-## 👥 팀 소개
 
-| 이름   | GitHub                                         | 아이디 |
-| ------ | ---------------------------------------------- | ------ |
-| 김재민 | [@jammin94](https://github.com/jammin94)       | J064   |
-| 김지원 | [@Kjiw0n](https://github.com/Kjiw0n)           | J072   |
-| 이용우 | [@RyuRain0309](https://github.com/RyuRain0309) | J201   |
-| 채문성 | [@chaesunbak](https://github.com/chaesunbak)   | J267   |
+## 📌 UTMate 서비스 소개
 
----
+UTMate
+세상에서 제일 쉬운
+사용성 테스트 플랫폼
 
-## 📌 프로젝트 소개
+단계별 설정을 통해 사용성 테스트를 간단하게 생성할 수 있어요.
 
-**UTMate**는 웹 서비스의 사용성 테스트를 효율적으로 진행할 수 있도록 돕는 통합 플랫폼입니다.
+사용성 테스트를 생성하고 링크를 공유하기만 하세요.
+
+세션 리플레이, 로그 분석을 통해 사용성을 정량적으로 검증할 수 있어요.
+
+테스터 모집 고민은 끝!, 공개 테스트로 설정하면 더 많은 테스터를 모집할 수 잇어요, 
 
 ---
 
@@ -94,6 +94,19 @@ pnpm dev
 ```
 
 ---
+
+## 👥 팀 소개
+
+| 이름   | GitHub                                         | 아이디 |
+| ------ | ---------------------------------------------- | ------ |
+| 김재민 | [@jammin94](https://github.com/jammin94)       | J064   |
+| 김지원 | [@Kjiw0n](https://github.com/Kjiw0n)           | J072   |
+| 이용우 | [@RyuRain0309](https://github.com/RyuRain0309) | J201   |
+| 채문성 | [@chaesunbak](https://github.com/chaesunbak)   | J267   |
+
+---
+
+
 
 <div align="center">
 
