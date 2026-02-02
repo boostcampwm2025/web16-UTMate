@@ -12,7 +12,7 @@ import { generateNicknameFromId } from '@/shared/utils/nickname';
 import { getTestById } from '@/features/(test-detail)/api/client';
 
 import { getTestParticipantsResults } from '../apis/client';
-import { formatDistanceToNow } from '../utils/dates';
+import { formatDistanceToNow, formatDate } from '../utils/dates';
 
 export function TestResultSidebar() {
   const params = useParams();
@@ -69,6 +69,11 @@ export function TestResultSidebar() {
     setIsParticipantsOpen((prev) => !prev);
   };
 
+  const participantOrderedByCreatedAt = participants.toSorted((a, b) =>
+    // 최신순으로 정렬
+    b.joinedAt.localeCompare(a.joinedAt),
+  );
+
   return (
     <aside className="bg-background w-64 shrink-0 overflow-y-auto border-r p-2">
       <div className="flex flex-col gap-1">
@@ -98,7 +103,7 @@ export function TestResultSidebar() {
             <button
               type="button"
               onClick={handleMissionsTextClick}
-              className="flex flex-1 items-center gap-2 cursor-pointer"
+              className="flex flex-1 cursor-pointer items-center gap-2"
             >
               <Target className="h-4 w-4" />
               <span>미션별 보기</span>
@@ -144,7 +149,7 @@ export function TestResultSidebar() {
             <button
               type="button"
               onClick={handleParticipantsTextClick}
-              className="flex flex-1 items-center gap-2 cursor-pointer"
+              className="flex flex-1 cursor-pointer items-center gap-2"
             >
               <Users className="h-4 w-4" />
               <span>참여자별 보기</span>
@@ -158,7 +163,7 @@ export function TestResultSidebar() {
 
           <CollapsibleContent>
             <div className="mt-1 ml-4 flex flex-col gap-1">
-              {participants.map((participant, index) => {
+              {participantOrderedByCreatedAt.map((participant) => {
                 const joinedAt = participant.joinedAt;
                 return (
                   <Link
@@ -173,7 +178,7 @@ export function TestResultSidebar() {
                     )}
                   >
                     <span>{generateNicknameFromId(participant.participantId)}</span>
-                    <span className="text-muted-foreground text-xs">
+                    <span className="text-muted-foreground text-xs" title={formatDate(joinedAt)}>
                       {formatDistanceToNow(joinedAt)}
                     </span>
                   </Link>
