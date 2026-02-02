@@ -116,11 +116,7 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
 
             <MetricCard
               label="평균 분노 클릭"
-              value={
-                missionLogs.averageRageClickCount != null
-                  ? `${missionLogs.averageRageClickCount}회`
-                  : '-'
-              }
+              value={`${missionLogs.averageRageClickCount.toFixed(1)}회`}
               description={
                 <MetricExplanation
                   formula="1초 이내 3회 이상 클릭 (거리 100px 이내)"
@@ -130,12 +126,8 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
             />
 
             <MetricCard
-              label="마우스 스래싱"
-              value={
-                missionLogs.averageMouseThrashingCount != null
-                  ? `${missionLogs.averageMouseThrashingCount}회`
-                  : '-'
-              }
+              label="평균 마우스 스래싱"
+              value={`${missionLogs.averageMouseThrashingCount.toFixed(1)}회`}
               description={
                 <MetricExplanation
                   formula="1초 이내 급격한 마우스 이동 (거리 500px, 굴곡도 5 이상)"
