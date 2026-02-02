@@ -51,6 +51,7 @@ export function TestMissionsStep({
         <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-12 text-center">
           <div className="mx-auto max-w-md space-y-4">
             <h3 className="text-lg font-semibold text-gray-700">아직 미션이 없습니다</h3>
+            <p className="text-gray-600">좌측의 + 버튼을 눌러 미션을 추가해주세요.</p>
           </div>
         </div>
       ) : (
