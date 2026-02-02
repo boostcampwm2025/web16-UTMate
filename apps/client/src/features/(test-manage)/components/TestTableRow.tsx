@@ -42,7 +42,12 @@ export function TestTableRow({ test }: TestTableRowProps) {
         <IntegrationButton url={test.url} sdkStatus={test.sdkStatus} testId={test.publicId} />
       </TableCell>
       <TableCell className="text-center" onClick={handleActionClick}>
-        <MemberButton testId={test.publicId} owner={test.owner} members={test.members} />
+        <MemberButton
+          isDemo={test.status === TestStatus.DEMO}
+          testId={test.publicId}
+          owner={test.owner}
+          members={test.members}
+        />
       </TableCell>
 
       {/* TODO: 테스트 참여자 수 표시 */}
