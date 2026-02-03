@@ -34,7 +34,7 @@ const STEPS: StepItem[] = [
     step: TestFormStep.TEST_SETTINGS,
     icon: <Settings className="size-5" />,
     title: '테스트 설정',
-    description: '타겟 사용자 설정',
+    description: '공개범위 및 타겟 사용자 설정',
   },
   {
     step: TestFormStep.TEST_MISSIONS,

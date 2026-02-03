@@ -97,6 +97,8 @@ export function TestForm({ initialData }: TestFormProps) {
                   fields={fields}
                   selectedMissionIndex={selectedMissionIndex}
                   register={register}
+                  control={form.control}
+                  setValue={form.setValue}
                   errors={errors}
                   onSelectedMissionIndexChange={setSelectedMissionIndex}
                   onDeleteMission={handlers.deleteMission}

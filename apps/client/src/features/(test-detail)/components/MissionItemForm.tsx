@@ -1,4 +1,12 @@
-import type { UseFormRegister, FieldErrors, FieldArrayWithId } from 'react-hook-form';
+import type {
+  UseFormRegister,
+  FieldErrors,
+  FieldArrayWithId,
+  Control,
+  UseFormSetValue,
+} from 'react-hook-form';
+import { useWatch } from 'react-hook-form';
+import { CheckCircle, AlertCircle, Trash2 } from 'lucide-react';
 
 import {
   Field,
@@ -9,15 +17,17 @@ import {
 } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
+import { Button } from '@/shared/components/ui/button';
+import { useDialogStore } from '@/shared/stores/useDialogStore';
 
 import type { TestFormValues } from '../schemas/testForm';
-import { MissionItemDeleteButton } from './MissionItemDeleteButton';
-import { useUrlInput } from '../hooks/useUrlInput';
 
 interface MissionItemFormProps {
   field: FieldArrayWithId<TestFormValues, 'missions', 'id'>;
   missionIndex: number;
   register: UseFormRegister<TestFormValues>;
+  control: Control<TestFormValues>;
+  setValue: UseFormSetValue<TestFormValues>;
   errors: FieldErrors<TestFormValues>;
   onDeleteMission: (publicId: string) => void;
 }
@@ -26,15 +36,41 @@ export function MissionItemForm({
   field,
   missionIndex,
   register,
+  control,
+  setValue,
   errors,
   onDeleteMission,
 }: MissionItemFormProps) {
-  const { urlValue, isValidUrl, handleUrlChange, handleUrlBlur } = useUrlInput({
-    initialValue: field.missionUrl || '',
+  const { confirm } = useDialogStore();
+  const missionUrl = useWatch({
+    control,
+    name: `missions.${missionIndex}.missionUrl`,
+    defaultValue: field.missionUrl || '',
   });
 
-  const handleDeleteMission = () => {
-    onDeleteMission(field.publicId || '');
+  const handleUrlBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim();
+    if (value && !/^https?:\/\//i.test(value)) {
+      setValue(`missions.${missionIndex}.missionUrl`, `https://${value}`, {
+        shouldValidate: true,
+      });
+    }
+  };
+
+  const hasUrlError = !!errors.missions?.[missionIndex]?.missionUrl;
+  const isValidUrl = missionUrl && !hasUrlError;
+
+  const handleDeleteMission = async () => {
+    const confirmed = await confirm(
+      '미션을 삭제하시겠습니까?',
+      '이 작업은 되돌릴 수 없습니다.',
+      null,
+      { isAlert: true, confirmText: '삭제' },
+    );
+
+    if (confirmed) {
+      onDeleteMission(field.publicId || '');
+    }
   };
 
   const missionErrors = errors.missions?.[missionIndex];
@@ -47,10 +83,15 @@ export function MissionItemForm({
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold text-gray-700">미션 {missionIndex + 1}</h3>
-        <MissionItemDeleteButton
-          publicId={field.publicId || ''}
-          onDeleteMission={handleDeleteMission}
-        />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="group text-red-600 hover:bg-red-50 hover:text-red-700"
+          onClick={handleDeleteMission}
+        >
+          <Trash2 className="size-4" />
+          <span className="ml-1 hidden group-hover:inline">삭제</span>
+        </Button>
       </div>
 
       <FieldGroup>
@@ -91,53 +132,22 @@ export function MissionItemForm({
               id={`mission-url-${field.id}`}
               placeholder="예: www.stocks.com 또는 https://www.stocks.com"
               {...register(`missions.${missionIndex}.missionUrl`, {
-                onChange: handleUrlChange,
                 onBlur: handleUrlBlur,
               })}
-              value={urlValue}
               className="h-10 pr-10"
               aria-invalid={!!missionErrors?.missionUrl}
             />
-            {urlValue && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            {missionUrl && (
+              <div className="absolute top-1/2 right-3 -translate-y-1/2">
                 {isValidUrl ? (
-                  <svg
-                    className="h-5 w-5 text-green-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
                 ) : (
-                  <svg
-                    className="h-5 w-5 text-yellow-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
+                  <AlertCircle className="h-5 w-5 text-yellow-600" />
                 )}
               </div>
             )}
           </div>
-          <FieldDescription>
-            테스트 참여자가 미션을 시작할 URL을 입력해주세요.
-            {urlValue && !isValidUrl && (
-              <span className="text-yellow-700"> (http:// 또는 https://가 자동으로 추가됩니다)</span>
-            )}
-          </FieldDescription>
+          <FieldDescription>테스트 참여자가 미션을 시작할 URL을 입력해주세요.</FieldDescription>
           {missionErrors?.missionUrl && <FieldError>{missionErrors.missionUrl.message}</FieldError>}
         </Field>
 
