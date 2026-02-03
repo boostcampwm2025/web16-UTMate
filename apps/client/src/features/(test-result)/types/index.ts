@@ -98,6 +98,9 @@ export type MissionResultDetail = {
   rageClickCount?: number;
   mouseThrashingCount?: number;
   analysisData?: AnalyzerResult;
+  participantId: string;
+  personaTags: string[];
+  uaInfo?: UAInfo;
 };
 
 export type MissionDetail = {
