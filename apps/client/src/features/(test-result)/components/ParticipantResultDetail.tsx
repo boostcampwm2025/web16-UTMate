@@ -4,7 +4,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { Calendar } from 'lucide-react';
 
-import { Card } from '@/shared/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import {
   Table,
   TableBody,
@@ -18,6 +18,7 @@ import { AnimalAvatar } from '@/shared/components/AnimalAvatar';
 import { generateNicknameFromId } from '@/shared/utils/nickname';
 
 import { MissionStatusBadge } from './MissionStatusBadge';
+import { UAInfoDisplay } from './UAInfoDisplay';
 import { getParticipantDetail } from '../apis/client';
 import { formatDate } from '../utils/dates';
 import { PersonaTag } from './PersonaTag';
@@ -79,6 +80,29 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
           </div>
         </div>
       </Card>
+
+      {/* UA Info and Feedback Section */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">사용 환경</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <UAInfoDisplay uaInfo={participant.uaInfo} />
+          </CardContent>
+        </Card>
+
+        {participant.feedback && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">전체 피드백</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm leading-relaxed text-gray-700">{participant.feedback}</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Mission Results Table */}
       <Table className="w-full text-left">
