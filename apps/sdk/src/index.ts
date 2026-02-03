@@ -1,7 +1,7 @@
 import { record } from '@rrweb/record';
 import type { eventWithTime } from '@rrweb/types';
-import pako from 'pako';
 
+import { compress } from './utils/compression';
 import { EVENT_SEND_INTERVAL, SERVER_URL } from './constants';
 
 /**
@@ -32,7 +32,7 @@ function getIdsFromUrl(): string | undefined {
  */
 async function sendEventsToServer(auth: string, events: eventWithTime[], isUnload = false) {
   const jsonl = events.map((e) => JSON.stringify(e)).join('\n') + '\n';
-  const compressed = pako.gzip(jsonl);
+  const compressed = compress(jsonl);
 
   const response = await fetch(`${SERVER_URL}/sdk/replay_logs`, {
     method: 'POST',
@@ -43,7 +43,7 @@ async function sendEventsToServer(auth: string, events: eventWithTime[], isUnloa
       Authorization: `Bearer ${auth}`,
       'Content-Encoding': 'gzip',
     },
-    body: compressed,
+    body: compressed as BodyInit,
   });
 
   if (!response.ok) {
