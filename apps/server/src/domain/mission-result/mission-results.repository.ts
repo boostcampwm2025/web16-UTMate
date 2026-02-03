@@ -51,6 +51,8 @@ export class MissionResultsRepository {
       .leftJoinAndSelect('missionResult.mission', 'mission')
       .leftJoinAndSelect('participant.test', 'test')
       .leftJoinAndSelect('test.members', 'member')
+      .leftJoinAndSelect('participant.user', 'user')
+      .leftJoinAndSelect('user.persona', 'persona')
       .where('missionResult.publicId = :publicId', { publicId })
       .getOne();
   }
