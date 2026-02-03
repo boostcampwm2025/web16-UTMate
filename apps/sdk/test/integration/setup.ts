@@ -1,7 +1,15 @@
+import { CompressionStream, DecompressionStream } from 'node:stream/web';
+
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 
 import { initRecorder } from '../../src/recorder';
+
+// jsdom 환경에서는 global에 이 API들이 없을 수 있으므로 수동으로 할당
+if (typeof global.CompressionStream === 'undefined') {
+  global.CompressionStream = CompressionStream as any;
+  global.DecompressionStream = DecompressionStream as any;
+}
 
 interface IRRWebEvent {
   type: number;

@@ -28,11 +28,11 @@ describe('Recorder 통합 테스트', () => {
         expect(request.headers.get('Content-Encoding')).toBe('gzip');
         expect(request.headers.get('Authorization')).toBe(`Bearer ${token}`);
 
-        const decompressed = decompress(new Uint8Array(body));
+        const decompressed = await decompress(new Uint8Array(body));
         const events = decompressed
           .split('\n')
-          .filter((line) => line.trim())
-          .map((line) => JSON.parse(line));
+          .filter((line: string) => line.trim())
+          .map((line: string) => JSON.parse(line));
         expect(events).toHaveLength(1);
 
         flushCalled();
@@ -47,7 +47,9 @@ describe('Recorder 통합 테스트', () => {
 
     await vi.advanceTimersByTimeAsync(EVENT_SEND_INTERVAL);
 
-    expect(flushCalled).toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(flushCalled).toHaveBeenCalled();
+    });
   });
 
   it('visibilitychange 이벤트를 처리해야 한다', async () => {
@@ -75,7 +77,9 @@ describe('Recorder 통합 테스트', () => {
 
     await vi.advanceTimersByTimeAsync(100);
 
-    expect(flushCalled).toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(flushCalled).toHaveBeenCalled();
+    });
   });
 
   it('pagehide 이벤트를 처리해야 한다', async () => {
@@ -97,7 +101,9 @@ describe('Recorder 통합 테스트', () => {
 
     await vi.advanceTimersByTimeAsync(100);
 
-    expect(flushCalled).toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(flushCalled).toHaveBeenCalled();
+    });
   });
 
   it('부모 창으로부터의 flush 요청을 처리해야 한다', async () => {
@@ -129,11 +135,13 @@ describe('Recorder 통합 테스트', () => {
 
     await vi.advanceTimersByTimeAsync(100);
 
-    expect(flushCalled).toHaveBeenCalled();
-    expect(mockOpener.postMessage).toHaveBeenCalledWith(
-      { type: 'UTM_SDK_FLUSH_COMPLETE', success: true },
-      '*',
-    );
+    await vi.waitFor(() => {
+      expect(flushCalled).toHaveBeenCalled();
+      expect(mockOpener.postMessage).toHaveBeenCalledWith(
+        { type: 'UTM_SDK_FLUSH_COMPLETE', success: true },
+        '*',
+      );
+    });
   });
 
   it('네트워크 실패 시 이벤트를 큐에 다시 넣어야 한다', async () => {
@@ -155,9 +163,13 @@ describe('Recorder 통합 테스트', () => {
     simulateRRWebEvent({ type: 3, data: {}, timestamp: Date.now() });
 
     await vi.advanceTimersByTimeAsync(EVENT_SEND_INTERVAL);
-    expect(callCount).toBe(1);
+    await vi.waitFor(() => {
+      expect(callCount).toBe(1);
+    });
 
     await vi.advanceTimersByTimeAsync(EVENT_SEND_INTERVAL);
-    expect(callCount).toBe(2);
+    await vi.waitFor(() => {
+      expect(callCount).toBe(2);
+    });
   });
 });

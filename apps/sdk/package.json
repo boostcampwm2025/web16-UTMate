@@ -39,7 +39,6 @@
     "@testing-library/dom": "^10.4.1",
     "@types/jsdom": "^27.0.0",
     "@types/node": "^25.2.0",
-    "@types/pako": "^2.0.3",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^8.57.0",
     "jsdom": "^27.4.0",
@@ -51,7 +50,6 @@
     "vitest": "^4.0.17"
   },
   "dependencies": {
-    "@rrweb/record": "2.0.0-alpha.18",
-    "pako": "^2.1.0"
+    "@rrweb/record": "2.0.0-alpha.18"
   }
 }

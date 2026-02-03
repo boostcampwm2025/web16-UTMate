@@ -13,7 +13,7 @@ export interface IRecorderConfig {
  */
 async function sendEventsToServer(auth: string, events: eventWithTime[], isUnload = false) {
   const jsonl = events.map((e) => JSON.stringify(e)).join('\n') + '\n';
-  const compressed = compress(jsonl);
+  const compressed = await compress(jsonl);
 
   const response = await fetch(`${SERVER_URL}/sdk/replay_logs`, {
     method: 'POST',
