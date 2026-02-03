@@ -17,8 +17,8 @@ export function AnomalyTags({
 
   // 이상현상 기준값 (필요시 조정 가능)
   const IDLE_THRESHOLD = 5000; // 5초 이상
-  const RAGE_CLICK_THRESHOLD = 3; // 3회 이상
-  const MOUSE_THRASHING_THRESHOLD = 3; // 3회 이상
+  const RAGE_CLICK_THRESHOLD = 0; // 1회 이상
+  const MOUSE_THRASHING_THRESHOLD = 0; // 1회 이상
 
   if (totalIdleTime && totalIdleTime > IDLE_THRESHOLD) {
     anomalies.push({
