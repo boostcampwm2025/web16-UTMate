@@ -131,9 +131,7 @@ export class Test {
       throw new Error('미션이 확인되지 않아 테스트를 게시할 수 없습니다.');
     }
 
-    if (!this.startDate) {
-      this.startDate = new Date();
-    }
+    this.startDate ??= new Date();
     this.endDate = undefined;
     this.status = TestStatus.PUBLISHED;
   }

@@ -58,9 +58,11 @@ export class ParticipantResultsDto {
     dto.participantId = participant.publicId;
     if (participant.userType === 'REGISTERED' && participant.user) {
       if (participant.user.persona) {
-        dto.personaTags.push(participant.user.persona.gender);
-        dto.personaTags.push(participant.user.persona.ageGroup);
-        dto.personaTags.push(...participant.user.persona.interests);
+        dto.personaTags.push(
+          participant.user.persona.gender,
+          participant.user.persona.ageGroup,
+          ...participant.user.persona.interests,
+        );
       } else {
         dto.personaTags.push('미설정');
       }
@@ -96,9 +98,11 @@ export class MainFeedbackDto {
     dto.content = participant.feedback;
     if (participant.userType === 'REGISTERED' && participant.user) {
       if (participant.user.persona) {
-        dto.personaTags.push(participant.user.persona.gender);
-        dto.personaTags.push(participant.user.persona.ageGroup);
-        dto.personaTags.push(...participant.user.persona.interests);
+        dto.personaTags.push(
+          participant.user.persona.gender,
+          participant.user.persona.ageGroup,
+          ...participant.user.persona.interests,
+        );
       } else {
         dto.personaTags.push('미설정');
       }
@@ -136,9 +140,11 @@ export class MissionResultOverviewDto {
     dto.participantId = missionResult.participant.publicId;
     if (missionResult.participant.userType === 'REGISTERED' && missionResult.participant.user) {
       if (missionResult.participant.user.persona) {
-        dto.personaTags.push(missionResult.participant.user.persona.gender);
-        dto.personaTags.push(missionResult.participant.user.persona.ageGroup);
-        dto.personaTags.push(...missionResult.participant.user.persona.interests);
+        dto.personaTags.push(
+          missionResult.participant.user.persona.gender,
+          missionResult.participant.user.persona.ageGroup,
+          ...missionResult.participant.user.persona.interests,
+        );
       } else {
         dto.personaTags.push('미설정');
       }
@@ -201,33 +207,31 @@ export class MissionOverviewDto {
           )
         : 0;
 
-    dto.averageDuration =
-      missions.missionResults.filter((mr) => mr.duration !== null).length > 0
-        ? Math.round(
-            missions.missionResults.reduce((acc, curr) => acc + (curr.duration || 0), 0) /
-              missions.missionResults.filter((mr) => mr.duration !== null).length,
-          )
-        : 0;
+    dto.averageDuration = missions.missionResults.some((mr) => mr.duration !== null)
+      ? Math.round(
+          missions.missionResults.reduce((acc, curr) => acc + (curr.duration || 0), 0) /
+            missions.missionResults.filter((mr) => mr.duration !== null).length,
+        )
+      : 0;
 
-    dto.averageIdleTime =
-      missions.missionResults.filter((mr) => mr.totalIdleTime !== null).length > 0
-        ? Math.round(
-            missions.missionResults.reduce((acc, curr) => acc + (curr.totalIdleTime || 0), 0) /
-              missions.missionResults.filter((mr) => mr.totalIdleTime !== null).length,
-          )
-        : 0;
+    dto.averageIdleTime = missions.missionResults.some((mr) => mr.totalIdleTime !== null)
+      ? Math.round(
+          missions.missionResults.reduce((acc, curr) => acc + (curr.totalIdleTime || 0), 0) /
+            missions.missionResults.filter((mr) => mr.totalIdleTime !== null).length,
+        )
+      : 0;
 
-    dto.averageRageClickCount =
-      missions.missionResults.filter((mr) => mr.rageClickCount !== null).length > 0
-        ? missions.missionResults.reduce((acc, curr) => acc + (curr.rageClickCount || 0), 0) /
-          missions.missionResults.filter((mr) => mr.rageClickCount !== null).length
-        : 0;
+    dto.averageRageClickCount = missions.missionResults.some((mr) => mr.rageClickCount !== null)
+      ? missions.missionResults.reduce((acc, curr) => acc + (curr.rageClickCount || 0), 0) /
+        missions.missionResults.filter((mr) => mr.rageClickCount !== null).length
+      : 0;
 
-    dto.averageMouseThrashingCount =
-      missions.missionResults.filter((mr) => mr.mouseThrashingCount !== null).length > 0
-        ? missions.missionResults.reduce((acc, curr) => acc + (curr.mouseThrashingCount || 0), 0) /
-          missions.missionResults.filter((mr) => mr.mouseThrashingCount !== null).length
-        : 0;
+    dto.averageMouseThrashingCount = missions.missionResults.some(
+      (mr) => mr.mouseThrashingCount !== null,
+    )
+      ? missions.missionResults.reduce((acc, curr) => acc + (curr.mouseThrashingCount || 0), 0) /
+        missions.missionResults.filter((mr) => mr.mouseThrashingCount !== null).length
+      : 0;
 
     dto.missionResults = MissionResultOverviewDto.fromEntities(missions.missionResults);
 
