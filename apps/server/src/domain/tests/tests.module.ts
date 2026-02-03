@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Test } from './entities/test.entity';
-import { TestsService } from './services/tests.service';
 import { TestsCommandService } from './services/tests-command.service';
 import { TestsMemberService } from './services/tests-member.service';
 import { TestsParticipantService } from './services/tests-participant.service';
@@ -26,7 +25,6 @@ import { UsersModule } from '#domain/users/users.module';
   ],
   controllers: [TestsController],
   providers: [
-    TestsService,
     TestsQueryService,
     TestsCommandService,
     TestsResultService,
@@ -34,6 +32,6 @@ import { UsersModule } from '#domain/users/users.module';
     TestsMemberService,
     TestsRepository,
   ],
-  exports: [TestsService],
+  exports: [TestsCommandService],
 })
 export class TestsModule {}

@@ -1,4 +1,5 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { CreatePersonaDto, UpdatePersonaDto } from '../dto/persona.dto';
@@ -31,6 +32,10 @@ describe('UserService', () => {
     save: jest.fn(),
   };
 
+  const mockEventEmitter = {
+    emit: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -42,6 +47,10 @@ describe('UserService', () => {
         {
           provide: PersonaRepository,
           useValue: mockPersonaRepository,
+        },
+        {
+          provide: EventEmitter2,
+          useValue: mockEventEmitter,
         },
       ],
     }).compile();
