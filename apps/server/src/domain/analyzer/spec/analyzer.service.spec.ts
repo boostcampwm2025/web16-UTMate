@@ -3,7 +3,7 @@ import path from 'path';
 
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AnalyzerService } from './analyzer.service';
+import { AnalyzerService } from '../analyzer.service';
 
 describe('SdkService', () => {
   let service: AnalyzerService;
@@ -23,7 +23,7 @@ describe('SdkService', () => {
   describe('로그 분석', () => {
     it('정상적으로 로그 분석을 완료해야한다.', async () => {
       const logsBuffer = fs.readFileSync(
-        path.join(__dirname, '../../../uploads/replay_log/sample-log.jsonl'),
+        path.join(__dirname, '../../../../test/mocks/sample-log.jsonl'),
       );
 
       const analysisResult = service.analyze(logsBuffer);
