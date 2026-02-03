@@ -22,6 +22,9 @@ export interface ParticipantMissionResult {
   duration?: number;
   feedback?: string | null;
   createdAt?: string;
+  totalIdleTime?: number;
+  rageClickCount?: number;
+  mouseThrashingCount?: number;
 }
 
 export interface UAInfo {
