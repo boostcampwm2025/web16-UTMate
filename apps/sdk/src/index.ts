@@ -1,4 +1,4 @@
-import { SERVER_URL } from './constants';
+import { RECORDER_SCRIPT_URL, SERVER_URL } from './constants';
 
 /**
  * URL에서 인증 토큰을 추출하거나 세션 스토리지에서 가져옵니다.
@@ -45,12 +45,7 @@ async function verifySdkInstallation(testId: string) {
 async function loadRecorderScript(): Promise<void> {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    const scriptSrc =
-      process.env.NODE_ENV === 'production'
-        ? 'https://utmate.me/sdk/utmate-recorder.iife.js'
-        : '/utmate-recorder.iife.js';
-
-    script.src = scriptSrc;
+    script.src = RECORDER_SCRIPT_URL;
     script.async = true;
     script.onload = () => resolve();
     script.onerror = () => reject(new Error('Failed to load recorder script'));
