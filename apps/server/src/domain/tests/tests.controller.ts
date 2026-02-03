@@ -19,7 +19,7 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { AddMemberDto } from './dto/member.dto';
 import { SearchTestQueryDto } from './dto/search-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
-import { TestStatus } from './entities/test.entity';
+import { TestStatus } from './enums';
 import { TestsService } from './tests.service';
 
 import { UserId } from '#domain/auth/decorator/param.decorator';

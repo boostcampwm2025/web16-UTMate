@@ -11,16 +11,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { TestStatus } from '../enums';
+
 import { AgeRange, Gender, Interest } from '#common/enums';
 import { Mission } from '#domain/missions/entities/mission.entity';
 import { Participant } from '#domain/participants/entities/participant.entity';
 import { User } from '#domain/users/entities/user.entity';
-
-export enum TestStatus {
-  DRAFT = 'DRAFT',
-  PUBLISHED = 'PUBLISHED',
-  ARCHIVED = 'ARCHIVED',
-}
 
 @Entity('tests')
 export class Test {
