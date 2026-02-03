@@ -123,42 +123,54 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
               </TableCell>
             </TableRow>
           ) : (
-            participant.missionResults.map((missionResult) => (
-              <TableRow
-                key={missionResult.missionResultId}
-                onClick={() => handleRowClick(missionResult.missionResultId)}
-                className="cursor-pointer transition-colors hover:bg-gray-50/50"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleRowClick(missionResult.missionResultId);
+            participant.missionResults.map((missionResult) => {
+              const isClickable = missionResult.status === 'SUCCESS' || missionResult.status === 'FAILED';
+
+              return (
+                <TableRow
+                  key={missionResult.missionResultId}
+                  onClick={() => isClickable && handleRowClick(missionResult.missionResultId)}
+                  className={
+                    isClickable
+                      ? 'cursor-pointer transition-colors hover:bg-gray-50/50'
+                      : 'cursor-not-allowed opacity-60'
                   }
-                }}
-                aria-label={`${missionResult.missionTitle} 미션 결과 상세 보기`}
-              >
-                <TableCell className="font-medium">{missionResult.missionTitle}</TableCell>
-                <TableCell className="text-center">
-                  <MissionStatusBadge status={missionResult.status} />
-                </TableCell>
-                <TableCell className="max-w-[200px]">
-                  <div
-                    className="text-muted-foreground truncate text-sm"
-                    title={missionResult.feedback || ''}
-                  >
-                    {missionResult.feedback || (
-                      <span className="text-gray-300 italic">피드백 없음</span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {missionResult.duration
-                    ? formatDurationFromMilliSeconds(missionResult.duration)
-                    : '-'}
-                </TableCell>
-              </TableRow>
-            ))
+                  role={isClickable ? 'button' : undefined}
+                  tabIndex={isClickable ? 0 : undefined}
+                  onKeyDown={(e) => {
+                    if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
+                      e.preventDefault();
+                      handleRowClick(missionResult.missionResultId);
+                    }
+                  }}
+                  aria-label={
+                    isClickable
+                      ? `${missionResult.missionTitle} 미션 결과 상세 보기`
+                      : `${missionResult.missionTitle} 미션 (상세 보기 불가)`
+                  }
+                >
+                  <TableCell className="font-medium">{missionResult.missionTitle}</TableCell>
+                  <TableCell className="text-center">
+                    <MissionStatusBadge status={missionResult.status} />
+                  </TableCell>
+                  <TableCell className="max-w-[200px]">
+                    <div
+                      className="text-muted-foreground truncate text-sm"
+                      title={missionResult.feedback || ''}
+                    >
+                      {missionResult.feedback || (
+                        <span className="text-gray-300 italic">피드백 없음</span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right font-medium">
+                    {missionResult.duration
+                      ? formatDurationFromMilliSeconds(missionResult.duration)
+                      : '-'}
+                  </TableCell>
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>
