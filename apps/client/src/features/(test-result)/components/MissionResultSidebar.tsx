@@ -1,5 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { AnimalAvatar } from '@/shared/components/AnimalAvatar';
+import { generateNicknameFromId } from '@/shared/utils/nickname';
+
 import { MissionStatusBadge } from './MissionStatusBadge';
+import { PersonaTag } from './PersonaTag';
+import { UAInfoDisplay } from './UAInfoDisplay';
 import { formatDuration, formatTimestamp } from '../utils/format';
 
 import type { MissionResultDetail, MissionDetail } from '../types';
@@ -13,9 +18,33 @@ export function MissionResultSidebar({
   missionResultData,
   missionDetail,
 }: MissionResultSidebarProps) {
+  const nickname = generateNicknameFromId(missionResultData.participantId);
+  const animalName = nickname.split(' ')[1];
+
   return (
     <aside className="bg-background h-full w-80 overflow-y-auto border-r p-4">
       <div className="space-y-4">
+        {/* 참여자 정보 */}
+        <Card className="gap-2">
+          <CardHeader>
+            <CardTitle className="text-base">참여자 정보</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div>
+              <p className="text-muted-foreground mb-1 font-medium">참여자</p>
+              <div className="flex items-center gap-2">
+                <AnimalAvatar name={animalName} />
+                <span className="text-gray-900">{nickname}</span>
+                <PersonaTag tags={missionResultData.personaTags} />
+              </div>
+            </div>
+            <div>
+              <p className="text-muted-foreground mb-2 font-medium">사용 환경</p>
+              <UAInfoDisplay uaInfo={missionResultData.uaInfo} />
+            </div>
+          </CardContent>
+        </Card>
+
         {/* 미션 정보 */}
         <Card className="gap-2">
           <CardHeader>
