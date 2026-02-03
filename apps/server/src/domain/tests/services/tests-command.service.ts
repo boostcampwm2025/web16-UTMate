@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
@@ -50,6 +55,10 @@ export class TestsCommandService {
       if (!test) {
         throw new NotFoundException('Test not found');
       }
+      if (test.status !== TestStatus.DRAFT) {
+        throw new BadRequestException('테스트는 DRAFT 상태에서만 수정할 수 있습니다');
+      }
+
       test.updateTestInfo(dto.title, dto.description, dto.url, dto.isPublic);
       test.updateTargeting(dto.targetGenders, dto.targetAges, dto.targetInterests);
       await this.testsRepository.save(test, manager);
@@ -77,6 +86,9 @@ export class TestsCommandService {
     if (!test) {
       throw new NotFoundException('Test not found');
     }
+    if (test.ownerId !== userId) {
+      throw new ForbiddenException('테스트 삭제 권한이 없습니다');
+    }
     await this.testsRepository.remove(test);
   }
 
@@ -93,6 +105,10 @@ export class TestsCommandService {
     const test = await this.testsRepository.findByPublicIdAndUserIdWithMissions(publicId, userId);
     if (!test) {
       throw new NotFoundException('Test not found');
+    }
+
+    if (test.status === TestStatus.DEMO) {
+      throw new BadRequestException('DEMO 테스트는 상태를 변경할 수 없습니다');
     }
 
     try {
