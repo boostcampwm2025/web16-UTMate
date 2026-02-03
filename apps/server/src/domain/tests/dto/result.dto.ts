@@ -17,6 +17,9 @@ export class ParticipantMissionResultDto {
   duration?: number;
   feedback?: string;
   createdAt?: Date;
+  totalIdleTime?: number;
+  rageClickCount?: number;
+  mouseThrashingCount?: number;
 
   static fromEntity(missions: Mission[], missionResult: MissionResult) {
     const dto = new ParticipantMissionResultDto();
@@ -36,6 +39,9 @@ export class ParticipantMissionResultDto {
     dto.duration = missionResult.duration;
     dto.feedback = missionResult.feedback;
     dto.createdAt = missionResult.createdAt;
+    dto.totalIdleTime = missionResult.totalIdleTime;
+    dto.rageClickCount = missionResult.rageClickCount;
+    dto.mouseThrashingCount = missionResult.mouseThrashingCount;
     return dto;
   }
 
