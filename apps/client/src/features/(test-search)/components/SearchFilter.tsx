@@ -3,7 +3,6 @@ import { Interest, Gender, AgeGroup } from '@/features/(auth)/types/persona';
 import { Label } from '@/shared/components/ui/label';
 
 import { InterestFilter } from './InterestFilter';
-
 interface SearchFilterProps {
   gender: Gender | undefined;
   ageGroup: AgeGroup | undefined;
