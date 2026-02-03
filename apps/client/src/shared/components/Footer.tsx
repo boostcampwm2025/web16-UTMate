@@ -19,6 +19,7 @@ export function Footer({ className, ...props }: React.HTMLAttributes<HTMLElement
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary-foreground/70 hover:text-primary-foreground text-center text-xs transition-colors md:text-right"
+          aria-label="Flaticon에서 Freepik이 제작한 동물 아이콘 출처 보기 (새 탭에서 열림)"
         >
           Animals icons created by Freepik - Flaticon
         </a>

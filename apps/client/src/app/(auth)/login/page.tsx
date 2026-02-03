@@ -11,7 +11,7 @@ export default function LoginPage() {
       <div className="relative flex flex-col bg-white px-8 lg:px-16 xl:px-24">
         {/* 상단 헤더 (로고 ) */}
         <div className="flex items-center justify-between pt-8 pb-12">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2" aria-label="UTMate 홈으로 이동">
             <span className="text-primary text-2xl font-black tracking-tighter">UT</span>
           </Link>
         </div>

@@ -31,7 +31,19 @@ export function TestTableRow({ test }: TestTableRowProps) {
   };
 
   return (
-    <TableRow onClick={handleRowClick} className="cursor-pointer">
+    <TableRow
+      onClick={handleRowClick}
+      className="cursor-pointer"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleRowClick();
+        }
+      }}
+      aria-label={`${test.title} 테스트 ${test.status === TestStatus.DRAFT ? '편집' : '결과 보기'}`}
+    >
       <TableCell className="text-left">
         <div className="font-medium text-gray-900">{test.title}</div>
       </TableCell>

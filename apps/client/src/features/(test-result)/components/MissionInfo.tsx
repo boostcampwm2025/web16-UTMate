@@ -68,9 +68,9 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
 
         {/* Performance Metrics Section */}
         <div className="px-6">
-          <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900">
             성과 지표
-          </h3>
+          </h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
             <MetricCard
               label="성공률"

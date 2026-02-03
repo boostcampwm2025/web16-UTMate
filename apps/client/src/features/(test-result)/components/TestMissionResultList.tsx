@@ -17,7 +17,7 @@ export function TestMissionResultList({ testId }: { testId: string }) {
 
   return (
     <div>
-      <h3 className="mb-4 ml-2 text-xl font-semibold">미션 목록</h3>
+      <h2 className="mb-4 ml-2 text-xl font-semibold">미션 목록</h2>
       <div className="flex flex-col gap-4">
         {missionsData.missions && missionsData.missions.length > 0 ? (
           missionsData.missions.map((mission, index) => (
@@ -44,7 +44,7 @@ interface TestMissionResultItemProps {
 
 function TestMissionResultItem({ testId, mission, index }: TestMissionResultItemProps) {
   return (
-    <Link href={`/tests/${testId}/result/missions/${mission.id}`}>
+    <Link href={`/tests/${testId}/result/missions/${mission.id}`} aria-label={`${mission.name} 미션 상세 결과 보기`}>
       <Card className="flex cursor-pointer flex-col md:p-2">
         <CardHeader className="p-4 md:p-6 md:pb-2">
           <CardTitle className="flex items-center gap-2 text-lg font-bold">

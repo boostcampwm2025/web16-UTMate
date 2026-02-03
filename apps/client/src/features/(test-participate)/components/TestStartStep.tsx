@@ -37,7 +37,7 @@ export function TestStartStep({ testInfo, onStart, isLoading }: TestStartStepPro
       <CardContent className="space-y-6">
         {/* 테스트 개요 */}
         <div className="space-y-2">
-          <h3 className="font-semibold">테스트 개요</h3>
+          <h2 className="font-semibold">테스트 개요</h2>
           <p className="text-muted-foreground text-sm">{testInfo.description}</p>
         </div>
 
@@ -55,7 +55,7 @@ export function TestStartStep({ testInfo, onStart, isLoading }: TestStartStepPro
 
         {/* 권한 동의 설명 */}
         <div className="bg-muted space-y-3 rounded-lg p-4">
-          <h4 className="font-semibold">권한 동의 안내</h4>
+          <h3 className="font-semibold">권한 동의 안내</h3>
           <ul className="text-muted-foreground space-y-2 text-sm">
             <li>• 테스트 진행 중 사용자 행동 데이터가 수집됩니다.</li>
             <li>• 수집된 데이터는 테스트 분석 목적으로만 사용됩니다.</li>
@@ -74,7 +74,13 @@ export function TestStartStep({ testInfo, onStart, isLoading }: TestStartStepPro
         </div>
 
         {/* 시작 버튼 */}
-        <Button onClick={handleStart} disabled={!agreedToTerms || isLoading} className="w-full" size="lg">
+        <Button
+          onClick={handleStart}
+          disabled={!agreedToTerms || isLoading}
+          className="w-full"
+          size="lg"
+          aria-label="테스트 시작하기"
+        >
           {isLoading ? '시작 중...' : '테스트 시작하기'}
         </Button>
       </CardContent>
