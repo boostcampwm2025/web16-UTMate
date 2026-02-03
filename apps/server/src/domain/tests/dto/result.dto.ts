@@ -313,7 +313,7 @@ export class MissionResultOverviewDetailDto extends MissionResultOverviewDto {
 }
 
 export class MissionOverviewDetailDto extends MissionOverviewDto {
-  missionResults: MissionResultOverviewDetailDto[];
+  declare missionResults: MissionResultOverviewDetailDto[];
 
   static fromEntity(missions: Mission) {
     const dto = new MissionOverviewDetailDto();
