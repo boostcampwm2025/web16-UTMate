@@ -1,6 +1,8 @@
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 
+import { initRecorder } from '../../src/recorder';
+
 interface IRRWebEvent {
   type: number;
   data?: Record<string, unknown>;
@@ -17,14 +19,22 @@ declare global {
 vi.mock('@rrweb/record', () => ({
   record: vi.fn(({ emit }) => {
     // expose the emit function so we can simulate rrweb events in tests
-    globalThis.simulateRRWebEvent = emit;
+    (globalThis as unknown as { simulateRRWebEvent: typeof emit }).simulateRRWebEvent = emit;
     return () => {}; // return stop function
   }),
 }));
 
 export const server = setupServer();
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' });
+
+  // Expose UTMateRecorder globally to bypass dynamic script loading in tests
+  (window as Window & { UTMateRecorder?: unknown }).UTMateRecorder = {
+    initRecorder,
+  };
+});
+
 afterEach(() => {
   server.resetHandlers();
   vi.clearAllMocks();
@@ -32,7 +42,5 @@ afterEach(() => {
   localStorage.clear();
   document.body.innerHTML = '';
 });
-afterAll(() => server.close());
 
-// Mock constants if needed, but we can also just use the ones from the file
-// if they are exported. (They are imported in index.ts)
+afterAll(() => server.close());

@@ -17,7 +17,7 @@
     }
   },
   "scripts": {
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && BUILD_TARGET=recorder vite build",
     "dev": "vite build --watch",
     "preview": "vite preview",
     "lint": "eslint .",
