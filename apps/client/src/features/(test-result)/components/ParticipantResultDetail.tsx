@@ -19,6 +19,7 @@ import { generateNicknameFromId } from '@/shared/utils/nickname';
 
 import { MissionStatusBadge } from './MissionStatusBadge';
 import { UAInfoDisplay } from './UAInfoDisplay';
+import { AnomalyTags } from './AnomalyTags';
 import { getParticipantDetail } from '../apis/client';
 import { formatDate } from '../utils/dates';
 import { PersonaTag } from './PersonaTag';
@@ -110,6 +111,7 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
         <TableHeader>
           <TableRow className="hover:bg-transparent">
             <TableHead>미션명</TableHead>
+            <TableHead>이상현상</TableHead>
             <TableHead className="text-center">결과</TableHead>
             <TableHead>피드백</TableHead>
             <TableHead className="text-right">소요시간</TableHead>
@@ -118,7 +120,7 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
         <TableBody>
           {participant.missionResults.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-muted-foreground py-8 text-center">
+              <TableCell colSpan={5} className="text-muted-foreground py-8 text-center">
                 미션 수행 기록이 없습니다.
               </TableCell>
             </TableRow>
@@ -150,6 +152,14 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
                   }
                 >
                   <TableCell className="font-medium">{missionResult.missionTitle}</TableCell>
+                  <TableCell>
+                    <AnomalyTags
+                      totalIdleTime={missionResult.totalIdleTime}
+                      rageClickCount={missionResult.rageClickCount}
+                      mouseThrashingCount={missionResult.mouseThrashingCount}
+                      compact
+                    />
+                  </TableCell>
                   <TableCell className="text-center">
                     <MissionStatusBadge status={missionResult.status} />
                   </TableCell>
