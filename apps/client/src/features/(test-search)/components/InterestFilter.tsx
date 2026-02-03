@@ -57,8 +57,8 @@ export function InterestFilter({ selectedInterests, onInterestToggle }: Interest
       <Label>관심사</Label>
       <Button variant="outline" onClick={toggle} className="rounded-full px-2 font-normal">
         {selectedInterests.length > 0
-          ? selectedInterests.length > 3
-            ? `${selectedInterests[0]}, ${selectedInterests[1]} 외 ${selectedInterests.length - 2}`
+          ? selectedInterests.length > 2
+            ? `${selectedInterests[0]} 외 ${selectedInterests.length - 1}`
             : selectedInterests.join(', ')
           : '모두'}
         <Plus className="text-muted-foreground h-4 w-4" />
