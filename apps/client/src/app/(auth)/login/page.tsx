@@ -1,8 +1,13 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 import { LoginForm } from '@/features/(auth)/components/LoginForm';
 import { UTMateCarousel } from '@/features/(auth)/components/UTMateCarousel';
-import { Logo } from '@/shared/components/Logo';
+
+export const metadata: Metadata = {
+  title: '로그인 | UTMate',
+  description: 'UTMate에 로그인하고 더 많은 서비스를 이용해보세요.',
+};
 
 export default function LoginPage() {
   return (

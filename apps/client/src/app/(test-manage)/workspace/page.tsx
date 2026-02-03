@@ -1,4 +1,10 @@
 import { RecentTestSection } from '@/features/(test-manage)/components/RecentTestSection';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '워크스페이스 | UTMate',
+  description: '나의 테스트를 관리하고 결과를 확인하세요.',
+};
 
 //TODO : 로그인한 사용자만 접근 가능하도록 프록시에서 처리
 export default function WorkspacePage() {

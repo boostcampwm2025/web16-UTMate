@@ -20,8 +20,33 @@ if (
 }
 
 export const metadata: Metadata = {
-  title: 'UTMate',
-  description: '당신을 위한 사용성 테스트 솔루션',
+  title: 'UTMate | 사용성 테스트 플랫폼',
+  description: '세상에서 제일 쉬운 사용성 테스트 플랫폼, UTMate',
+  keywords: [
+    'UT',
+    'usability testing',
+    'user testing',
+    'UX',
+    'remote testing',
+    '사용성 테스트',
+    'UTMate',
+  ],
+  openGraph: {
+    title: 'UTMate | 사용성 테스트 플랫폼',
+    description: '세상에서 제일 쉬운 사용성 테스트 플랫폼, UTMate',
+    url: 'https://utmate.me',
+    siteName: 'UTMate',
+    locale: 'ko_KR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'UTMate | 사용성 테스트 플랫폼',
+    description: '세상에서 제일 쉬운 사용성 테스트 플랫폼, UTMate',
+  },
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
