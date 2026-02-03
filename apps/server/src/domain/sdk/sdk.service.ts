@@ -1,5 +1,5 @@
-import { Readable } from 'stream';
-import * as zlib from 'zlib';
+import { Readable } from 'node:stream';
+import * as zlib from 'node:zlib';
 
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import Redis from 'ioredis/built/Redis';

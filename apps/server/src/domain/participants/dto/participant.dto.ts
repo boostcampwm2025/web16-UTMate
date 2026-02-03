@@ -15,8 +15,6 @@ export class ParticipantDto {
   @IsObject()
   missionResults: MissionResultDto[];
 
-  constructor() {}
-
   static fromEntity(participant: Participant, missionResults: MissionResultDto[]) {
     const dto = new ParticipantDto();
     dto.id = participant.publicId;
