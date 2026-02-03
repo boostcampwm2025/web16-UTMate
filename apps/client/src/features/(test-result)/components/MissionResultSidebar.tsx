@@ -35,8 +35,19 @@ export function MissionResultSidebar({
               <div className="flex items-center gap-2">
                 <AnimalAvatar name={animalName} />
                 <span className="text-gray-900">{nickname}</span>
-                <PersonaTag tags={missionResultData.personaTags} />
               </div>
+            </div>
+            <div>
+              <p className="text-muted-foreground mb-1 font-medium">페르소나</p>
+              {missionResultData.personaTags.length === 1 &&
+              (missionResultData.personaTags[0] === 'GUEST' ||
+                missionResultData.personaTags[0] === '미설정') ? (
+                <span className="text-sm text-gray-500 italic">
+                  {missionResultData.personaTags[0] === 'GUEST' ? '게스트 사용자' : '미설정'}
+                </span>
+              ) : (
+                <PersonaTag tags={missionResultData.personaTags} />
+              )}
             </div>
             <div>
               <p className="text-muted-foreground mb-2 font-medium">사용 환경</p>
