@@ -283,6 +283,9 @@ export class ParticipantResultDetailDto extends ParticipantResultsDto {
 // 미션 결과 상세 조회용 DTO (UA 정보 포함)
 export class MissionResultOverviewDetailDto extends MissionResultOverviewDto {
   uaInfo: UAParser.IResult;
+  totalIdleTime?: number;
+  rageClickCount?: number;
+  mouseThrashingCount?: number;
 
   static fromEntity(missionResult: MissionResult) {
     const dto = new MissionResultOverviewDetailDto();
@@ -290,6 +293,9 @@ export class MissionResultOverviewDetailDto extends MissionResultOverviewDto {
     dto.status = missionResult.status;
     dto.duration = missionResult.duration;
     dto.feedback = missionResult.feedback;
+    dto.totalIdleTime = missionResult.totalIdleTime;
+    dto.rageClickCount = missionResult.rageClickCount;
+    dto.mouseThrashingCount = missionResult.mouseThrashingCount;
 
     dto.participantId = missionResult.participant.publicId;
     dto.uaInfo = missionResult.participant.uaInfo;
