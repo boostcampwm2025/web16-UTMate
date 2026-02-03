@@ -128,6 +128,9 @@ export type MissionResults = {
   participantId: string;
   personaTags: string[];
   uaInfo?: UAInfo;
+  totalIdleTime?: number;
+  rageClickCount?: number;
+  mouseThrashingCount?: number;
 };
 // 참여자 상세 조회는 ParticipantResult와 동일한 구조
 export type ParticipantDetail = ParticipantResult;
