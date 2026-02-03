@@ -42,8 +42,6 @@ export class MissionResultDetailDto {
   @IsOptional()
   analysisData?: AnalyzerResult;
 
-  constructor() {}
-
   static fromMissionResultEntity(missionResult: MissionResult, presignedUrl: string) {
     const dto = new MissionResultDetailDto();
     dto.id = missionResult.publicId;

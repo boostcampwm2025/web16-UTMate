@@ -44,8 +44,6 @@ export class SearchTestResultDto {
 
   tags: string[] = [];
 
-  constructor() {}
-
   static fromTestEntity(test: Test) {
     const dto = new SearchTestResultDto();
     dto.id = test.publicId;
@@ -72,8 +70,6 @@ export class SearchTestResultDto {
 export class SearchTestResponseDto {
   tests: SearchTestResultDto[];
   totalPage: number;
-
-  constructor() {}
 
   static fromTestEntities(tests: Test[], totalPage: number) {
     const dto = new SearchTestResponseDto();
