@@ -1,10 +1,10 @@
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { server } from '../vitest.setup';
+import { EVENT_SEND_INTERVAL, SERVER_URL } from '../../src/constants';
+import { decompress } from '../../src/utils/compression';
 
-import { decompress } from './utils/compression';
-import { EVENT_SEND_INTERVAL, SERVER_URL } from './constants';
+import { server } from './setup';
 
 // 모듈의 IIFE를 트리거하기 위해 모듈을 다시 임포트해야 할 수 있습니다.
 // Vitest는 이를 위해 vi.resetModules()를 제공합니다.
@@ -34,7 +34,7 @@ describe('SDK 통합 테스트', () => {
     });
 
     // 임포트 시 IIFE가 실행됨
-    await import('./index');
+    await import('../../src/index');
 
     // 토큰이 sessionStorage에 저장되었는지 확인
     expect(sessionStorage.getItem('utmate-auth')).toBe(token);
@@ -45,7 +45,7 @@ describe('SDK 통합 테스트', () => {
   });
 
   it('토큰이 없으면 기록을 시작하지 않아야 한다', async () => {
-    await import('./index');
+    await import('../../src/index');
 
     const { record } = await import('@rrweb/record');
     expect(record).not.toHaveBeenCalled();
@@ -68,7 +68,7 @@ describe('SDK 통합 테스트', () => {
     // alert 모킹
     const alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
 
-    await import('./index');
+    await import('../../src/index');
 
     await vi.waitFor(() => {
       expect(verifyCalled).toHaveBeenCalled();
@@ -118,7 +118,7 @@ describe('SDK 통합 테스트', () => {
       }),
     );
 
-    await import('./index');
+    await import('../../src/index');
 
     // rrweb 이벤트 시뮬레이션
     const mockEvent = { type: 3, data: {}, timestamp: Date.now() };
@@ -161,7 +161,7 @@ describe('SDK 통합 테스트', () => {
       }),
     );
 
-    await import('./index');
+    await import('../../src/index');
 
     // 큐에 이벤트 추가
     globalThis.simulateRRWebEvent({ type: 3 });
@@ -204,7 +204,7 @@ describe('SDK 통합 테스트', () => {
       }),
     );
 
-    await import('./index');
+    await import('../../src/index');
 
     // 큐에 이벤트 추가
     globalThis.simulateRRWebEvent({ type: 3 });
@@ -238,7 +238,7 @@ describe('SDK 통합 테스트', () => {
       }),
     );
 
-    await import('./index');
+    await import('../../src/index');
 
     // rrweb 이벤트 시뮬레이션
     const mockEvent = { type: 3, data: {}, timestamp: Date.now() };
@@ -293,7 +293,7 @@ describe('SDK 통합 테스트', () => {
       }),
     );
 
-    await import('./index');
+    await import('../../src/index');
 
     // 이벤트 추가
     globalThis.simulateRRWebEvent({ type: 3 });
