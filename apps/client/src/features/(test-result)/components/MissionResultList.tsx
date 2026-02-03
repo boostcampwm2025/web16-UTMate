@@ -16,6 +16,7 @@ import { generateNicknameFromId } from '@/shared/utils/nickname';
 
 import { MissionStatusBadge } from './MissionStatusBadge';
 import { UAInfoDisplay } from './UAInfoDisplay';
+import { AnomalyTags } from './AnomalyTags';
 import { formatTimestamp } from '../utils/format';
 import type { MissionDetail } from '../types';
 import { PersonaTag } from './PersonaTag';
@@ -39,6 +40,7 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
         <TableRow className="hover:bg-transparent">
           <TableHead>참여자</TableHead>
           <TableHead>사용 환경</TableHead>
+          <TableHead>이상현상</TableHead>
           <TableHead className="text-center">결과</TableHead>
           <TableHead>피드백</TableHead>
           <TableHead className="text-right">소요시간</TableHead>
@@ -47,7 +49,7 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
       <TableBody>
         {!missionLogs.missionResults || missionLogs.missionResults.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={5} className="text-muted-foreground py-8 text-center">
+            <TableCell colSpan={6} className="text-muted-foreground py-8 text-center">
               해당 미션에 대한 결과가 없습니다.
             </TableCell>
           </TableRow>
@@ -81,6 +83,15 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
 
                 <TableCell>
                   <UAInfoDisplay uaInfo={missionResult.uaInfo} compact />
+                </TableCell>
+
+                <TableCell>
+                  <AnomalyTags
+                    totalIdleTime={missionResult.totalIdleTime}
+                    rageClickCount={missionResult.rageClickCount}
+                    mouseThrashingCount={missionResult.mouseThrashingCount}
+                    compact
+                  />
                 </TableCell>
 
                 <TableCell className="text-center">
