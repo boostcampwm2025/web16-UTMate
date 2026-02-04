@@ -22,6 +22,34 @@ export interface ParticipantMissionResult {
   duration?: number;
   feedback?: string | null;
   createdAt?: string;
+  totalIdleTime?: number;
+  rageClickCount?: number;
+  mouseThrashingCount?: number;
+}
+
+export interface UAInfo {
+  ua: string;
+  browser: {
+    name?: string;
+    version?: string;
+    major?: string;
+  };
+  engine: {
+    name?: string;
+    version?: string;
+  };
+  os: {
+    name?: string;
+    version?: string;
+  };
+  device: {
+    vendor?: string;
+    model?: string;
+    type?: string;
+  };
+  cpu: {
+    architecture?: string;
+  };
 }
 
 export interface ParticipantResult {
@@ -29,6 +57,8 @@ export interface ParticipantResult {
   personaTags: string[];
   joinedAt: string;
   missionResults: ParticipantMissionResult[];
+  uaInfo?: UAInfo;
+  feedback?: string;
 }
 
 // 주요 피드백 관련 타입 추가
@@ -71,6 +101,9 @@ export type MissionResultDetail = {
   rageClickCount?: number;
   mouseThrashingCount?: number;
   analysisData?: AnalyzerResult;
+  participantId: string;
+  personaTags: string[];
+  uaInfo?: UAInfo;
 };
 
 export type MissionDetail = {
@@ -97,6 +130,10 @@ export type MissionResults = {
   feedback?: string;
   participantId: string;
   personaTags: string[];
+  uaInfo?: UAInfo;
+  totalIdleTime?: number;
+  rageClickCount?: number;
+  mouseThrashingCount?: number;
 };
 // 참여자 상세 조회는 ParticipantResult와 동일한 구조
 export type ParticipantDetail = ParticipantResult;

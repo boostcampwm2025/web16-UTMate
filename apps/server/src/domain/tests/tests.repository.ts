@@ -309,6 +309,8 @@ export class TestsRepository {
       .leftJoinAndSelect('tests.missions', 'missions')
       .leftJoinAndSelect('missions.missionResults', 'missionResults')
       .leftJoinAndSelect('missionResults.participant', 'participant')
+      .leftJoinAndSelect('participant.user', 'participantUser')
+      .leftJoinAndSelect('participantUser.persona', 'participantPersona')
       .where('tests.publicId = :publicId', { publicId })
       .orderBy('missions.order', 'ASC')
       .getOne();
