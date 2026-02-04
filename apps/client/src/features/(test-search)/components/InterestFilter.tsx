@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 import { Interest } from '@/features/(auth)/types/persona';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { cn } from '@/shared/utils';
 import { Button } from '@/shared/components/ui/button';
+import { ResponsiveDialog } from '@/shared/components/ResponsiveDialog';
 import { useToggle } from '@/shared/hooks/useToggle';
 
 const INTEREST_EMOJI_MAP: Record<Interest, string> = {
@@ -49,55 +49,47 @@ interface InterestFilterProps {
 }
 
 export function InterestFilter({ selectedInterests, onInterestToggle }: InterestFilterProps) {
-  const [isExpanded, toggle] = useToggle(false);
+  const [isOpen, toggle, setIsOpen] = useToggle(false);
   const interests = Object.values(Interest);
 
   return (
-    <div className="flex-1 space-y-2">
-      <div className="flex items-center justify-between">
-        <Label>관심사</Label>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggle}
-          className="text-muted-foreground h-8 px-2 text-xs"
-        >
-          {isExpanded ? (
-            <>
-              접기 <ChevronUp className="ml-1 h-3 w-3" />
-            </>
-          ) : (
-            <>
-              더보기 <ChevronDown className="ml-1 h-3 w-3" />
-            </>
-          )}
-        </Button>
-      </div>
-      <div
-        className={cn(
-          'flex flex-wrap gap-2 overflow-hidden transition-[max-height] duration-400',
-          isExpanded ? 'max-h-[400px]' : 'max-h-[68px]',
-        )}
+    <div className="flex flex-col justify-between">
+      <Label>관심사</Label>
+      <Button variant="outline" onClick={toggle} className="rounded-full px-2 font-normal">
+        {selectedInterests.length > 0
+          ? selectedInterests.length > 2
+            ? `${selectedInterests[0]} 외 ${selectedInterests.length - 1}`
+            : selectedInterests.join(', ')
+          : '모두'}
+        <Plus className="text-muted-foreground h-4 w-4" />
+      </Button>
+      <ResponsiveDialog
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        title="관심사"
+        description="관심사를 선택해주세요."
       >
-        {interests.map((interest) => {
-          const isSelected = selectedInterests.includes(interest);
+        <div className="flex flex-wrap gap-2 p-2">
+          {interests.map((interest) => {
+            const isSelected = selectedInterests.includes(interest);
 
-          return (
-            <Badge
-              key={interest}
-              variant="outline"
-              className={cn(
-                'bg-card cursor-pointer px-2 py-1 text-sm font-medium transition-colors',
-                isSelected && 'bg-primary text-primary-foreground',
-              )}
-              onClick={() => onInterestToggle(interest)}
-            >
-              <span className="mr-1.5">{INTEREST_EMOJI_MAP[interest]}</span>
-              {interest}
-            </Badge>
-          );
-        })}
-      </div>
+            return (
+              <Badge
+                key={interest}
+                variant="outline"
+                className={cn(
+                  'bg-card cursor-pointer px-2 py-1 text-sm font-medium transition-colors',
+                  isSelected && 'bg-primary text-primary-foreground',
+                )}
+                onClick={() => onInterestToggle(interest)}
+              >
+                <span className="mr-1.5">{INTEREST_EMOJI_MAP[interest]}</span>
+                {interest}
+              </Badge>
+            );
+          })}
+        </div>
+      </ResponsiveDialog>
     </div>
   );
 }
