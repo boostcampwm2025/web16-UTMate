@@ -42,6 +42,16 @@ export class MissionResultDetailDto {
   @IsOptional()
   analysisData?: AnalyzerResult;
 
+  // 참여자 정보
+  @IsString()
+  participantId: string;
+
+  @IsOptional()
+  personaTags: string[] = [];
+
+  @IsOptional()
+  uaInfo: UAParser.IResult;
+
   constructor() {}
 
   static fromMissionResultEntity(missionResult: MissionResult, presignedUrl: string) {
@@ -56,6 +66,23 @@ export class MissionResultDetailDto {
     dto.rageClickCount = missionResult.rageClickCount;
     dto.mouseThrashingCount = missionResult.mouseThrashingCount;
     dto.analysisData = missionResult.analysisData;
+
+    // 참여자 정보 추가
+    dto.participantId = missionResult.participant.publicId;
+    dto.uaInfo = missionResult.participant.uaInfo;
+
+    if (missionResult.participant.userType === 'REGISTERED' && missionResult.participant.user) {
+      if (missionResult.participant.user.persona) {
+        dto.personaTags.push(missionResult.participant.user.persona.gender);
+        dto.personaTags.push(missionResult.participant.user.persona.ageGroup);
+        dto.personaTags.push(...missionResult.participant.user.persona.interests);
+      } else {
+        dto.personaTags.push('미설정');
+      }
+    } else {
+      dto.personaTags.push('GUEST');
+    }
+
     return dto;
   }
 }

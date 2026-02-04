@@ -5,7 +5,7 @@ import { UpdateMissionDto } from './dto/update-mission.dto';
 import { Mission } from './entities/mission.entity';
 import { MissionRepository } from './missions.repository';
 
-import { MissionOverviewDto } from '#domain/tests/dto/result.dto';
+import { MissionOverviewDetailDto } from '#domain/tests/dto/result.dto';
 
 @Injectable()
 export class MissionsService {
@@ -67,6 +67,6 @@ export class MissionsService {
       throw new NotFoundException('Mission not found');
     }
 
-    return MissionOverviewDto.fromEntity(mission);
+    return MissionOverviewDetailDto.fromEntity(mission);
   }
 }

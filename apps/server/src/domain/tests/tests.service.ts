@@ -9,7 +9,13 @@ import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';
 import { DataSource } from 'typeorm';
 
-import { MainFeedbackDto, ParticipantResultsDto, TestMissionsResultsDto } from './dto/result.dto';
+import {
+  MainFeedbackDto,
+  ParticipantResultsDto,
+  ParticipantResultDetailDto,
+  TestMissionsResultsDto,
+  MissionOverviewDetailDto,
+} from './dto/result.dto';
 import { SearchTestQueryDto, SearchTestResponseDto } from './dto/search-test.dto';
 import { TestDto } from './dto/test.dto';
 import { TestResultSummaryDto } from './dto/test-result-summary.dto';
@@ -356,7 +362,7 @@ export class TestsService {
     if (!test.participants || test.participants.length === 0) {
       throw new NotFoundException('Participant not found');
     }
-    return ParticipantResultsDto.fromEntity(test.participants[0], test.missions);
+    return ParticipantResultDetailDto.fromEntity(test.participants[0], test.missions);
   }
 
   /**
