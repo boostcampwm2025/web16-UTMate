@@ -742,6 +742,8 @@ export const resultHandlers = [
       totalIdleTime: 2300,
       rageClickCount: 3,
       mouseThrashingCount: 1,
+      participantId: 'tester-1',
+      personaTags: ['GUEST'],
       analysisData: {
         startTime: BASE_TIME + 1000,
         endTime: BASE_TIME + 16600,
