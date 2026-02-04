@@ -1,11 +1,11 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AnalyzerService } from '../analyzer.service';
 
-describe('SdkService', () => {
+describe('AnalyzerService', () => {
   let service: AnalyzerService;
 
   beforeEach(async () => {

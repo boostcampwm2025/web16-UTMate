@@ -1,4 +1,4 @@
-import { Readable } from 'stream';
+import { Readable } from 'node:stream';
 
 import { UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -8,19 +8,19 @@ import { SdkService } from '../sdk.service';
 
 import { SDK_AUTH_REDIS } from '#common/redis/redis.module';
 import { StorageService } from '#common/storage/storage.service';
-import { TestsService } from '#domain/tests/tests.service';
+import { TestsCommandService } from '#domain/tests/services/tests-command.service';
 
 describe('SdkService', () => {
   let service: SdkService;
   let storageService: StorageService;
-  let testsService: TestsService;
+  let testsCommandService: TestsCommandService;
   let sdkAuthRedis: Redis;
 
   const mockStorageService = {
     save: jest.fn(),
   };
 
-  const mockTestsService = {
+  const mockTestsCommandService = {
     verifySdkInstallationBySDK: jest.fn(),
   };
 
@@ -33,14 +33,14 @@ describe('SdkService', () => {
       providers: [
         SdkService,
         { provide: StorageService, useValue: mockStorageService },
-        { provide: TestsService, useValue: mockTestsService },
+        { provide: TestsCommandService, useValue: mockTestsCommandService },
         { provide: SDK_AUTH_REDIS, useValue: mockSdkAuthRedis },
       ],
     }).compile();
 
     service = module.get<SdkService>(SdkService);
     storageService = module.get<StorageService>(StorageService);
-    testsService = module.get<TestsService>(TestsService);
+    testsCommandService = module.get<TestsCommandService>(TestsCommandService);
     sdkAuthRedis = module.get(SDK_AUTH_REDIS);
 
     jest.clearAllMocks();
@@ -114,17 +114,19 @@ describe('SdkService', () => {
     it('TestsService의 verifySdkInstallationBySDK를 호출해야 한다', async () => {
       const testPublicId = 'test-123';
 
-      mockTestsService.verifySdkInstallationBySDK.mockResolvedValue(undefined);
+      mockTestsCommandService.verifySdkInstallationBySDK.mockResolvedValue(undefined);
 
       await service.verifySdkInstallation(testPublicId);
 
-      expect(testsService.verifySdkInstallationBySDK).toHaveBeenCalledWith(testPublicId);
+      expect(testsCommandService.verifySdkInstallationBySDK).toHaveBeenCalledWith(testPublicId);
     });
 
     it('TestsService에서 예외가 발생하면 전파해야 한다', async () => {
       const testPublicId = 'invalid-test';
 
-      mockTestsService.verifySdkInstallationBySDK.mockRejectedValue(new Error('Test not found'));
+      mockTestsCommandService.verifySdkInstallationBySDK.mockRejectedValue(
+        new Error('Test not found'),
+      );
 
       await expect(service.verifySdkInstallation(testPublicId)).rejects.toThrow('Test not found');
     });

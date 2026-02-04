@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { S3StorageService } from './s3-storage.service';
 
@@ -7,7 +7,7 @@ import { S3StorageService } from './s3-storage.service';
  */
 @Controller('/storage')
 export class StorageController {
-  constructor(@Inject() private storageService: S3StorageService) {}
+  constructor(private readonly storageService: S3StorageService) {}
 
   @Get('/file/*testFile')
   async getTestFile(@Param('testFile') testFile: string[]) {

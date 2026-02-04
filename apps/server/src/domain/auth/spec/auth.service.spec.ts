@@ -47,7 +47,7 @@ describe('AuthService', () => {
       const tokenDto: TokenDto = { accessToken: 'access', refreshToken: 'refresh' };
 
       usersService.registerOrUpdateUser.mockResolvedValue(publicId);
-      jest.spyOn(global.crypto, 'randomUUID').mockReturnValue(familyId);
+      jest.spyOn(globalThis.crypto, 'randomUUID').mockReturnValue(familyId);
       tokenService.generateTokenPair.mockResolvedValue(tokenDto);
       refreshTokenService.saveRefreshToken.mockResolvedValue(undefined);
 

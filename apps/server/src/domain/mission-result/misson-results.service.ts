@@ -79,7 +79,7 @@ export class MissionResultsService {
       throw new NotFoundException('미션 결과를 찾을 수 없습니다.');
     }
 
-    const fileName = `replay_logs/${missionResult.publicId}.log.jsonl`;
+    const fileName = this.getFilename(missionResult.publicId);
     try {
       const logBuffer = await this.storageService.getBufferByFilename(fileName);
       const s3FileName = await this.s3StorageService.uploadToS3(fileName, logBuffer);
@@ -183,10 +183,15 @@ export class MissionResultsService {
         continue;
       }
       if (missionResult.status === MissionResultStatus.IN_PROGRESS) {
-        await this.createMissionResultRecord(missionResult.publicId);
+        await this.storageService.deleteByFilename(this.getFilename(missionResult.publicId), false);
+        await this.sdkAuthRedis.del(missionResult.publicId);
       }
       missionResult.drop();
     }
     await this.missionResultsRepository.saveAll(missionResults, manager);
+  }
+
+  private getFilename(publicId: string) {
+    return `replay_logs/${publicId}.log.jsonl`;
   }
 }

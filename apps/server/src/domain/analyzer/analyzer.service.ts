@@ -57,7 +57,7 @@ export class AnalyzerService {
   private analyzeDuration(events: eventWithTime[]) {
     if (events.length === 0) return { startTime: 0, endTime: 0 };
     const startTime = events[0].timestamp;
-    const endTime = events[events.length - 1].timestamp;
+    const endTime = events.at(-1)!.timestamp;
     return { startTime, endTime };
   }
 
@@ -132,33 +132,41 @@ export class AnalyzerService {
 
     const rageClicks: EventCluster[] = [];
 
-    for (let pivot = 0; pivot < clickDatas.length; pivot++) {
+    let pivot = 0;
+
+    while (pivot < clickDatas.length) {
       let clusterCount = 1;
+      let lastIncludedIndex = pivot;
+
       for (let candidate = pivot + 1; candidate < clickDatas.length; candidate++) {
-        // 처음 클릭과의 시간 차이 확인
+        // 시간 차이 확인 (시간 초과 시 그룹화 종료)
         if (clickDatas[candidate].timestamp - clickDatas[pivot].timestamp > RAGE_CLICK_TIMEFRAME) {
           break;
         }
-        // 좌표 거리 계산
+
+        // 좌표 거리 계산 (거리가 멀면 클러스터 카운트 제외하지만 탐색은 계속)
         if (
           Math.abs(clickDatas[candidate].x - clickDatas[pivot].x) > RAGE_CLICK_MAX_DISTANCE ||
           Math.abs(clickDatas[candidate].y - clickDatas[pivot].y) > RAGE_CLICK_MAX_DISTANCE
         ) {
-          // 너무 멀리 떨어진 클릭은 클러스터에 포함하지 않으나 계속 탐색
           continue;
         }
+
         clusterCount++;
+        lastIncludedIndex = candidate; // 마지막 인덱스 갱신
       }
 
-      // 클러스터 내 클릭 수가 최소 기준 이상인 경우 rage click으로 간주
       if (clusterCount >= RAGE_CLICK_MIN_CLICKS) {
         rageClicks.push({
           startTime: clickDatas[pivot].timestamp,
-          endTime: clickDatas[pivot + clusterCount - 1].timestamp,
+          endTime: clickDatas[lastIncludedIndex].timestamp,
           count: clusterCount,
         });
-        pivot += clusterCount - 1; // 이미 카운트된 클릭들은 건너뜀
+
+        // 기준을 마지막 인덱스로 이동
+        pivot = lastIncludedIndex;
       }
+      pivot++;
     }
 
     // 3초 이내 중복된 rage click 통합
@@ -208,8 +216,11 @@ export class AnalyzerService {
 
     const trashings: EventCluster[] = [];
 
-    for (let pivot = 0; pivot < mouseMoveEvents.length; pivot++) {
+    let pivot = 0;
+    while (pivot < mouseMoveEvents.length) {
       let clusterCount = 1;
+      let lastIncludedIndex = pivot;
+
       // 1초 이내의 이벤트 카운팅
       for (let candidate = pivot + 1; candidate < mouseMoveEvents.length; candidate++) {
         // 처음 움직임과의 시간 차이 확인
@@ -220,9 +231,12 @@ export class AnalyzerService {
           break;
         }
         clusterCount++;
+        lastIncludedIndex = candidate; // 마지막 인덱스 갱신
       }
+
       // 데이터가 너무 적으면 분석 스킵 ( 노이즈 가능성 높음 )
       if (clusterCount < MOUSE_THRASHING_MIN_EVENTS) {
+        pivot++;
         continue;
       }
 
@@ -237,8 +251,9 @@ export class AnalyzerService {
           startTime: mouseMoveEvents[pivot].timestamp,
           endTime: mouseMoveEvents[pivot + clusterCount - 1].timestamp,
         });
-        pivot += clusterCount - 1; // 이미 카운트된 움직임들은 건너뜀
+        pivot = lastIncludedIndex; // 기준을 마지막 인덱스로 이동
       }
+      pivot++;
     }
 
     // 3초 이내 중복된 마우스 스러싱 통합
@@ -274,7 +289,7 @@ export class AnalyzerService {
 
     // 변위 계산
     const start = points[0];
-    const end = points[points.length - 1];
+    const end = points.at(-1)!;
     const displacement = this.getDistance(start, end);
 
     // 비율 계산 (변위가 0인 경우 100으로 설정 - ArithmeticException 방지 )

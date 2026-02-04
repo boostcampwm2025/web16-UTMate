@@ -17,8 +17,6 @@ export class MissionResultDto {
   @IsString()
   missionId: string;
 
-  constructor() {}
-
   static fromMissionResultEntity(missionResult: MissionResult) {
     const dto = new MissionResultDto();
     dto.id = missionResult.publicId;

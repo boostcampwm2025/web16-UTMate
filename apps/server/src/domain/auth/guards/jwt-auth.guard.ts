@@ -39,7 +39,7 @@ export class JwtAuthGuard extends AuthGuard(JWT) {
 
     // hanldeRequset
     if (err) {
-      throw err || new UnauthorizedException();
+      throw err ?? new UnauthorizedException();
     }
     return user;
   }

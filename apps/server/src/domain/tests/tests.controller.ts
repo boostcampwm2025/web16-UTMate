@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Inject,
   Param,
   ParseEnumPipe,
   Post,
@@ -19,8 +18,12 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { AddMemberDto } from './dto/member.dto';
 import { SearchTestQueryDto } from './dto/search-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
+import { TestsCommandService } from './services/tests-command.service';
+import { TestsMemberService } from './services/tests-member.service';
+import { TestsParticipantService } from './services/tests-participant.service';
+import { TestsQueryService } from './services/tests-query.service';
+import { TestsResultService } from './services/tests-result.service';
 import { TestStatus } from './enums';
-import { TestsService } from './tests.service';
 
 import { UserId } from '#domain/auth/decorator/param.decorator';
 import { JwtAuthGuard } from '#domain/auth/guards/jwt-auth.guard';
@@ -28,36 +31,46 @@ import { OptionalJwtAuthGuard } from '#domain/auth/guards/optional-jwt-auth.guar
 
 @Controller('tests')
 export class TestsController {
-  constructor(@Inject() private readonly testsService: TestsService) {}
+  constructor(
+    private readonly testsCommandService: TestsCommandService,
+    private readonly testsQueryService: TestsQueryService,
+    private readonly testsResultService: TestsResultService,
+    private readonly testsParticipantService: TestsParticipantService,
+    private readonly testsMemberService: TestsMemberService,
+  ) {}
+
+  // -- Test 조회 Endpoints --
 
   @Get()
   @UseGuards(JwtAuthGuard)
   async getTests(@UserId() userId: number) {
-    const tests = await this.testsService.getMyTests(userId);
+    const tests = await this.testsQueryService.getMyTests(userId);
     return tests;
   }
 
   @Get('/search')
   async searchTests(@Query() query: SearchTestQueryDto) {
-    return this.testsService.searchTestsByQuery(query);
+    return this.testsQueryService.searchTestsByQuery(query);
   }
 
   @Get('/:id')
   @UseGuards(OptionalJwtAuthGuard)
   async getTestById(@UserId() userId: number | undefined, @Param('id') publicId: string) {
-    return this.testsService.getTestById(userId, publicId);
+    return this.testsQueryService.getTestById(userId, publicId);
   }
 
   @Get('/:id/sdkStatus')
   @UseGuards(JwtAuthGuard)
   async getSdkStatus(@UserId() userId: number, @Param('id') publicId: string) {
-    return this.testsService.getSdkStatus(userId, publicId);
+    return this.testsQueryService.getSdkStatus(userId, publicId);
   }
+
+  // -- Test 관리 Endpoints --
 
   @Post()
   @UseGuards(JwtAuthGuard)
   async createTest(@UserId() userId: number, @Body() body: CreateTestDto) {
-    const testId = await this.testsService.createTest(userId, body.title);
+    const testId = await this.testsCommandService.createTest(userId, body.title);
     return { testId };
   }
 
@@ -68,14 +81,14 @@ export class TestsController {
     @Param('id') publicId: string,
     @Body() updateTestDto: UpdateTestDto,
   ) {
-    return await this.testsService.updateTest(userId, publicId, updateTestDto);
+    return await this.testsCommandService.updateTest(userId, publicId, updateTestDto);
   }
 
   @Post('/:id/verify-sdk')
   @UseGuards(JwtAuthGuard)
   async verifySdk(@UserId() userId: number, @Param('id') publicId: string) {
     // SDK 검증 로직은 서비스 레이어에서 구현
-    return this.testsService.verifySdkInstallation(userId, publicId);
+    return this.testsCommandService.verifySdkInstallation(userId, publicId);
   }
 
   @Post('/:id/status')
@@ -85,14 +98,16 @@ export class TestsController {
     @Param('id') publicId: string,
     @Body('status', new ParseEnumPipe(TestStatus)) status: TestStatus,
   ) {
-    return await this.testsService.updateTestStatus(userId, publicId, status);
+    return await this.testsCommandService.updateTestStatus(userId, publicId, status);
   }
 
   @Delete('/:id')
   @UseGuards(JwtAuthGuard)
   async deleteTest(@UserId() userId: number, @Param('id') publicId: string) {
-    return await this.testsService.deleteTest(userId, publicId);
+    return await this.testsCommandService.deleteTest(userId, publicId);
   }
+
+  // -- Test 참여 Endpoints --
 
   @Post('/:id/participants')
   @UseGuards(OptionalJwtAuthGuard)
@@ -105,31 +120,33 @@ export class TestsController {
     const parser = new UAParser(uaString);
     const uaInfo = parser.getResult();
 
-    return this.testsService.participateTest(userId, publicId, uaInfo);
+    return this.testsParticipantService.participateTest(userId, publicId, uaInfo);
   }
+
+  // -- Test 결과 조회 Endpoints --
 
   @Get('/:id/result')
   @UseGuards(JwtAuthGuard)
   async getTestResultSummary(@UserId() userId: number, @Param('id') publicId: string) {
-    return this.testsService.getTestResultSummary(userId, publicId);
+    return this.testsResultService.getTestResultSummary(userId, publicId);
   }
 
   @Get('/:id/result/participants')
   @UseGuards(JwtAuthGuard)
   async getTestParticipantsResults(@UserId() userId: number, @Param('id') publicId: string) {
-    return this.testsService.getTestParticipantsResults(userId, publicId);
+    return this.testsResultService.getTestParticipantsResults(userId, publicId);
   }
 
   @Get('/:id/result/missions')
   @UseGuards(JwtAuthGuard)
   async getTestMissionsResults(@UserId() userId: number, @Param('id') publicId: string) {
-    return this.testsService.getTestMissionsResults(userId, publicId);
+    return this.testsResultService.getTestMissionsResults(userId, publicId);
   }
 
   @Get('/:id/result/mainfeedback')
   @UseGuards(JwtAuthGuard)
   async getTestMainFeedback(@UserId() userId: number, @Param('id') publicId: string) {
-    return this.testsService.getTestMainFeedback(userId, publicId);
+    return this.testsResultService.getTestMainFeedback(userId, publicId);
   }
 
   @Get('/:id/result/participants/:participantId')
@@ -139,8 +156,10 @@ export class TestsController {
     @Param('id') publicId: string,
     @Param('participantId') participantId: string,
   ) {
-    return this.testsService.getTestParticipantDetail(userId, publicId, participantId);
+    return this.testsResultService.getTestParticipantDetail(userId, publicId, participantId);
   }
+
+  // -- Test Member 관리 Endpoints --
 
   @Post('/:id/members')
   @UseGuards(JwtAuthGuard)
@@ -149,7 +168,7 @@ export class TestsController {
     @Param('id') publicId: string,
     @Body() addMemberDto: AddMemberDto,
   ) {
-    return this.testsService.addMember(userId, publicId, addMemberDto.memberId);
+    return this.testsMemberService.addMember(userId, publicId, addMemberDto.memberId);
   }
 
   @Delete('/:id/members/:memberId')
@@ -159,6 +178,6 @@ export class TestsController {
     @Param('id') publicId: string,
     @Param('memberId') memberId: string,
   ) {
-    return this.testsService.removeMember(userId, publicId, memberId);
+    return this.testsMemberService.removeMember(userId, publicId, memberId);
   }
 }

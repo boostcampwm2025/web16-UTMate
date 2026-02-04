@@ -46,8 +46,6 @@ export class TestDto {
   @IsEnum(Interest, { each: true })
   targetInterests: Interest[];
 
-  constructor() {}
-
   static fromTestEntity(test: Test) {
     const dto = new TestDto();
     dto.publicId = test.publicId;
