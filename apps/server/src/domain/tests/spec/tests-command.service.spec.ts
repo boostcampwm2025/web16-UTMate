@@ -76,6 +76,7 @@ describe('TestsCommandService', () => {
       mockTest.id = 1;
       mockTest.publicId = 'test-123';
       mockTest.title = '원래 제목';
+      mockTest.status = TestStatus.DRAFT;
       mockTest.updateTestInfo = jest.fn();
       mockTest.updateTargeting = jest.fn();
 

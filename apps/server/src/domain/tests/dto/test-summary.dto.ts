@@ -41,6 +41,7 @@ export class TestSummaryDto {
       dto.owner = new UserSummaryDto();
 
       // 데모 테스트의 소유자는 고정값으로 설정
+      dto.owner.publicId = 'demo-owner';
       dto.owner.avatarUrl = 'https://utmate.me/images/icons/penguin.webp';
       dto.owner.username = 'UTMate Demo';
       dto.members = [];

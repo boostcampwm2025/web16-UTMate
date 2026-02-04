@@ -59,7 +59,7 @@ export class UsersService {
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    return UserSummaryDto.fromUserEntity(user);
+    return UserSummaryDto.fromUserEntityWithEmail(user);
   }
 
   /**
