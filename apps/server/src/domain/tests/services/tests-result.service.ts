@@ -1,6 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { MainFeedbackDto, ParticipantResultsDto, TestMissionsResultsDto } from '../dto/result.dto';
+import {
+  MainFeedbackDto,
+  ParticipantResultDetailDto,
+  ParticipantResultsDto,
+  TestMissionsResultsDto,
+} from '../dto/result.dto';
 import { TestResultSummaryDto } from '../dto/test-result-summary.dto';
 import { TestsRepository } from '../tests.repository';
 
@@ -83,7 +88,7 @@ export class TestsResultService {
     if (!test.participants || test.participants.length === 0) {
       throw new NotFoundException('Participant not found');
     }
-    return ParticipantResultsDto.fromEntity(test.participants[0], test.missions);
+    return ParticipantResultDetailDto.fromEntity(test.participants[0], test.missions);
   }
 
   /**
