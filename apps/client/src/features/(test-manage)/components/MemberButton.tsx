@@ -22,6 +22,8 @@ export function MemberButton({ isDemo, testId, owner, members }: MemberButtonPro
   const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
+    if (isDemo) return;
+
     await confirm(
       '테스트 멤버 관리',
       '테스트 멤버를 추가하여 테스트를 공유할 수 있습니다.',
