@@ -192,9 +192,6 @@ importers:
       '@rrweb/record':
         specifier: 2.0.0-alpha.18
         version: 2.0.0-alpha.18
-      pako:
-        specifier: ^2.1.0
-        version: 2.1.0
     devDependencies:
       '@org/eslint-config':
         specifier: workspace:*
@@ -220,9 +217,6 @@ importers:
       '@types/node':
         specifier: ^25.2.0
         version: 25.2.0
-      '@types/pako':
-        specifier: ^2.0.3
-        version: 2.0.4
       '@vitest/coverage-v8':
         specifier: ^4.0.18
         version: 4.0.18(vitest@4.0.17(@opentelemetry/api@1.9.0)(@types/node@25.2.0)(jiti@2.6.1)(jsdom@27.4.0)(msw@2.12.7(@types/node@25.2.0)(typescript@5.9.3))(terser@5.44.1))
@@ -2945,9 +2939,6 @@ packages:
 
   '@types/oauth@0.9.6':
     resolution: {integrity: sha512-H9TRCVKBNOhZZmyHLqFt9drPM9l+ShWiqqJijU1B8P3DX3ub84NjxDuy+Hjrz+fEca5Kwip3qPMKNyiLgNJtIA==}
-
-  '@types/pako@2.0.4':
-    resolution: {integrity: sha512-VWDCbrLeVXJM9fihYodcLiIv0ku+AlOa/TQ1SvYOaBuyrSKgEcro95LJyIsJ4vSo6BXIxOKxiJAat04CmST9Fw==}
 
   '@types/passport-github2@1.2.9':
     resolution: {integrity: sha512-/nMfiPK2E6GKttwBzwj0Wjaot8eHrM57hnWxu52o6becr5/kXlH/4yE2v2rh234WGvSgEEzIII02Nc5oC5xEHA==}
@@ -5695,9 +5686,6 @@ packages:
 
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
-
-  pako@2.1.0:
-    resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
 
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
@@ -10243,8 +10231,6 @@ snapshots:
     dependencies:
       '@types/node': 22.19.6
 
-  '@types/pako@2.0.4': {}
-
   '@types/passport-github2@1.2.9':
     dependencies:
       '@types/express': 5.0.6
@@ -13695,8 +13681,6 @@ snapshots:
   p-try@2.2.0: {}
 
   package-json-from-dist@1.0.1: {}
-
-  pako@2.1.0: {}
 
   parent-module@1.0.1:
     dependencies:

@@ -1,5 +1,15 @@
+import { CompressionStream, DecompressionStream } from 'node:stream/web';
+
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
+
+import { initRecorder } from '../../src/recorder';
+
+// jsdom 환경에서는 global에 이 API들이 없을 수 있으므로 수동으로 할당
+if (typeof global.CompressionStream === 'undefined') {
+  global.CompressionStream = CompressionStream as any;
+  global.DecompressionStream = DecompressionStream as any;
+}
 
 interface IRRWebEvent {
   type: number;
@@ -17,14 +27,22 @@ declare global {
 vi.mock('@rrweb/record', () => ({
   record: vi.fn(({ emit }) => {
     // expose the emit function so we can simulate rrweb events in tests
-    globalThis.simulateRRWebEvent = emit;
+    (globalThis as unknown as { simulateRRWebEvent: typeof emit }).simulateRRWebEvent = emit;
     return () => {}; // return stop function
   }),
 }));
 
 export const server = setupServer();
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' });
+
+  // Expose UTMateRecorder globally to bypass dynamic script loading in tests
+  (window as Window & { UTMateRecorder?: unknown }).UTMateRecorder = {
+    initRecorder,
+  };
+});
+
 afterEach(() => {
   server.resetHandlers();
   vi.clearAllMocks();
@@ -32,7 +50,5 @@ afterEach(() => {
   localStorage.clear();
   document.body.innerHTML = '';
 });
-afterAll(() => server.close());
 
-// Mock constants if needed, but we can also just use the ones from the file
-// if they are exported. (They are imported in index.ts)
+afterAll(() => server.close());
