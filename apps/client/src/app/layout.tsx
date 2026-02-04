@@ -59,7 +59,10 @@ export default function RootLayout({
       <body className="antialiased">
         <MSWProvider>
           <NuqsAdapter>
-            <QueryClientProviders>{children}</QueryClientProviders>
+            <QueryClientProviders>
+              {children}
+              <DialogProvider />
+            </QueryClientProviders>
           </NuqsAdapter>
         </MSWProvider>
 
@@ -67,7 +70,6 @@ export default function RootLayout({
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID as string} />
         )}
         {process.env.NEXT_PUBLIC_GA_ID && <WebVitalsCollector />}
-        <DialogProvider />
       </body>
       <script async src="https://utmate.me/sdk/utmate-sdk.iife.js"></script>
     </html>
