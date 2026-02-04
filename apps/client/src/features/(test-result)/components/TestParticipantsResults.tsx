@@ -18,6 +18,7 @@ import { formatDistanceToNow } from '../utils/dates';
 import { getTestParticipantsResults } from '../apis/client';
 import type { ParticipantResult } from '../types';
 import { PersonaTag } from './PersonaTag';
+import { UAInfoDisplay } from './UAInfoDisplay';
 
 export function TestParticipantsResults({ testId }: { testId: string }) {
   const { data: participants } = useSuspenseQuery({
@@ -64,10 +65,11 @@ function ParticipantItem({
             {nickname}
             <PersonaTag tags={participant.personaTags} />
           </CardTitle>
-          <CardDescription className="mt-1">
-            <p className="tex-xs text-muted-foreground mt-1">
+          <CardDescription className="mt-2 space-y-1">
+            <p className="text-muted-foreground text-xs">
               {formatDistanceToNow(participant.joinedAt)}
             </p>
+            <UAInfoDisplay uaInfo={participant.uaInfo} compact />
           </CardDescription>
         </CardHeader>
         <CardContent className="my-auto">
