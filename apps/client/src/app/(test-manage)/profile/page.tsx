@@ -164,7 +164,7 @@ export default function ProfilePage() {
               </AvatarFallback>
             </Avatar>
             <div className="space-y-1">
-              <h3 className="text-2xl font-semibold">{user.username}</h3>
+              <h2 className="text-2xl font-semibold">{user.username}</h2>
               {user.email && <p className="text-muted-foreground text-sm">{user.email}</p>}
             </div>
           </div>
@@ -254,6 +254,8 @@ export default function ProfilePage() {
                       ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
                       : 'border-input bg-background hover:bg-accent hover:text-accent-foreground'
                   }`}
+                  aria-label={`${option.label} 관심사 ${persona.interests.includes(option.key) ? '선택됨' : '선택'}`}
+                  aria-pressed={persona.interests.includes(option.key)}
                 >
                   {option.label}
                 </button>
@@ -282,7 +284,7 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          <Button onClick={handleSavePersona} disabled={isSaving}>
+          <Button onClick={handleSavePersona} disabled={isSaving} aria-label="페르소나 저장">
             {isSaving ? '저장 중...' : '페르소나 저장'}
           </Button>
         </CardContent>
@@ -299,7 +301,7 @@ export default function ProfilePage() {
         <CardContent>
           <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="destructive">회원 탈퇴</Button>
+              <Button variant="destructive" aria-label="회원 탈퇴 확인 대화상자 열기">회원 탈퇴</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -322,10 +324,16 @@ export default function ProfilePage() {
                   variant="outline"
                   onClick={() => setDeleteDialogOpen(false)}
                   disabled={isDeleting}
+                  aria-label="회원 탈퇴 취소"
                 >
                   취소
                 </Button>
-                <Button variant="destructive" onClick={handleDeleteAccount} disabled={isDeleting}>
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting}
+                  aria-label="회원 탈퇴 확정"
+                >
                   {isDeleting ? '탈퇴 처리 중...' : '탈퇴하기'}
                 </Button>
               </DialogFooter>

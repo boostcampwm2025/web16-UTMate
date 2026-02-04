@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Plus, Minus } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
@@ -23,6 +24,8 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
   const [memberList, setMemberList] = useState<UserSummary[]>(members);
   const [error, setError] = useState<string | null>(null);
   const [searchResult, setSearchResult] = useState<UserSummary | null>(null);
+
+  const queryClient = useQueryClient();
 
   // 검색 버튼 클릭 시 (실제 구현시 API 연동 필요)
   const handleSearch = async () => {
@@ -53,6 +56,7 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
     try {
       await addMemberToTest(testId, user.publicId);
       setMemberList([...memberList, user]);
+      queryClient.invalidateQueries({ queryKey: ['tests'] }); // 내 테스트 목록을 다시 가져오기
       setSearchResult(null);
       setInput('');
       setError(null);
@@ -66,6 +70,7 @@ export function MemberManager({ testId, members, owner }: MemberModalProps) {
     try {
       await removeMemberFromTest(testId, user.publicId);
       setMemberList(memberList.filter((m) => m.publicId !== user.publicId));
+      queryClient.invalidateQueries({ queryKey: ['tests'] }); // 내 테스트 목록을 다시 가져오기
     } catch (error) {
       setError('멤버 삭제에 실패했습니다. 다시 시도해주세요.');
     }

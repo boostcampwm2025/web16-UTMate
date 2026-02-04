@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { CreatePersonaDto, PersonaResponseDto, UpdatePersonaDto } from './dto/persona.dto';
 import { SearchUserDto } from './dto/search-user.dto';
@@ -14,6 +15,7 @@ export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly personaRepository: PersonaRepository,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   /**
@@ -42,6 +44,7 @@ export class UsersService {
     // 사용자가 존재하지 않는 경우 새로 등록
     const user = oauthUser.toUserEntity();
     await this.usersRepository.save(user);
+    this.eventEmitter.emit('user.registered', user);
     return user.publicId;
   }
 
@@ -56,7 +59,7 @@ export class UsersService {
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    return UserSummaryDto.fromUserEntity(user);
+    return UserSummaryDto.fromUserEntityWithEmail(user);
   }
 
   /**

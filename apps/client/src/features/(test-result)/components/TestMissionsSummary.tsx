@@ -52,6 +52,7 @@ export function TestMissionsSummary({ testId }: TestMissionsSummaryProps) {
               key={mission.publicId}
               href={`/tests/${testId}/result/missions/${mission.publicId}`}
               className="block rounded-lg p-2 transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
+              aria-label={`${mission.order}번 미션 상세 결과 보기`}
             >
               <MissionSummaryItem mission={mission} />
             </Link>

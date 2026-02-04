@@ -2,9 +2,13 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Test } from './entities/test.entity';
+import { TestsCommandService } from './services/tests-command.service';
+import { TestsMemberService } from './services/tests-member.service';
+import { TestsParticipantService } from './services/tests-participant.service';
+import { TestsQueryService } from './services/tests-query.service';
+import { TestsResultService } from './services/tests-result.service';
 import { TestsController } from './tests.controller';
 import { TestsRepository } from './tests.repository';
-import { TestsService } from './tests.service';
 
 import { MissionResultModule } from '#domain/mission-result/mission-results.module';
 import { MissionModule } from '#domain/missions/missions.module';
@@ -20,7 +24,14 @@ import { UsersModule } from '#domain/users/users.module';
     UsersModule,
   ],
   controllers: [TestsController],
-  providers: [TestsService, TestsRepository],
-  exports: [TestsService],
+  providers: [
+    TestsQueryService,
+    TestsCommandService,
+    TestsResultService,
+    TestsParticipantService,
+    TestsMemberService,
+    TestsRepository,
+  ],
+  exports: [TestsCommandService],
 })
 export class TestsModule {}

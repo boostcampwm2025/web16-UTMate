@@ -35,6 +35,7 @@ export function TestMainFeedback({ testId }: TestMainFeedbackProps) {
                 key={feedback.participantId}
                 href={`/tests/${testId}/result/participants/${feedback.participantId}`}
                 className="hover:bg-accent hover:text-accent-foreground block rounded-lg p-2 transition-all duration-200"
+                aria-label={`${generateNicknameFromId(feedback.participantId)} 참여자 결과 보기`}
               >
                 <MainFeedbackItem feedback={feedback} />
               </Link>
@@ -60,13 +61,13 @@ function MainFeedbackItem({ feedback }: MainFeedbackItemProps) {
 
       {/* 피드백 내용 */}
       <div className="min-w-0 flex-1">
-        <div className="mb-1 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-900">{nickname}</span>
+        <div className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+            <span className="shrink-0 text-sm font-medium text-gray-900">{nickname}</span>
             <PersonaTag tags={feedback.personaTags} />
           </div>
 
-          <span className="text-muted-foreground text-xs">
+          <span className="text-muted-foreground shrink-0 text-xs">
             {formatDistanceToNow(feedback.createdAt)}
           </span>
         </div>

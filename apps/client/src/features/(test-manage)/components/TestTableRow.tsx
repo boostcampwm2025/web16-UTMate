@@ -31,7 +31,19 @@ export function TestTableRow({ test }: TestTableRowProps) {
   };
 
   return (
-    <TableRow onClick={handleRowClick} className="cursor-pointer">
+    <TableRow
+      onClick={handleRowClick}
+      className="cursor-pointer"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleRowClick();
+        }
+      }}
+      aria-label={`${test.title} 테스트 ${test.status === TestStatus.DRAFT ? '편집' : '결과 보기'}`}
+    >
       <TableCell className="text-left">
         <div className="font-medium text-gray-900">{test.title}</div>
       </TableCell>
@@ -42,7 +54,12 @@ export function TestTableRow({ test }: TestTableRowProps) {
         <IntegrationButton url={test.url} sdkStatus={test.sdkStatus} testId={test.publicId} />
       </TableCell>
       <TableCell className="text-center" onClick={handleActionClick}>
-        <MemberButton testId={test.publicId} owner={test.owner} members={test.members} />
+        <MemberButton
+          isDemo={test.status === TestStatus.DEMO}
+          testId={test.publicId}
+          owner={test.owner}
+          members={test.members}
+        />
       </TableCell>
 
       {/* TODO: 테스트 참여자 수 표시 */}

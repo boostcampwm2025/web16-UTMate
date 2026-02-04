@@ -3,7 +3,7 @@
 import { Info, Link, Clock } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { formatDuration } from '../utils/format';
+import { formatDurationFromMilliSeconds } from '../utils/format';
 import { MetricCard } from './MetricCard';
 import type { MissionDetail } from '../types';
 
@@ -45,7 +45,7 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
                 <Clock size={16} /> 예상 소요 시간
               </h3>
               <div className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-900">
-                {formatDuration(missionLogs.estimatedDuration)}
+                {formatDurationFromMilliSeconds(missionLogs.estimatedDuration)}
               </div>
             </div>
             <div>
@@ -68,9 +68,9 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
 
         {/* Performance Metrics Section */}
         <div className="px-6">
-          <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900">
             성과 지표
-          </h3>
+          </h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
             <MetricCard
               label="성공률"
@@ -94,11 +94,7 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
             />
             <MetricCard
               label="평균 소요 시간"
-              value={formatDuration(
-                missionLogs.averageDuration != null
-                  ? missionLogs.averageDuration / 1000 / 60
-                  : null,
-              )}
+              value={formatDurationFromMilliSeconds(missionLogs.averageDuration)}
               description={
                 <MetricExplanation
                   formula="∑(완료 미션 소요 시간) ÷ 완료 미션 수"
@@ -109,11 +105,7 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
 
             <MetricCard
               label="평균 유휴 시간"
-              value={formatDuration(
-                missionLogs.averageIdleTime != null
-                  ? missionLogs.averageIdleTime / 1000 / 60
-                  : null,
-              )}
+              value={formatDurationFromMilliSeconds(missionLogs.averageIdleTime)}
               description={
                 <MetricExplanation
                   formula="∑(10초 이상 무동작 시간) ÷ 전체 미션 수"
@@ -124,11 +116,7 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
 
             <MetricCard
               label="평균 분노 클릭"
-              value={
-                missionLogs.averageRageClickCount != null
-                  ? `${missionLogs.averageRageClickCount}회`
-                  : '-'
-              }
+              value={`${missionLogs.averageRageClickCount.toFixed(1)}회`}
               description={
                 <MetricExplanation
                   formula="1초 이내 3회 이상 클릭 (거리 100px 이내)"
@@ -138,12 +126,8 @@ export function MissionInfo({ missionLogs }: MissionInfoProps) {
             />
 
             <MetricCard
-              label="마우스 스래싱"
-              value={
-                missionLogs.averageMouseThrashingCount != null
-                  ? `${missionLogs.averageMouseThrashingCount}회`
-                  : '-'
-              }
+              label="평균 마우스 스레싱"
+              value={`${missionLogs.averageMouseThrashingCount.toFixed(1)}회`}
               description={
                 <MetricExplanation
                   formula="1초 이내 급격한 마우스 이동 (거리 500px, 굴곡도 5 이상)"

@@ -31,6 +31,6 @@ export class OptionalJwtAuthGuard extends AuthGuard(JWT) {
       }
       throw new UnauthorizedException('토큰이 유효하지 않습니다.');
     }
-    return user || undefined;
+    return user;
   }
 }

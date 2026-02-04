@@ -20,7 +20,19 @@ interface TestSearchResultItemProps {
 
 export function TestSearchResultItem({ test, onClick }: TestSearchResultItemProps) {
   return (
-    <Card className="group flex h-full cursor-pointer flex-col gap-4" onClick={onClick}>
+    <Card
+      className="group flex h-full cursor-pointer flex-col gap-4"
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      aria-label={`${test.title} 테스트 상세 보기`}
+    >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div>

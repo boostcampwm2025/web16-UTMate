@@ -1,8 +1,13 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 import { LoginForm } from '@/features/(auth)/components/LoginForm';
 import { UTMateCarousel } from '@/features/(auth)/components/UTMateCarousel';
-import { Logo } from '@/shared/components/Logo';
+
+export const metadata: Metadata = {
+  title: '로그인 | UTMate',
+  description: 'UTMate에 로그인하고 더 많은 서비스를 이용해보세요.',
+};
 
 export default function LoginPage() {
   return (
@@ -11,7 +16,7 @@ export default function LoginPage() {
       <div className="relative flex flex-col bg-white px-8 lg:px-16 xl:px-24">
         {/* 상단 헤더 (로고 ) */}
         <div className="flex items-center justify-between pt-8 pb-12">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2" aria-label="UTMate 홈으로 이동">
             <span className="text-primary text-2xl font-black tracking-tighter">UT</span>
           </Link>
         </div>

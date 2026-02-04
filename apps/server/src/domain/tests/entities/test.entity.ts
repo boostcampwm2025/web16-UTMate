@@ -11,16 +11,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { TestStatus } from '../enums';
+
 import { AgeRange, Gender, Interest } from '#common/enums';
 import { Mission } from '#domain/missions/entities/mission.entity';
 import { Participant } from '#domain/participants/entities/participant.entity';
 import { User } from '#domain/users/entities/user.entity';
-
-export enum TestStatus {
-  DRAFT = 'DRAFT',
-  PUBLISHED = 'PUBLISHED',
-  ARCHIVED = 'ARCHIVED',
-}
 
 @Entity('tests')
 export class Test {
@@ -135,9 +131,7 @@ export class Test {
       throw new Error('미션이 확인되지 않아 테스트를 게시할 수 없습니다.');
     }
 
-    if (!this.startDate) {
-      this.startDate = new Date();
-    }
+    this.startDate ??= new Date();
     this.endDate = undefined;
     this.status = TestStatus.PUBLISHED;
   }

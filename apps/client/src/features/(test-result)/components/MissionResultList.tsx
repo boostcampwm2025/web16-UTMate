@@ -15,6 +15,8 @@ import { AnimalAvatar } from '@/shared/components/AnimalAvatar';
 import { generateNicknameFromId } from '@/shared/utils/nickname';
 
 import { MissionStatusBadge } from './MissionStatusBadge';
+import { UAInfoDisplay } from './UAInfoDisplay';
+import { AnomalyTags } from './AnomalyTags';
 import { formatTimestamp } from '../utils/format';
 import type { MissionDetail } from '../types';
 import { PersonaTag } from './PersonaTag';
@@ -37,6 +39,8 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
       <TableHeader>
         <TableRow className="hover:bg-transparent">
           <TableHead>참여자</TableHead>
+          <TableHead>사용 환경</TableHead>
+          <TableHead>이상현상</TableHead>
           <TableHead className="text-center">결과</TableHead>
           <TableHead>피드백</TableHead>
           <TableHead className="text-right">소요시간</TableHead>
@@ -45,7 +49,7 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
       <TableBody>
         {!missionLogs.missionResults || missionLogs.missionResults.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={4} className="text-muted-foreground py-8 text-center">
+            <TableCell colSpan={6} className="text-muted-foreground py-8 text-center">
               해당 미션에 대한 결과가 없습니다.
             </TableCell>
           </TableRow>
@@ -59,11 +63,35 @@ export function MissionResultList({ testId, missionLogs }: MissionResultListProp
                 key={missionResult.id}
                 onClick={() => handleRowClick(missionResult.id)}
                 className="cursor-pointer transition-colors hover:bg-gray-50/50"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleRowClick(missionResult.id);
+                  }
+                }}
+                aria-label={`${nickname} 참여자의 미션 결과 상세 보기`}
               >
-                <TableCell className="flex items-center gap-2 font-medium">
-                  <AnimalAvatar name={animalName} />
-                  {nickname}
-                  <PersonaTag tags={missionResult.personaTags} />
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <AnimalAvatar name={animalName} />
+                    {nickname}
+                    <PersonaTag tags={missionResult.personaTags} />
+                  </div>
+                </TableCell>
+
+                <TableCell>
+                  <UAInfoDisplay uaInfo={missionResult.uaInfo} compact />
+                </TableCell>
+
+                <TableCell>
+                  <AnomalyTags
+                    totalIdleTime={missionResult.totalIdleTime}
+                    rageClickCount={missionResult.rageClickCount}
+                    mouseThrashingCount={missionResult.mouseThrashingCount}
+                    compact
+                  />
                 </TableCell>
 
                 <TableCell className="text-center">

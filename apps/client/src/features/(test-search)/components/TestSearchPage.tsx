@@ -13,6 +13,7 @@ import { searchTests } from '../api/client';
 import { SearchFilter } from './SearchFilter';
 import { TestSearchResultItem } from './TestSearchResultItem';
 import { NumberlessPaginationWithText } from './NumberlessPagiantion';
+import { PersonaButton } from './PersonaButton';
 import type { SearchTestResult } from '../types';
 
 export function TestSearchPage() {
@@ -66,15 +67,15 @@ export function TestSearchPage() {
   };
 
   return (
-    <main className="h-full w-full bg-gray-50 p-6">
+    <main className="h-full w-full bg-gray-50 p-4">
       <div className="flex flex-col space-y-4">
         <div className="w-full">
-          <h2 className="text-2xl font-semibold text-gray-800">테스트 탐색</h2>
+          <h1 className="text-2xl font-semibold text-gray-800">테스트 탐색</h1>
           <p className="text-muted-foreground">당신을 기다리고 있는 UT를 찾아보세요.</p>
         </div>
 
         {/* Filters */}
-        <div className="w-full">
+        <div className="flex w-full flex-col items-start justify-between gap-4 md:flex-row">
           <SearchFilter
             gender={(gender as Gender) || undefined}
             ageGroup={(ageGroup as AgeGroup) || undefined}
@@ -83,6 +84,7 @@ export function TestSearchPage() {
             onAgeGroupChange={handleAgeGroupChange}
             onInterestToggle={handleInterestToggle}
           />
+          <PersonaButton />
         </div>
 
         {/* Main Content */}

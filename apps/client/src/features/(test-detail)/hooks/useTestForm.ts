@@ -13,9 +13,11 @@ import type { Interest } from '@/features/(auth)/types';
 import { TestFormStep } from '../components/TestFormSidebar';
 import { testFormSchema, type TestFormValues } from '../schemas/testForm';
 import { MAX_MISSIONS } from '../constants';
+import { useDialogStore } from '@/shared/stores/useDialogStore';
 
 export function useTestForm(initialData: TestDetail) {
   const router = useRouter();
+  const confirm = useDialogStore((state) => state.confirm);
 
   // UI 상태
   const [step, setStep] = useState<TestFormStep>(TestFormStep.TEST_INFO);
@@ -203,8 +205,14 @@ export function useTestForm(initialData: TestDetail) {
 
       await minLoadingTime;
 
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
+      if (missionsWithOrder.length > 0) {
+        await confirm(
+          '테스트 초안작성이 완료되었습니다.',
+          '테스트가 사용자를 기다리고 있어요. 테스트 목록 페이지에서 테스트를 배포 상태로 전환하고 테스트를 공유해보세요.',
+          undefined,
+          { hasCancel: false, confirmText: '확인' },
+        );
+      }
 
       router.push(`/tests/${initialData.publicId}`);
     } catch (err) {

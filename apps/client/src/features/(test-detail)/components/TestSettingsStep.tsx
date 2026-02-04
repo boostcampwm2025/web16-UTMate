@@ -1,21 +1,8 @@
 'use client';
 
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
-import { Label } from '@/shared/components/ui/label';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
+import { Button } from '@/shared/components/ui/button';
 import {
   INTEREST_OPTIONS,
   GENDER_OPTIONS,
@@ -23,6 +10,7 @@ import {
 } from '@/features/(auth)/constants/interests';
 import type { Interest } from '@/features/(auth)/types';
 import type { TestFormValues } from '../schemas/testForm';
+import { cn } from '@/shared/utils';
 
 interface TestSettingsStepProps {
   register: UseFormRegister<TestFormValues>;
@@ -63,186 +51,174 @@ export function TestSettingsStep({
     }
   };
 
-  // 모두 선택/해제 핸들러
+  const isAllGenderSelected =
+    GENDER_OPTIONS.length > 0 && GENDER_OPTIONS.every((opt) => targetGender.includes(opt.value));
+
+  const handleGenderSelectAll = () => {
+    if (isAllGenderSelected) {
+      onTargetGenderChange([]);
+    } else {
+      onTargetGenderChange(GENDER_OPTIONS.map((opt) => opt.value));
+    }
+  };
+
+  const isAllAgeGroupSelected =
+    AGE_GROUP_OPTIONS.length > 0 &&
+    AGE_GROUP_OPTIONS.every((opt) => targetAgeGroup.includes(opt.value));
+
   const handleAgeGroupSelectAll = () => {
-    const allSelected = AGE_GROUP_OPTIONS.every((opt) => targetAgeGroup.includes(opt.value));
-    if (allSelected) {
+    if (isAllAgeGroupSelected) {
       onTargetAgeGroupChange([]);
     } else {
       onTargetAgeGroupChange(AGE_GROUP_OPTIONS.map((opt) => opt.value));
     }
   };
 
-  const handleInterestSelectAll = () => {
-    const allSelected = INTEREST_OPTIONS.every((opt) => targetInterests.includes(opt.key));
-    if (allSelected) {
-      onToggleInterest(INTEREST_OPTIONS[0].key); // 첫 항목만 남기기 위해 전체 해제 후 하나씩
-      INTEREST_OPTIONS.forEach((opt) => {
-        if (targetInterests.includes(opt.key)) {
-          onToggleInterest(opt.key);
-        }
-      });
-    } else {
-      INTEREST_OPTIONS.forEach((opt) => {
-        if (!targetInterests.includes(opt.key)) {
-          onToggleInterest(opt.key);
-        }
-      });
-    }
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <div>
-        <h2 className="text-2xl font-bold">테스트 설정</h2>
-        <p className="text-muted-foreground mt-2">
-          테스트에 참여할 타겟 사용자 페르소나를 설정하세요.
-        </p>
+        <h2 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">테스트 설정</h2>
+        <p className="text-gray-500">테스트 공개범위와 타겟 사용자를 설정하세요.</p>
       </div>
 
-      {/* 공개 범위 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>공개 범위</CardTitle>
-          <CardDescription>테스트 공개 여부를 선택하세요</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => onIsPublicChange(true)}
-              className={`flex-1 cursor-pointer rounded-lg border-2 p-4 text-center font-medium transition-colors ${
-                isPublic
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-input hover:bg-accent'
-              }`}
-            >
-              공개
-            </button>
-            <button
-              type="button"
+      <FieldGroup className="gap-10">
+        {/* 공개 범위 */}
+        <Field>
+          <FieldLabel className="text-base">공개 범위 *</FieldLabel>
+          <div className="flex w-full gap-3">
+            <SelectionButton
+              selected={!isPublic}
               onClick={() => onIsPublicChange(false)}
-              className={`flex-1 cursor-pointer rounded-lg border-2 p-4 text-center font-medium transition-colors ${
-                !isPublic
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-input hover:bg-accent'
-              }`}
+              className="flex-1"
             >
               비공개
-            </button>
-          </div>
-          <p
-            className={`mt-3 text-sm ${isPublic ? 'text-muted-foreground' : 'font-semibold text-blue-600'}`}
-          >
-            {isPublic
-              ? '모든 사용자가 이 테스트를 검색하고 참여할 수 있습니다.'
-              : '링크를 공유한 사용자만 이 테스트에 참여할 수 있습니다.'}
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* 성별 설정 - 공개인 경우에만 활성화 */}
-      <Card className={!isPublic ? 'opacity-50' : ''}>
-        <CardHeader>
-          <CardTitle>
-            성별 <span className="text-destructive">*</span>
-          </CardTitle>
-          <CardDescription>중복선택 가능 (필수)</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            {GENDER_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => toggleGender(option.value)}
-                disabled={!isPublic}
-                className={`flex-1 cursor-pointer rounded-lg border-2 p-4 text-center font-medium transition-colors ${
-                  targetGender.includes(option.value)
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-input hover:bg-accent'
-                } ${!isPublic ? 'cursor-not-allowed' : ''}`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 연령대 설정 - 공개인 경우에만 활성화 */}
-      <Card className={!isPublic ? 'opacity-50' : ''}>
-        <CardHeader>
-          <CardTitle>
-            연령대 <span className="text-destructive">*</span>
-          </CardTitle>
-          <CardDescription>중복선택 가능 (필수)</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={handleAgeGroupSelectAll}
-              disabled={!isPublic}
-              className={`cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-colors ${
-                targetAgeGroup.length === AGE_GROUP_OPTIONS.length
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-input hover:bg-accent'
-              } ${!isPublic ? 'cursor-not-allowed' : ''}`}
+            </SelectionButton>
+            <SelectionButton
+              selected={isPublic}
+              onClick={() => onIsPublicChange(true)}
+              className="flex-1"
             >
-              {targetAgeGroup.length === AGE_GROUP_OPTIONS.length ? '모두 취소' : '모두 선택'}
-            </button>
-            {AGE_GROUP_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => toggleAgeGroup(option.value)}
-                disabled={!isPublic}
-                className={`cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-colors ${
-                  targetAgeGroup.includes(option.value)
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-input hover:bg-accent'
-                } ${!isPublic ? 'cursor-not-allowed' : ''}`}
-              >
-                {option.label}
-              </button>
-            ))}
+              공개
+            </SelectionButton>
           </div>
-        </CardContent>
-      </Card>
+          <FieldDescription>
+            {isPublic
+              ? '모든 사용자가 테스트를 검색하고 참여할 수 있어요.'
+              : '테스트 링크를 공유받은 사용자만 테스트에 참여할 수 있어요.'}
+          </FieldDescription>
+        </Field>
 
-      {/* 관심사 설정 - 공개인 경우에만 활성화 */}
-      <Card className={!isPublic ? 'opacity-50' : ''}>
-        <CardHeader>
-          <CardTitle>관심사</CardTitle>
-          <CardDescription>타겟 사용자의 관심사를 선택하세요 (복수 선택 가능)</CardDescription>
-        </CardHeader>
-        <CardContent>
+        {/* 관심사 설정 */}
+        <Field className={cn(!isPublic && 'opacity-50 transition-opacity')}>
+          <FieldLabel className="text-base">주제</FieldLabel>
           <div className="flex flex-wrap gap-2">
             {INTEREST_OPTIONS.map((option) => (
-              <button
+              <Button
                 key={option.key}
                 type="button"
+                variant={targetInterests.includes(option.key) ? 'default' : 'outline'}
+                size="sm"
                 onClick={() => onToggleInterest(option.key)}
                 disabled={!isPublic}
-                className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                  targetInterests.includes(option.key)
-                    ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
-                    : 'border-input bg-background hover:bg-accent hover:text-accent-foreground'
-                } ${!isPublic ? 'cursor-not-allowed' : ''}`}
+                className={cn(
+                  'border-primary rounded-full border px-4 font-medium shadow-none',
+                  !targetInterests.includes(option.key) &&
+                    'border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
+                  !isPublic && 'cursor-not-allowed opacity-50',
+                )}
               >
                 {option.label}
-              </button>
+              </Button>
             ))}
           </div>
-          <p className="text-muted-foreground mt-3 text-sm">
-            선택한 관심사:{' '}
-            {targetInterests.length === 0
-              ? '관심사를 선택하지 않을 시 매칭에 어려움이 있을 수 있습니다.'
-              : `${targetInterests.length}개`}
-          </p>
-        </CardContent>
-      </Card>
+          <FieldDescription>
+            테스트 주제를 선택하면 타겟 사용자의 관심사 기반으로 테스트를 추천해드려요.
+          </FieldDescription>
+        </Field>
+      </FieldGroup>
+
+      {/* 성별 설정 */}
+      <Field className={cn(!isPublic && 'opacity-50 transition-opacity')}>
+        <FieldLabel className="text-base">성별 *</FieldLabel>
+        <div className="flex w-full gap-3">
+          <SelectionButton
+            selected={isAllGenderSelected}
+            onClick={handleGenderSelectAll}
+            disabled={!isPublic}
+            className="flex-1"
+          >
+            모두
+          </SelectionButton>
+          {GENDER_OPTIONS.map((option) => (
+            <SelectionButton
+              key={option.value}
+              selected={targetGender.includes(option.value)}
+              onClick={() => toggleGender(option.value)}
+              disabled={!isPublic}
+              className="flex-1"
+            >
+              {option.label}
+            </SelectionButton>
+          ))}
+        </div>
+        <FieldDescription>중복선택이 가능해요</FieldDescription>
+      </Field>
+
+      {/* 연령대 설정 */}
+      <Field className={cn(!isPublic && 'opacity-50 transition-opacity')}>
+        <FieldLabel className="text-base">연령대 *</FieldLabel>
+        <div className="grid grid-cols-4 gap-3">
+          <SelectionButton
+            selected={isAllAgeGroupSelected}
+            onClick={handleAgeGroupSelectAll}
+            disabled={!isPublic}
+            className="col-span-1"
+          >
+            모두
+          </SelectionButton>
+          {AGE_GROUP_OPTIONS.map((option) => (
+            <SelectionButton
+              key={option.value}
+              selected={targetAgeGroup.includes(option.value)}
+              onClick={() => toggleAgeGroup(option.value)}
+              disabled={!isPublic}
+              className="col-span-1"
+            >
+              {option.label}
+            </SelectionButton>
+          ))}
+        </div>
+        <FieldDescription>중복선택이 가능해요</FieldDescription>
+      </Field>
     </div>
   );
 }
+
+const SelectionButton = ({
+  selected,
+  onClick,
+  children,
+  disabled = false,
+  className,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  disabled?: boolean;
+  className?: string;
+}) => (
+  <Button
+    type="button"
+    variant={selected ? 'default' : 'outline'}
+    onClick={onClick}
+    disabled={disabled}
+    className={cn(
+      'h-12 w-full text-base font-medium transition-all',
+      !selected && 'text-gray-600 hover:text-gray-900',
+      disabled && 'cursor-not-allowed opacity-50',
+      className,
+    )}
+  >
+    {children}
+  </Button>
+);

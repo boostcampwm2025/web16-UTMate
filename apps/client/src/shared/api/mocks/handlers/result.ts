@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse, delay } from 'msw';
 import { CLIENT_BASE_URL } from '@/shared/constants/api';
 import type {
   TestResultSummary,
@@ -256,7 +256,7 @@ const createMainFeedbacksWithRelativeTime = (): MainFeedback[] => {
       participantId: 'tester-1',
       content: '메인 페이지의 디자인이 직관적이어서 사용하기 편리했습니다.',
       createdAt: new Date(now - 1 * HOUR).toISOString(),
-      personaTags: ['GUEST'],
+      personaTags: ['남성', '20대', '교육', '외국어', 'IT'],
     },
     {
       participantId: 'tester-2',
@@ -314,7 +314,7 @@ const mockMissionResults: Record<number, MissionResultWithParticipant[]> = {
       feedback: '매우 만족스러웠습니다.',
       duration: 21808,
       participantId: 'tester-1',
-      personaTags: ['GUEST'],
+      personaTags: ['남성', '20대', '교육', '외국어', 'IT'],
     },
     {
       missionResultId: 'mission-result-2',
@@ -543,12 +543,9 @@ export const resultHandlers = [
   http.get(`${CLIENT_BASE_URL}/tests/:testId/result`, ({ params }) => {
     const { testId } = params;
 
-    console.log('[MSW] Intercepted request for testId:', testId);
-
     const summary = mockTestSummaries.find((s) => s.id === Number(testId));
 
     if (!summary) {
-      console.warn(`[MSW] Summary not found for testId: ${testId}`);
       return new HttpResponse(null, {
         status: 404,
         statusText: 'Summary not found',
@@ -581,13 +578,10 @@ export const resultHandlers = [
   http.get(`${CLIENT_BASE_URL}/missions/:missionId/result`, ({ params }) => {
     const { missionId } = params;
 
-    console.log('[MSW] Intercepted request for missionId:', missionId);
-
     // mission-1 같은 문자열 ID 처리
     if (typeof missionId === 'string' && missionId.startsWith('mission-')) {
       const missionDetail = mockMissionDetail[missionId];
       if (missionDetail) {
-        console.log('[MSW] Returning mission detail:', missionDetail);
         return HttpResponse.json(missionDetail);
       }
     }
@@ -596,12 +590,10 @@ export const resultHandlers = [
     const numericId = Number(missionId);
     if (!isNaN(numericId)) {
       const results = mockMissionResults[numericId] || [];
-      console.log('[MSW] Returning results:', results);
       return HttpResponse.json(results);
     }
 
     // 찾을 수 없는 경우
-    console.warn(`[MSW] Mission detail not found for missionId: ${missionId}`);
     return new HttpResponse(null, {
       status: 404,
       statusText: 'Mission detail not found',
@@ -709,19 +701,12 @@ export const resultHandlers = [
       missions,
     };
 
-    console.log('[MSW] Intercepted request for testId:', testId);
-    console.log('[MSW] Returning missions results:', response);
-
     return HttpResponse.json(response);
   }),
   // GET /tests/:testId/result/participants/:participantId - 특정 참여자 상세 조회
   http.get(`${CLIENT_BASE_URL}/tests/:testId/result/participants/:participantId`, ({ params }) => {
     const { testId, participantId } = params;
     const testIdNum = Number(testId);
-
-    console.log(
-      `[MSW] Intercepted request for participant detail: testId=${testId}, participantId=${participantId}`,
-    );
 
     const participants = mockParticipantResults[testIdNum];
     if (!participants) {
@@ -740,9 +725,12 @@ export const resultHandlers = [
   // GET /mission-results/:id - 미션 결과 상세 조회
   http.get(`${CLIENT_BASE_URL}/mission-results/:id`, ({ params }) => {
     const { id } = params;
-    console.log('[MSW] Intercepted request for mission result detail:', id);
+
+    // 의도적인 딜레이
+    delay(800);
 
     // 모킹 데이터 생성
+    const BASE_TIME = 1768917821307;
     const mockDetail: MissionResultDetail = {
       id: id as string,
       status: 'SUCCESS',
@@ -754,19 +742,21 @@ export const resultHandlers = [
       totalIdleTime: 2300,
       rageClickCount: 3,
       mouseThrashingCount: 1,
+      participantId: 'tester-1',
+      personaTags: ['GUEST'],
       analysisData: {
-        startTime: 1000,
-        endTime: 16600,
+        startTime: BASE_TIME + 1000,
+        endTime: BASE_TIME + 16600,
         timeToFirstInteraction: 1500,
         idleTime: [
-          { timestamp: 2000, duration: 1000 },
-          { timestamp: 8000, duration: 1300 },
+          { timestamp: BASE_TIME + 2500, duration: 1000 },
+          { timestamp: BASE_TIME + 8000, duration: 1300 },
         ],
         rageClickCount: [
-          { timestamp: 5000, duration: 0, count: 2 },
-          { timestamp: 12000, duration: 0, count: 1 },
+          { timestamp: BASE_TIME + 1500, duration: 0, count: 2 },
+          { timestamp: BASE_TIME + 3500, duration: 0, count: 1 },
         ],
-        mouseThrashingCount: [{ timestamp: 9000, duration: 500, count: 1 }],
+        mouseThrashingCount: [{ timestamp: BASE_TIME + 4200, duration: 500, count: 1 }],
       },
     };
 
@@ -777,6 +767,9 @@ export const resultHandlers = [
   http.get(
     'https://kr.object.ncloudstorage.com/mock-bucket/Ey_FDxlnOwx_IGT14hjoW.log.jsonl.gz',
     async () => {
+      // 의도적인 딜레이
+      delay(800);
+
       const logContent = `{"type":0,"data":{},"timestamp":1768917821307}
 {"type":1,"data":{},"timestamp":1768917821308}
 {"type":4,"data":{"href":"https://jammin94.github.io/jamjam94.github.io/?participant-id=Ey_FDxlnOwx_IGT14hjoW&mission-id=7f_kqNJLp6921oNp_8h2G","width":1200,"height":799},"timestamp":1768917821308}

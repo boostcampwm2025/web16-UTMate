@@ -17,6 +17,9 @@ export class ParticipantMissionResultDto {
   duration?: number;
   feedback?: string;
   createdAt?: Date;
+  totalIdleTime?: number;
+  rageClickCount?: number;
+  mouseThrashingCount?: number;
 
   static fromEntity(missions: Mission[], missionResult: MissionResult) {
     const dto = new ParticipantMissionResultDto();
@@ -36,6 +39,9 @@ export class ParticipantMissionResultDto {
     dto.duration = missionResult.duration;
     dto.feedback = missionResult.feedback;
     dto.createdAt = missionResult.createdAt;
+    dto.totalIdleTime = missionResult.totalIdleTime;
+    dto.rageClickCount = missionResult.rageClickCount;
+    dto.mouseThrashingCount = missionResult.mouseThrashingCount;
     return dto;
   }
 
@@ -58,9 +64,11 @@ export class ParticipantResultsDto {
     dto.participantId = participant.publicId;
     if (participant.userType === 'REGISTERED' && participant.user) {
       if (participant.user.persona) {
-        dto.personaTags.push(participant.user.persona.gender);
-        dto.personaTags.push(participant.user.persona.ageGroup);
-        dto.personaTags.push(...participant.user.persona.interests);
+        dto.personaTags.push(
+          participant.user.persona.gender,
+          participant.user.persona.ageGroup,
+          ...participant.user.persona.interests,
+        );
       } else {
         dto.personaTags.push('미설정');
       }
@@ -96,9 +104,11 @@ export class MainFeedbackDto {
     dto.content = participant.feedback;
     if (participant.userType === 'REGISTERED' && participant.user) {
       if (participant.user.persona) {
-        dto.personaTags.push(participant.user.persona.gender);
-        dto.personaTags.push(participant.user.persona.ageGroup);
-        dto.personaTags.push(...participant.user.persona.interests);
+        dto.personaTags.push(
+          participant.user.persona.gender,
+          participant.user.persona.ageGroup,
+          ...participant.user.persona.interests,
+        );
       } else {
         dto.personaTags.push('미설정');
       }
@@ -136,9 +146,11 @@ export class MissionResultOverviewDto {
     dto.participantId = missionResult.participant.publicId;
     if (missionResult.participant.userType === 'REGISTERED' && missionResult.participant.user) {
       if (missionResult.participant.user.persona) {
-        dto.personaTags.push(missionResult.participant.user.persona.gender);
-        dto.personaTags.push(missionResult.participant.user.persona.ageGroup);
-        dto.personaTags.push(...missionResult.participant.user.persona.interests);
+        dto.personaTags.push(
+          missionResult.participant.user.persona.gender,
+          missionResult.participant.user.persona.ageGroup,
+          ...missionResult.participant.user.persona.interests,
+        );
       } else {
         dto.personaTags.push('미설정');
       }
@@ -201,6 +213,153 @@ export class MissionOverviewDto {
           )
         : 0;
 
+    dto.averageDuration = missions.missionResults.some((mr) => mr.duration !== null)
+      ? Math.round(
+          missions.missionResults.reduce((acc, curr) => acc + (curr.duration || 0), 0) /
+            missions.missionResults.filter((mr) => mr.duration !== null).length,
+        )
+      : 0;
+
+    dto.averageIdleTime = missions.missionResults.some((mr) => mr.totalIdleTime !== null)
+      ? Math.round(
+          missions.missionResults.reduce((acc, curr) => acc + (curr.totalIdleTime || 0), 0) /
+            missions.missionResults.filter((mr) => mr.totalIdleTime !== null).length,
+        )
+      : 0;
+
+    dto.averageRageClickCount = missions.missionResults.some((mr) => mr.rageClickCount !== null)
+      ? missions.missionResults.reduce((acc, curr) => acc + (curr.rageClickCount || 0), 0) /
+        missions.missionResults.filter((mr) => mr.rageClickCount !== null).length
+      : 0;
+
+    dto.averageMouseThrashingCount = missions.missionResults.some(
+      (mr) => mr.mouseThrashingCount !== null,
+    )
+      ? missions.missionResults.reduce((acc, curr) => acc + (curr.mouseThrashingCount || 0), 0) /
+        missions.missionResults.filter((mr) => mr.mouseThrashingCount !== null).length
+      : 0;
+
+    dto.missionResults = MissionResultOverviewDto.fromEntities(missions.missionResults);
+
+    return dto;
+  }
+
+  static fromEntities(missions: Mission[]): MissionOverviewDto[] {
+    return missions.map((mission) => this.fromEntity(mission));
+  }
+}
+
+export class TestMissionsResultsDto {
+  missions: MissionOverviewDto[];
+
+  static fromTest(test: Test): TestMissionsResultsDto {
+    const dto = new TestMissionsResultsDto();
+    dto.missions = MissionOverviewDto.fromEntities(test.missions || []);
+    return dto;
+  }
+}
+
+// 참여자 상세 조회용 DTO (UA 정보 + 전체 피드백 포함)
+export class ParticipantResultDetailDto extends ParticipantResultsDto {
+  uaInfo: UAParser.IResult;
+  feedback?: string;
+
+  static fromEntity(participant: Participant, missions: Mission[]) {
+    const dto = new ParticipantResultDetailDto();
+    dto.participantId = participant.publicId;
+    if (participant.userType === 'REGISTERED' && participant.user) {
+      if (participant.user.persona) {
+        dto.personaTags.push(participant.user.persona.gender);
+        dto.personaTags.push(participant.user.persona.ageGroup);
+        dto.personaTags.push(...participant.user.persona.interests);
+      } else {
+        dto.personaTags.push('미설정');
+      }
+    } else {
+      dto.personaTags.push('GUEST');
+    }
+
+    dto.joinedAt = participant.joinedAt;
+    dto.uaInfo = participant.uaInfo;
+    dto.feedback = participant.feedback;
+    dto.missionResults = ParticipantMissionResultDto.fromEntities(
+      missions,
+      participant.missionResults,
+    );
+    return dto;
+  }
+}
+
+// 미션 결과 상세 조회용 DTO (UA 정보 포함)
+export class MissionResultOverviewDetailDto extends MissionResultOverviewDto {
+  uaInfo: UAParser.IResult;
+  totalIdleTime?: number;
+  rageClickCount?: number;
+  mouseThrashingCount?: number;
+
+  static fromEntity(missionResult: MissionResult) {
+    const dto = new MissionResultOverviewDetailDto();
+    dto.id = missionResult.publicId;
+    dto.status = missionResult.status;
+    dto.duration = missionResult.duration;
+    dto.feedback = missionResult.feedback;
+    dto.totalIdleTime = missionResult.totalIdleTime;
+    dto.rageClickCount = missionResult.rageClickCount;
+    dto.mouseThrashingCount = missionResult.mouseThrashingCount;
+
+    dto.participantId = missionResult.participant.publicId;
+    dto.uaInfo = missionResult.participant.uaInfo;
+    if (missionResult.participant.userType === 'REGISTERED' && missionResult.participant.user) {
+      if (missionResult.participant.user.persona) {
+        dto.personaTags.push(missionResult.participant.user.persona.gender);
+        dto.personaTags.push(missionResult.participant.user.persona.ageGroup);
+        dto.personaTags.push(...missionResult.participant.user.persona.interests);
+      } else {
+        dto.personaTags.push('미설정');
+      }
+    } else {
+      dto.personaTags.push('GUEST');
+    }
+    return dto;
+  }
+
+  static fromEntities(missionResults: MissionResult[]) {
+    return missionResults.map((mr) => this.fromEntity(mr));
+  }
+}
+
+export class MissionOverviewDetailDto extends MissionOverviewDto {
+  declare missionResults: MissionResultOverviewDetailDto[];
+
+  static fromEntity(missions: Mission) {
+    const dto = new MissionOverviewDetailDto();
+    dto.id = missions.publicId;
+    dto.missionOrder = missions.order;
+    dto.name = missions.name;
+    dto.description = missions.description;
+    dto.missionUrl = missions.missionUrl;
+    dto.estimatedDuration = missions.estimatedDuration;
+
+    dto.successRate =
+      missions.missionResults.length > 0
+        ? Math.round(
+            (missions.missionResults.filter((mr) => mr.status === MissionResultStatus.SUCCESS)
+              .length /
+              missions.missionResults.length) *
+              100,
+          )
+        : 0;
+
+    dto.dropRate =
+      missions.missionResults.length > 0
+        ? Math.round(
+            (missions.missionResults.filter((mr) => mr.status === MissionResultStatus.PENDING)
+              .length /
+              missions.missionResults.length) *
+              100,
+          )
+        : 0;
+
     dto.averageDuration =
       missions.missionResults.filter((mr) => mr.duration !== null).length > 0
         ? Math.round(
@@ -229,22 +388,12 @@ export class MissionOverviewDto {
           missions.missionResults.filter((mr) => mr.mouseThrashingCount !== null).length
         : 0;
 
-    dto.missionResults = MissionResultOverviewDto.fromEntities(missions.missionResults);
+    dto.missionResults = MissionResultOverviewDetailDto.fromEntities(missions.missionResults);
 
     return dto;
   }
 
-  static fromEntities(missions: Mission[]): MissionOverviewDto[] {
+  static fromEntities(missions: Mission[]): MissionOverviewDetailDto[] {
     return missions.map((mission) => this.fromEntity(mission));
-  }
-}
-
-export class TestMissionsResultsDto {
-  missions: MissionOverviewDto[];
-
-  static fromTest(test: Test): TestMissionsResultsDto {
-    const dto = new TestMissionsResultsDto();
-    dto.missions = MissionOverviewDto.fromEntities(test.missions || []);
-    return dto;
   }
 }

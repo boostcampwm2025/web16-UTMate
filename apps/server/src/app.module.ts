@@ -1,6 +1,7 @@
 import { BullModule } from '@nestjs/bullmq';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { makeHistogramProvider, PrometheusModule } from '@willsoto/nestjs-prometheus';
 import * as Joi from 'joi';
@@ -95,6 +96,9 @@ import { UsersModule } from '#domain/users/users.module';
         prefix: 'drop:',
       }),
     }),
+
+    // 이벤트 모듈
+    EventEmitterModule.forRoot(),
 
     // Prometheus Module
     PrometheusModule.register({

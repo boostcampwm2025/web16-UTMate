@@ -1,7 +1,8 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsEnum, IsString, ValidateNested } from 'class-validator';
 
-import { Test, TestStatus } from '../entities/test.entity';
+import { Test } from '../entities/test.entity';
+import { TestStatus } from '../enums';
 
 import { AgeRange, Gender, Interest } from '#common/enums';
 import { MissionDto } from '#domain/missions/dto/mission.dto';
@@ -44,8 +45,6 @@ export class TestDto {
   @IsArray()
   @IsEnum(Interest, { each: true })
   targetInterests: Interest[];
-
-  constructor() {}
 
   static fromTestEntity(test: Test) {
     const dto = new TestDto();

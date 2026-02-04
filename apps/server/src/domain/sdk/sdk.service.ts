@@ -1,18 +1,18 @@
-import { Readable } from 'stream';
-import * as zlib from 'zlib';
+import { Readable } from 'node:stream';
+import * as zlib from 'node:zlib';
 
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import Redis from 'ioredis/built/Redis';
 
 import { SDK_AUTH_REDIS } from '#common/redis/redis.module';
 import { StorageService } from '#common/storage/storage.service';
-import { TestsService } from '#domain/tests/tests.service';
+import { TestsCommandService } from '#domain/tests/services/tests-command.service';
 
 @Injectable()
 export class SdkService {
   constructor(
     private readonly storageService: StorageService,
-    private readonly testsService: TestsService,
+    private readonly testsCommandService: TestsCommandService,
     @Inject(SDK_AUTH_REDIS) private readonly sdkAuthRedis: Redis,
   ) {}
 
@@ -51,6 +51,6 @@ export class SdkService {
    * @throws NotFoundException 테스트를 찾을 수 없는 경우 ( 허위 서비스에서 전파 )
    */
   async verifySdkInstallation(testId: string) {
-    await this.testsService.verifySdkInstallationBySDK(testId);
+    await this.testsCommandService.verifySdkInstallationBySDK(testId);
   }
 }

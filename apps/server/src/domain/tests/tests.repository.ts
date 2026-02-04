@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, EntityManager, ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { SearchTestQueryDto } from './dto/search-test.dto';
-import { Test, TestStatus } from './entities/test.entity';
+import { Test } from './entities/test.entity';
+import { TestStatus } from './enums';
 
 @Injectable()
 export class TestsRepository {
@@ -30,7 +31,36 @@ export class TestsRepository {
     return result.affected || 0;
   }
 
+  /**
+   * 테스트에 멤버를 추가합니다.
+   *
+   * @param testId 테스트 ID
+   * @param memberId 추가할 멤버 ID
+   * @param manager EntityManager (Optional)
+   */
+  async addMemberToTests(testId: number, memberId: number, manager?: EntityManager) {
+    // 멤버 추가
+    return this.getRepo(manager)
+      .createQueryBuilder('tests')
+      .relation(Test, 'members')
+      .of(testId)
+      .add(memberId);
+  }
+
   /*----------- 조회 메서드 (비권한 체크) -----------*/
+
+  /**
+   * 데모 테스트를 조회합니다.
+   *
+   * @param manager EntityManager (Optional)
+   * @returns
+   */
+  async findDemoTest(manager?: EntityManager) {
+    return this.getRepo(manager)
+      .createQueryBuilder('tests')
+      .where('tests.status = :status', { status: TestStatus.DEMO })
+      .getOne();
+  }
 
   /**
    * 공개 ID로 테스트를 조회합니다.
@@ -279,6 +309,8 @@ export class TestsRepository {
       .leftJoinAndSelect('tests.missions', 'missions')
       .leftJoinAndSelect('missions.missionResults', 'missionResults')
       .leftJoinAndSelect('missionResults.participant', 'participant')
+      .leftJoinAndSelect('participant.user', 'participantUser')
+      .leftJoinAndSelect('participantUser.persona', 'participantPersona')
       .where('tests.publicId = :publicId', { publicId })
       .orderBy('missions.order', 'ASC')
       .getOne();

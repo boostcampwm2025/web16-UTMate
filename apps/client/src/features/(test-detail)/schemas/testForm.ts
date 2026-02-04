@@ -3,6 +3,7 @@ import { z } from 'zod';
 import type { Interest } from '@/features/(auth)/types';
 
 import { MAX_MISSIONS } from '../constants';
+import { normalizeUrl } from '../utils/string';
 
 // 미션 스키마
 export const missionSchema = z.object({
@@ -10,7 +11,19 @@ export const missionSchema = z.object({
   order: z.number(),
   name: z.string().min(1, '미션 이름을 입력해주세요.'),
   description: z.string().min(1, '미션 설명을 입력해주세요.'),
-  missionUrl: z.string().min(1, '대상 URL을 입력해주세요.').url('올바른 URL 형식이 아닙니다.'),
+  missionUrl: z
+    .string()
+    .min(1, '대상 URL을 입력해주세요.')
+    .transform(normalizeUrl)
+    .pipe(
+      z
+        .string()
+        .url('올바른 URL 형식이 아닙니다.')
+        .refine(
+          (val) => val.startsWith('http://') || val.startsWith('https://'),
+          'http 또는 https 프로토콜만 지원합니다.',
+        ),
+    ),
   estimatedDuration: z
     .number({ message: '예상 소요시간을 입력해주세요.' })
     .min(1, '예상 소요시간은 1분 이상이어야 합니다.'),
@@ -24,7 +37,19 @@ export const testFormSchema = z
       .min(1, '테스트 이름을 입력해주세요.')
       .min(2, '테스트 이름은 최소 2자 이상이어야 합니다.'),
     description: z.string(),
-    url: z.string().min(1, '서비스 URL을 입력해주세요.').url('올바른 URL 형식이 아닙니다.'),
+    url: z
+      .string()
+      .min(1, '서비스 URL을 입력해주세요.')
+      .transform(normalizeUrl)
+      .pipe(
+        z
+          .string()
+          .url('올바른 URL 형식이 아닙니다.')
+          .refine(
+            (val) => val.startsWith('http://') || val.startsWith('https://'),
+            'http 또는 https 프로토콜만 지원합니다.',
+          ),
+      ),
     missions: z
       .array(missionSchema)
       .max(MAX_MISSIONS, `미션은 최대 ${MAX_MISSIONS}개까지만 추가할 수 있습니다.`),

@@ -11,10 +11,15 @@ export class UserSummaryDto {
     dto.publicId = user.publicId;
     dto.username = user.username;
     dto.avatarUrl = user.avatarUrl;
-    // email이 있으면 포함
-    if (user.email) {
-      dto.email = user.email;
-    }
+    return dto;
+  }
+
+  static fromUserEntityWithEmail(user: User): UserSummaryDto {
+    const dto = new UserSummaryDto();
+    dto.publicId = user.publicId;
+    dto.username = user.username;
+    dto.avatarUrl = user.avatarUrl;
+    dto.email = user.email;
     return dto;
   }
 

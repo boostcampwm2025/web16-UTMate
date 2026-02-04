@@ -4,7 +4,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { Calendar } from 'lucide-react';
 
-import { Card } from '@/shared/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import {
   Table,
   TableBody,
@@ -18,6 +18,8 @@ import { AnimalAvatar } from '@/shared/components/AnimalAvatar';
 import { generateNicknameFromId } from '@/shared/utils/nickname';
 
 import { MissionStatusBadge } from './MissionStatusBadge';
+import { UAInfoDisplay } from './UAInfoDisplay';
+import { AnomalyTags } from './AnomalyTags';
 import { getParticipantDetail } from '../apis/client';
 import { formatDate } from '../utils/dates';
 import { PersonaTag } from './PersonaTag';
@@ -80,12 +82,36 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
         </div>
       </Card>
 
+      {/* UA Info and Feedback Section */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">사용 환경</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <UAInfoDisplay uaInfo={participant.uaInfo} />
+          </CardContent>
+        </Card>
+
+        {participant.feedback && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">전체 피드백</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm leading-relaxed text-gray-700">{participant.feedback}</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
       {/* Mission Results Table */}
       <Table className="w-full text-left">
         <TableCaption className="sr-only">미션 목록</TableCaption>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
             <TableHead>미션명</TableHead>
+            <TableHead>이상현상</TableHead>
             <TableHead className="text-center">결과</TableHead>
             <TableHead>피드백</TableHead>
             <TableHead className="text-right">소요시간</TableHead>
@@ -94,38 +120,67 @@ export function ParticipantResultDetail({ testId, participantId }: ParticipantRe
         <TableBody>
           {participant.missionResults.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-muted-foreground py-8 text-center">
+              <TableCell colSpan={5} className="text-muted-foreground py-8 text-center">
                 미션 수행 기록이 없습니다.
               </TableCell>
             </TableRow>
           ) : (
-            participant.missionResults.map((missionResult) => (
-              <TableRow
-                key={missionResult.missionResultId}
-                onClick={() => handleRowClick(missionResult.missionResultId)}
-                className="cursor-pointer transition-colors hover:bg-gray-50/50"
-              >
-                <TableCell className="font-medium">{missionResult.missionTitle}</TableCell>
-                <TableCell className="text-center">
-                  <MissionStatusBadge status={missionResult.status} />
-                </TableCell>
-                <TableCell className="max-w-[200px]">
-                  <div
-                    className="text-muted-foreground truncate text-sm"
-                    title={missionResult.feedback || ''}
-                  >
-                    {missionResult.feedback || (
-                      <span className="text-gray-300 italic">피드백 없음</span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {missionResult.duration
-                    ? formatDurationFromMilliSeconds(missionResult.duration)
-                    : '-'}
-                </TableCell>
-              </TableRow>
-            ))
+            participant.missionResults.map((missionResult) => {
+              const isClickable = missionResult.status === 'SUCCESS' || missionResult.status === 'FAILED';
+
+              return (
+                <TableRow
+                  key={missionResult.missionResultId}
+                  onClick={() => isClickable && handleRowClick(missionResult.missionResultId)}
+                  className={
+                    isClickable
+                      ? 'cursor-pointer transition-colors hover:bg-gray-50/50'
+                      : 'cursor-not-allowed opacity-60'
+                  }
+                  role={isClickable ? 'button' : undefined}
+                  tabIndex={isClickable ? 0 : undefined}
+                  onKeyDown={(e) => {
+                    if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
+                      e.preventDefault();
+                      handleRowClick(missionResult.missionResultId);
+                    }
+                  }}
+                  aria-label={
+                    isClickable
+                      ? `${missionResult.missionTitle} 미션 결과 상세 보기`
+                      : `${missionResult.missionTitle} 미션 (상세 보기 불가)`
+                  }
+                >
+                  <TableCell className="font-medium">{missionResult.missionTitle}</TableCell>
+                  <TableCell>
+                    <AnomalyTags
+                      totalIdleTime={missionResult.totalIdleTime}
+                      rageClickCount={missionResult.rageClickCount}
+                      mouseThrashingCount={missionResult.mouseThrashingCount}
+                      compact
+                    />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <MissionStatusBadge status={missionResult.status} />
+                  </TableCell>
+                  <TableCell className="max-w-[200px]">
+                    <div
+                      className="text-muted-foreground truncate text-sm"
+                      title={missionResult.feedback || ''}
+                    >
+                      {missionResult.feedback || (
+                        <span className="text-gray-300 italic">피드백 없음</span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right font-medium">
+                    {missionResult.duration
+                      ? formatDurationFromMilliSeconds(missionResult.duration)
+                      : '-'}
+                  </TableCell>
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>

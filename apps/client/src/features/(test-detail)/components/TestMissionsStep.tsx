@@ -1,4 +1,10 @@
-import type { UseFormRegister, FieldErrors, FieldArrayWithId } from 'react-hook-form';
+import type {
+  UseFormRegister,
+  FieldErrors,
+  FieldArrayWithId,
+  Control,
+  UseFormSetValue,
+} from 'react-hook-form';
 
 import { MissionItemForm } from './MissionItemForm';
 import type { TestFormValues } from '../schemas/testForm';
@@ -7,6 +13,8 @@ interface TestMissionsStepProps {
   fields: FieldArrayWithId<TestFormValues, 'missions', 'id'>[];
   selectedMissionIndex: number;
   register: UseFormRegister<TestFormValues>;
+  control: Control<TestFormValues>;
+  setValue: UseFormSetValue<TestFormValues>;
   errors: FieldErrors<TestFormValues>;
   onSelectedMissionIndexChange: (index: number) => void;
   onDeleteMission: (publicId: string) => void;
@@ -16,6 +24,8 @@ export function TestMissionsStep({
   fields,
   selectedMissionIndex,
   register,
+  control,
+  setValue,
   errors,
   onSelectedMissionIndexChange,
   onDeleteMission,
@@ -41,6 +51,7 @@ export function TestMissionsStep({
         <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-12 text-center">
           <div className="mx-auto max-w-md space-y-4">
             <h3 className="text-lg font-semibold text-gray-700">아직 미션이 없습니다</h3>
+            <p className="text-gray-600">좌측의 + 버튼을 눌러 미션을 추가해주세요.</p>
           </div>
         </div>
       ) : (
@@ -49,6 +60,8 @@ export function TestMissionsStep({
             field={selectedField}
             missionIndex={selectedMissionIndex}
             register={register}
+            control={control}
+            setValue={setValue}
             errors={errors}
             onDeleteMission={handleDeleteMission}
           />

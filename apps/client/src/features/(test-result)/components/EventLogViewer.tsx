@@ -91,18 +91,18 @@ export function EventLogViewer({ logs, analysisData, onLogClick }: EventLogViewe
   }, [analysisData]);
 
   return (
-    <div className="flex h-full w-full flex-col space-y-4 p-4">
+    <div className="flex h-full w-full flex-col space-y-2 p-4">
       {/* 1. 상단 요약 카드 */}
       {summary && summary.total > 0 && (
-        <div className="flex flex-col gap-2 rounded-lg border p-3">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <span>발견된 문제점</span>
+            <span className="ml-2">발견된 이상현상</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {summary.rage > 0 && (
               <Badge
                 variant="outline"
-                className="gap-1.5 border-red-200 bg-red-50 py-1 text-red-600"
+                className="gap-1.5 border px-2 py-1 font-medium text-red-600"
               >
                 <Angry className="h-3 w-3" />
                 레이지 클릭 {summary.rage}회
@@ -111,7 +111,7 @@ export function EventLogViewer({ logs, analysisData, onLogClick }: EventLogViewe
             {summary.thrashing > 0 && (
               <Badge
                 variant="outline"
-                className="gap-1.5 border-orange-200 bg-orange-50 py-1 text-orange-600"
+                className="gap-1.5 border px-2 py-1 font-medium text-orange-600"
               >
                 <Activity className="h-3 w-3" />
                 마우스 흔들기 {summary.thrashing}회
@@ -120,7 +120,7 @@ export function EventLogViewer({ logs, analysisData, onLogClick }: EventLogViewe
             {summary.idle > 0 && (
               <Badge
                 variant="outline"
-                className="gap-1.5 border-blue-200 bg-blue-50 py-1 text-blue-600"
+                className="gap-1.5 border px-2 py-1 font-medium text-blue-600"
               >
                 <Hourglass className="h-3 w-3" />
                 유휴 시간 {summary.idle}회
@@ -131,40 +131,43 @@ export function EventLogViewer({ logs, analysisData, onLogClick }: EventLogViewe
       )}
 
       {/* 2. 필터 탭 */}
-      <div className="grid w-full grid-cols-3 gap-1 border-b pb-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          className={cn(
-            'h-8 px-1',
-            filter === 'ALL' && 'bg-gray-200 font-semibold text-gray-900 hover:bg-gray-200',
-          )}
+      <div className="flex w-full items-center rounded-lg bg-slate-100 p-1">
+        <button
+          type="button"
           onClick={() => setFilter('ALL')}
+          className={cn(
+            'flex-1 cursor-pointer rounded-md py-1.5 text-sm font-medium transition-all',
+            filter === 'ALL'
+              ? 'bg-white text-slate-900 shadow-sm'
+              : 'text-slate-500 hover:text-slate-900',
+          )}
         >
           전체
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className={cn(
-            'h-8 px-1',
-            filter === 'ANOMALY' && 'bg-gray-200 font-semibold text-gray-900 hover:bg-gray-200',
-          )}
+        </button>
+        <button
+          type="button"
           onClick={() => setFilter('ANOMALY')}
+          className={cn(
+            'flex-1 cursor-pointer rounded-md py-1.5 text-sm font-medium transition-all',
+            filter === 'ANOMALY'
+              ? 'bg-white text-slate-900 shadow-sm'
+              : 'text-slate-500 hover:text-slate-900',
+          )}
         >
           이상현상
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className={cn(
-            'h-8 px-1',
-            filter === 'GENERAL' && 'bg-gray-200 font-semibold text-gray-900 hover:bg-gray-200',
-          )}
+        </button>
+        <button
+          type="button"
           onClick={() => setFilter('GENERAL')}
+          className={cn(
+            'flex-1 cursor-pointer rounded-md py-1.5 text-sm font-medium transition-all',
+            filter === 'GENERAL'
+              ? 'bg-white text-slate-900 shadow-sm'
+              : 'text-slate-500 hover:text-slate-900',
+          )}
         >
           일반
-        </Button>
+        </button>
       </div>
 
       {/* 3. 리스트 */}

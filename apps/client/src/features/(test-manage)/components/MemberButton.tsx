@@ -11,12 +11,13 @@ import { MemberManager } from './MemberManager';
 import type { UserSummary } from '../types';
 
 interface MemberButtonProps {
+  isDemo: boolean;
   testId: string;
   owner: UserSummary;
   members: UserSummary[];
 }
 
-export function MemberButton({ testId, owner, members }: MemberButtonProps) {
+export function MemberButton({ isDemo, testId, owner, members }: MemberButtonProps) {
   const { confirm } = useDialogStore();
   const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -34,20 +35,27 @@ export function MemberButton({ testId, owner, members }: MemberButtonProps) {
   return (
     <div className="flex justify-center -space-x-2" onClick={handleClick}>
       {allMembers.slice(0, 4).map((user, idx) => (
-        <Avatar key={user.publicId} className="size-9">
-          <AvatarImage src={user.avatarUrl} alt={user.username} />
-        </Avatar>
+        <Tooltip key={user.publicId}>
+          <TooltipTrigger asChild>
+            <Avatar className="size-9">
+              <AvatarImage src={user.avatarUrl} alt={user.username} />
+            </Avatar>
+          </TooltipTrigger>
+          <TooltipContent>{user.username}</TooltipContent>
+        </Tooltip>
       ))}
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            className="z-10 size-9 rounded-full"
-            onClick={handleClick}
-            aria-label="멤버 추가"
-          >
-            <PlusIcon className="size-4" />
-          </Button>
+          {!isDemo && (
+            <Button
+              variant="outline"
+              className="z-10 size-9 rounded-full"
+              onClick={handleClick}
+              aria-label="멤버 추가"
+            >
+              <PlusIcon className="size-4" />
+            </Button>
+          )}
         </TooltipTrigger>
         <TooltipContent>테스트에 멤버를 추가하여 테스트를 공유할 수 있습니다.</TooltipContent>
       </Tooltip>

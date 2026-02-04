@@ -1,17 +1,29 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
 
+// 환경변수에 따라 빌드 타켓을 구분하고
+// 두번 빌드함
+const isRecorderBuild = process.env.BUILD_TARGET === 'recorder';
+
 export default defineConfig({
   build: {
+    emptyOutDir: !isRecorderBuild, // 첫 번째 빌드에서만 dist 폴더 비우기
     lib: {
-      // Could also be a dictionary or array of multiple entry points
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'UtmateSDK',
-      // the proper extensions will be added
-      fileName: 'utmate-sdk',
-      formats: ['iife'],
+      entry: resolve(__dirname, isRecorderBuild ? 'src/recorder.ts' : 'src/index.ts'),
+      name: isRecorderBuild ? 'UTMateRecorder' : 'UtmateSDK',
+      fileName: () => (isRecorderBuild ? 'utmate-recorder.iife.js' : 'utmate-sdk.iife.js'),
+      formats: ['umd'],
     },
   },
-  plugins: [dts({ rollupTypes: true })],
+  plugins: isRecorderBuild ? [] : [dts({ rollupTypes: true })],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './test/integration/setup.ts',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+    },
+  },
 });

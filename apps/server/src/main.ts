@@ -32,6 +32,12 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
+  const server = app.getHttpServer();
+
+  // keepAlive 설정
+  server.keepAliveTimeout = 65000; // 65초
+  server.headersTimeout = 66000; // 66초
+
   // Swagger 설정
   const swaggerConfig = new DocumentBuilder()
     .setTitle('UTMate API')

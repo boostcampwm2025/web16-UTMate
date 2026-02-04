@@ -6,6 +6,7 @@ interface DialogOptions {
   confirmText?: string;
   isAlert?: boolean;
   hasCancel?: boolean;
+  onConfirm?: () => void;
 }
 
 interface DialogState {
@@ -69,6 +70,7 @@ export const useDialogStore = create<DialogStore>((set) => ({
         hasCancel: options?.hasCancel ?? INITIAL_STATE.hasCancel,
         onConfirm: () => {
           set({ isOpen: false });
+          options?.onConfirm?.();
           resolve(true);
         },
         onCancel: () => {

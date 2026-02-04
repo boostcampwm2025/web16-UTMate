@@ -22,7 +22,7 @@ export function MissionResultHeader({ testId, missionResultData }: MissionResult
     <header className="border-b bg-white px-6 py-4">
       <div className="flex items-center gap-3">
         <Button variant="outline" size="icon" asChild>
-          <Link href={`/tests/${testId}/result`}>
+          <Link href={`/tests/${testId}/result`} aria-label="테스트 결과 페이지로 돌아가기">
             <ArrowLeft />
           </Link>
         </Button>

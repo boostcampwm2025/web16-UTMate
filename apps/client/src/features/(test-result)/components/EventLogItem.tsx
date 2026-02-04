@@ -1,6 +1,5 @@
 import {
   MousePointerClick,
-  ScrollText,
   Keyboard,
   Monitor,
   MoreHorizontal,
@@ -8,6 +7,7 @@ import {
   LucideIcon,
   Angry,
   Hourglass,
+  Mouse,
 } from 'lucide-react';
 
 import { formatRelativeTime } from '@/features/(test-result)/utils/format';
@@ -28,7 +28,7 @@ const EVENT_ICONS: Record<string, LucideIcon> = {
   idle: Hourglass,
   // rrweb sources
   click: MousePointerClick,
-  scroll: ScrollText,
+  scroll: Mouse,
   keyboard: Keyboard,
   monitor: Monitor,
   default: MoreHorizontal,
@@ -54,6 +54,27 @@ function getIconKey(item: EventLogDisplayItem): string {
   return 'default';
 }
 
+const ANALYSIS_EVENT_CONFIG = {
+  rageClick: {
+    label: '레이지 클릭',
+    detailInfo: '짧은 시간 동안 다수의 클릭 발생',
+    iconBg: 'bg-red-50',
+    iconColor: 'text-red-500',
+  },
+  mouseThrashing: {
+    label: '마우스 흔들기',
+    detailInfo: '불규칙한 마우스 움직임 감지',
+    iconBg: 'bg-orange-50',
+    iconColor: 'text-orange-600',
+  },
+  idle: {
+    label: '유휴 시간',
+    detailInfo: '일정 시간 동안 활동 없음',
+    iconBg: 'bg-blue-50',
+    iconColor: 'text-blue-600',
+  },
+} as const;
+
 export function EventLogItem({ item, startTime, onLogClick }: EventLogItemProps) {
   const relativeMs = item.timestamp - startTime;
 
@@ -64,11 +85,12 @@ export function EventLogItem({ item, startTime, onLogClick }: EventLogItemProps)
   const iconKey = getIconKey(item);
   const IconComponent = EVENT_ICONS[iconKey] || EVENT_ICONS.default;
 
-  // 라벨 및 부가 정보
+  // 기본 스타일 및 데이터 설정
   let label = '';
   let subLabel = '';
   let detailInfo: string | undefined;
-  let iconColorClass = 'text-slate-500'; // 기본 아이콘 색상
+  let iconBgClass = 'bg-slate-100';
+  let iconColorClass = 'text-slate-600';
 
   if (item.type === 'rrweb') {
     const logData = item.data;
@@ -78,55 +100,48 @@ export function EventLogItem({ item, startTime, onLogClick }: EventLogItemProps)
     }
     detailInfo = logData.targetInfo;
   } else {
-    // 분석 데이터 라벨링 및 색상 처리
-    if (item.type === 'rageClick') {
-      label = '레이지 클릭';
-      iconColorClass = 'text-red-500';
-      detailInfo = '짧은 시간 동안 다수의 클릭 발생';
-    } else if (item.type === 'mouseThrashing') {
-      label = '마우스 흔들기';
-      iconColorClass = 'text-orange-500';
-      detailInfo = '불규칙한 마우스 움직임 감지';
-    } else if (item.type === 'idle') {
-      label = '유휴 시간';
-      iconColorClass = 'text-blue-500';
-      detailInfo = '일정 시간 동안 활동 없음';
+    // 분석 데이터 설정 (Config 활용)
+    const config = ANALYSIS_EVENT_CONFIG[item.type as keyof typeof ANALYSIS_EVENT_CONFIG];
+    if (config) {
+      label = config.label;
+      detailInfo = config.detailInfo;
+      iconBgClass = config.iconBg;
+      iconColorClass = config.iconColor;
     }
   }
 
   return (
-    <Button
-      variant="outline"
+    <div
       className={cn(
-        'group flex h-auto w-full cursor-pointer flex-col items-stretch justify-start gap-2 py-3 whitespace-normal',
-        'hover:bg-accent hover:text-accent-foreground',
+        'group flex w-full cursor-pointer flex-col gap-3 rounded-xl border bg-white p-4 transition-colors',
+        'hover:bg-slate-50',
       )}
       onClick={handleLogClick}
+      title="클릭하여 이벤트 발생시점으로 이동"
     >
-      <div className="flex w-full items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex w-full items-start justify-between">
+        <div className="flex items-center gap-3">
           <div
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 transition-colors group-hover:bg-white',
+              'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl',
+              iconBgClass,
               iconColorClass,
             )}
           >
-            <IconComponent className="h-4 w-4" />
+            <IconComponent className="h-5 w-5" />
           </div>
-          <span className="font-semibold text-slate-900">
-            {label}
-            {subLabel && <span className="ml-1 font-normal text-slate-500">{subLabel}</span>}
-          </span>
+          <div className="flex flex-col gap-1">
+            <span className="font-bold text-slate-900">
+              {label}
+              {subLabel && <span className="ml-1 font-normal text-slate-500">{subLabel}</span>}
+            </span>
+            {detailInfo && <span className="text-sm font-medium text-slate-500">{detailInfo}</span>}
+          </div>
         </div>
-        <span className="text-xs font-medium text-slate-400 tabular-nums">
+        <span className="shrink-0 text-xs font-medium text-slate-400">
           {formatRelativeTime(item.timestamp, startTime)}
         </span>
       </div>
-      {detailInfo && (
-        <div className="ml-10 flex items-center gap-2 text-sm text-slate-500">
-          <span className="line-clamp-1">{detailInfo}</span>
-        </div>
-      )}
-    </Button>
+    </div>
   );
 }

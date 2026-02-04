@@ -1,6 +1,7 @@
 import { IsDate, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
-import { Test, TestStatus } from '../entities/test.entity';
+import { Test } from '../entities/test.entity';
+import { TestStatus } from '../enums';
 
 export class TestResultSummaryDto {
   @IsString()
