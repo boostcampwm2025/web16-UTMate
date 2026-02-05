@@ -56,7 +56,7 @@ function getIconKey(item: EventLogDisplayItem): string {
 
 const ANALYSIS_EVENT_CONFIG = {
   rageClick: {
-    label: '레이지 클릭',
+    label: '분노 클릭',
     detailInfo: '짧은 시간 동안 다수의 클릭 발생',
     iconBg: 'bg-red-50',
     iconColor: 'text-red-500',

@@ -105,7 +105,7 @@ export function EventLogViewer({ logs, analysisData, onLogClick }: EventLogViewe
                 className="gap-1.5 border px-2 py-1 font-medium text-red-600"
               >
                 <Angry className="h-3 w-3" />
-                레이지 클릭 {summary.rage}회
+                분노 클릭 {summary.rage}회
               </Badge>
             )}
             {summary.thrashing > 0 && (
