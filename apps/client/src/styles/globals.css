@@ -141,6 +141,51 @@ body {
   }
 }
 
+/* Apple 감성 Hero 배경 애니메이션 */
+@keyframes gradient-shift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+    opacity: 0.7;
+  }
+}
+
+@keyframes gradient-shift-2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+  33% {
+    transform: translate(-25px, 25px) scale(1.05);
+    opacity: 0.7;
+  }
+  66% {
+    transform: translate(25px, -25px) scale(0.95);
+    opacity: 0.6;
+  }
+}
+
+@keyframes gradient-shift-3 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(15px, 15px) scale(1.1) rotate(5deg);
+    opacity: 0.6;
+  }
+}
+
 /* Sidebar collapsed 상태에서 텍스트 완전히 숨기기 */
 @layer components {
   [data-collapsible='icon'] [data-sidebar='menu-button'] > span:not([class*='sr-only']) {
