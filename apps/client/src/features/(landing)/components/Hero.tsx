@@ -9,11 +9,32 @@ import { Button } from '@/shared/components/ui/button';
  */
 export function Hero() {
   return (
-    <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden bg-linear-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* 배경 장식 */}
-      <div className="absolute inset-0 -z-10">
-        <div className="bg-primary/5 absolute top-1/4 left-1/4 h-96 w-96 rounded-full blur-3xl" />
-        <div className="bg-secondary/5 absolute right-1/4 bottom-1/4 h-96 w-96 rounded-full blur-3xl" />
+    <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden bg-gradient-to-br from-primary/5 via-background to-primary/10">
+      {/* Apple 스타일 Interactive 배경 */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        {/* 메인 그라데이션 Blob 1 */}
+        <div
+          className="absolute -top-20 left-1/4 h-[600px] w-[600px] rounded-full bg-primary/20 blur-3xl"
+          style={{ animation: 'gradient-shift 20s ease-in-out infinite' }}
+        />
+        {/* 메인 그라데이션 Blob 2 */}
+        <div
+          className="absolute top-1/3 right-1/4 h-[700px] w-[700px] rounded-full bg-primary/15 blur-3xl"
+          style={{ animation: 'gradient-shift-2 25s ease-in-out infinite' }}
+        />
+        {/* 악센트 Blob 3 */}
+        <div
+          className="absolute bottom-0 left-1/3 h-[500px] w-[500px] rounded-full bg-secondary/20 blur-3xl"
+          style={{ animation: 'gradient-shift-3 30s ease-in-out infinite' }}
+        />
+        {/* 서브틀한 그리드 패턴 */}
+        <div
+          className="absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, hsl(var(--primary)) 1px, transparent 1px)',
+            backgroundSize: '40px 40px'
+          }}
+        />
       </div>
 
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
