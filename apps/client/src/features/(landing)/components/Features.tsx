@@ -25,6 +25,11 @@ export function Features() {
       description: '사용자의 실제 행동을 동영상처럼 재생하여 UX 문제를 정확히 파악할 수 있습니다.',
       image: '/images/landing/테스트세션리플레이.webp',
     },
+    {
+      title: '미션별 상세 분석',
+      description: '각 미션별 성공률, 소요 시간, 사용자 피드백을 한눈에 확인하고 분석할 수 있습니다.',
+      image: '/images/landing/미션별상세.png',
+    },
   ];
 
   return (
@@ -41,14 +46,16 @@ export function Features() {
         </div>
 
         {/* 기능 그리드 */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
+        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/50"
+              className={`group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/50 ${
+                index === features.length - 1 ? 'sm:col-span-2' : ''
+              }`}
             >
               {/* 이미지 영역 */}
-              <div className="relative h-64 w-full overflow-hidden bg-muted">
+              <div className="relative h-96 w-full overflow-hidden bg-muted">
                 <Image
                   src={feature.image}
                   alt={feature.title}
@@ -57,6 +64,7 @@ export function Features() {
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                   quality={75}
+                  unoptimized={feature.image.endsWith('.webp')}
                 />
               </div>
 
@@ -80,11 +88,17 @@ export function Features() {
         {/* 추가 설명 */}
         <div className="mt-16 rounded-2xl border bg-card/50 p-8 backdrop-blur-sm">
           <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-            {/* 이미지 영역 (추후 교체) */}
-            <div className="flex items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-secondary/5 p-8 lg:p-12">
-              <p className="text-center text-sm text-muted-foreground">
-                User Testing 설명 이미지
-              </p>
+            {/* 이미지 영역 */}
+            <div className="relative h-80 rounded-xl overflow-hidden bg-muted">
+              <Image
+                src="/images/landing/UserTesting이미지.png"
+                alt="User Testing - 사용자가 테스트를 진행하는 모습"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+                loading="lazy"
+                quality={85}
+              />
             </div>
 
             {/* 텍스트 */}
