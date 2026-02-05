@@ -1,32 +1,29 @@
+import Image from 'next/image';
+
 /**
  * Features Section - 서비스 주요 기능 소개
  */
 export function Features() {
   const features = [
     {
-      title: '세션 리플레이',
+      title: '공개 테스트 탐색',
+      description: '다양한 공개 테스트를 탐색하고 참여하여 더 많은 사용자 피드백을 받을 수 있습니다.',
+      image: '/images/landing/공개테스트탐색.webp',
+    },
+    {
+      title: '간편한 테스트 생성',
+      description: '단계별 설정을 통해 사용성 테스트를 간단하게 생성할 수 있습니다.',
+      image: '/images/landing/테스트 생성.webp',
+    },
+    {
+      title: '테스트 참여',
+      description: '링크 하나로 손쉽게 테스트에 참여하고 사용자 경험을 제공할 수 있습니다.',
+      image: '/images/landing/테스트참여.webp',
+    },
+    {
+      title: '세션 리플레이 분석',
       description: '사용자의 실제 행동을 동영상처럼 재생하여 UX 문제를 정확히 파악할 수 있습니다.',
-      // TODO: 이미지 경로 추가
-    },
-    {
-      title: '실시간 분석',
-      description: '클릭, 스크롤, 체류 시간 등 사용자 행동 데이터를 실시간으로 수집하고 분석합니다.',
-      // TODO: 이미지 경로 추가
-    },
-    {
-      title: '미션 기반 테스트',
-      description: '특정 작업을 수행하도록 요청하고, 완료 시간과 성공률을 측정합니다.',
-      // TODO: 이미지 경로 추가
-    },
-    {
-      title: '피드백 수집',
-      description: '사용자로부터 직접적인 의견과 개선 사항을 체계적으로 수집합니다.',
-      // TODO: 이미지 경로 추가
-    },
-    {
-      title: '대시보드',
-      description: '수집된 데이터를 시각화하여 인사이트를 빠르게 도출할 수 있습니다.',
-      // TODO: 이미지 경로 추가
+      image: '/images/landing/테스트세션리플레이.webp',
     },
   ];
 
@@ -44,26 +41,35 @@ export function Features() {
         </div>
 
         {/* 기능 그리드 */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="group relative overflow-hidden rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50"
+              className="group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/50"
             >
-              {/* 이미지 영역 (추후 교체) */}
-              <div className="mb-6 flex h-48 w-full items-center justify-center rounded-lg bg-gradient-to-br from-primary/10 to-secondary/5">
-                <p className="text-sm text-muted-foreground">
-                  {feature.title} 이미지
-                </p>
+              {/* 이미지 영역 */}
+              <div className="relative h-64 w-full overflow-hidden bg-muted">
+                <Image
+                  src={feature.image}
+                  alt={feature.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                  quality={75}
+                />
               </div>
 
-              {/* 제목 */}
-              <h3 className="mb-3 text-xl font-semibold">{feature.title}</h3>
+              {/* 콘텐츠 영역 */}
+              <div className="p-6">
+                {/* 제목 */}
+                <h3 className="mb-3 text-xl font-semibold">{feature.title}</h3>
 
-              {/* 설명 */}
-              <p className="text-muted-foreground leading-relaxed">
-                {feature.description}
-              </p>
+                {/* 설명 */}
+                <p className="text-muted-foreground leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
 
               {/* 호버 효과 */}
               <div className="absolute inset-0 -z-10 bg-linear-to-br from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
