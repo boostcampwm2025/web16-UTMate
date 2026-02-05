@@ -56,6 +56,7 @@
 <div align="center">
 
 ### 🍪 UTMate
+
 **세상에서 제일 쉬운 사용성 테스트 플랫폼**
 
 <br>
@@ -97,91 +98,16 @@
 
 ---
 
-## 🛠️ 기술 스택
+## 기술스택
 
-<table>
-    <thead>
-        <tr>
-            <th>Category</th>
-            <th>Stack</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                <p align=center>Common</p>
-            </td>
-            <td>
-                <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white">
-                <img src="https://img.shields.io/badge/Turborepo-EF4444?logo=turborepo&logoColor=white">
-                <img src="https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white">
-                <img src="https://img.shields.io/badge/ESLint-4B32C3?logo=eslint&logoColor=white">
-                <img src="https://img.shields.io/badge/Prettier-F7B93E?logo=prettier&logoColor=white">
-            </td>
-        </tr>
-        <tr>
-            <td>
-               <p align=center>Frontend</p>
-            </td>
-            <td>
-                <img src="https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black">
-                <img src="https://img.shields.io/badge/Next.js-000000?logo=nextdotjs&logoColor=white">
-                <img src="https://img.shields.io/badge/TailwindCSS-06B6D4?logo=tailwindcss&logoColor=white">
-                <img src="https://img.shields.io/badge/shadcn/ui-000000?logo=shadcnui&logoColor=white">
-                <img src="https://img.shields.io/badge/TanStack_Query-FF4154?logo=reactquery&logoColor=white">
-                <img src="https://img.shields.io/badge/Zustand-433E38?logo=react&logoColor=white">
-                <img src="https://img.shields.io/badge/React_Hook_Form-EC5990?logo=reacthookform&logoColor=white">
-                <img src="https://img.shields.io/badge/Zod-3E67B1?logo=zod&logoColor=white">
-                <img src="https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p align=center>Backend</p>
-            </td>
-            <td>
-                <img src="https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white">
-                <img src="https://img.shields.io/badge/TypeORM-FE0803?logo=typeorm&logoColor=white">
-                <img src="https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white">
-                <img src="https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white">
-                <img src="https://img.shields.io/badge/BullMQ-F05032?logo=bull&logoColor=white">
-                <img src="https://img.shields.io/badge/Passport-34E27A?logo=passport&logoColor=white">
-                <img src="https://img.shields.io/badge/Swagger-85EA2D?logo=swagger&logoColor=black">
-                <img src="https://img.shields.io/badge/Jest-C21325?logo=jest&logoColor=white">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p align=center>SDK</p>
-            </td>
-            <td>
-                <img src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white">
-                <img src="https://img.shields.io/badge/rrweb-FF6B6B?logo=&logoColor=white">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p align=center>Infrastructure & Deployment</p>
-            </td>
-            <td>
-                <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white">
-                <img src="https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=white">
-                <img src="https://img.shields.io/badge/NCP-03C75A?logo=naver&logoColor=white">
-                <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?logo=githubactions&logoColor=white">
-                <img src="https://img.shields.io/badge/AWS_S3-569A31?logo=amazons3&logoColor=white">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p align=center>Monitoring</p>
-            </td>
-            <td>
-                <img src="https://img.shields.io/badge/Prometheus-E6522C?logo=prometheus&logoColor=white">
-                <img src="https://img.shields.io/badge/Grafana-F46800?logo=grafana&logoColor=white">
-            </td>
-        </tr>
-    </tbody>
-</table>
+| 구분       | 기술 스택                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 공통       | ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) ![Turborepo](https://img.shields.io/badge/Turborepo-EF4444?style=flat-square&logo=turborepo&logoColor=white) ![pnpm](https://img.shields.io/badge/pnpm-F69220?style=flat-square&logo=pnpm&logoColor=white) ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=flat-square&logo=eslint&logoColor=white) ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=flat-square&logo=prettier&logoColor=white)                                                                                                                                                                                                                                                                                                                                                             |
+| 프론트엔드 | ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white) ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB) ![TanStack Query](https://img.shields.io/badge/TanStack%20Query-FF4154?style=flat-square&logo=reactquery&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) ![Zod](https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white) ![React Hook Form](https://img.shields.io/badge/React%20Hook%20Form-EC5990?style=flat-square&logo=reacthookform&logoColor=white) ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white) ![MSW](https://img.shields.io/badge/MSW-FF6A33?style=flat-square&logo=mockserviceworker&logoColor=white) |
+| 백엔드     | ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white) ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) ![TypeORM](https://img.shields.io/badge/TypeORM-262626?style=flat-square&logo=typeorm&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) ![BullMQ](https://img.shields.io/badge/BullMQ-FF4F00?style=flat-square&logo=smartthings&logoColor=white) ![Passport](https://img.shields.io/badge/Passport-34E27A?style=flat-square&logo=passport&logoColor=white) ![Jest](https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat-square&logo=swagger&logoColor=black)                                                                 |
+| SDK        | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white) ![rrweb](https://img.shields.io/badge/rrweb-FF6B6B?style=flat-square&logo=&logoColor=white) ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white) ![MSW](https://img.shields.io/badge/MSW-FF6A33?style=flat-square&logo=mockserviceworker&logoColor=white)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 인프라     | ![Naver Cloud Platform](https://img.shields.io/badge/NCP-03C75A?style=flat-square&logo=naver&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) ![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) ![GHCR](https://img.shields.io/badge/GHCR-181717?style=flat-square&logo=github&logoColor=white)                                                                                                                                                                                                                                                                                                                                                      |
+| 모니터링   | ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat-square&logo=grafana&logoColor=white) ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white) ![Google Analytics](https://img.shields.io/badge/Google%20Analytics-E37400?style=flat-square&logo=googleanalytics&logoColor=white)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 자세한 기술 스택 정보는 [기술 스택 문서](https://github.com/boostcampwm2025/web16-UTMate/wiki/TechStack-Overview)를 참고해주세요.
 
@@ -227,16 +153,19 @@ pnpm dev
 
 ## 👥 팀 소개
 
-| 이름   | GitHub                                         | 아이디 |
-| ------ | ---------------------------------------------- | ------ |
-| 김재민 | [@jammin94](https://github.com/jammin94)       | J064   |
-| 김지원 | [@Kjiw0n](https://github.com/Kjiw0n)           | J072   |
-| 이용우 | [@RyuRain0309](https://github.com/RyuRain0309) | J201   |
-| 채문성 | [@chaesunbak](https://github.com/chaesunbak)   | J267   |
+**팀명** : 노잼쿠키
+
+<div align="center">
+
+|                                                         김재민                                                          |                                                        김지원                                                        |                                                      이용우                                                      |                                                        채문성                                                        |
+| :---------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------: |
+| <img width="204" alt="김재민 프로필" src="https://github.com/boostcampwm2025/web16-UTMate/wiki/images/polar-bear.webp"> | <img width="204" alt="김지원 프로필" src="https://github.com/boostcampwm2025/web16-UTMate/wiki/images/sparrow.webp"> | <img width="204" alt="이용우 프로필" src="https://github.com/boostcampwm2025/web16-UTMate/wiki/images/owl.webp"> | <img width="204" alt="채문성 프로필" src="https://github.com/boostcampwm2025/web16-UTMate/wiki/images/penguin.webp"> |
+|                                                          J064                                                           |                                                         J072                                                         |                                                       J201                                                       |                                                         J267                                                         |
+|                                        [@jammin94](https://github.com/jammin94)                                         |                                         [@Kjiw0n](https://github.com/Kjiw0n)                                         |                                  [@RyuRain0309](https://github.com/RyuRain0309)                                  |                                     [@chaesunbak](https://github.com/chaesunbak)                                     |
+
+</div>
 
 ---
-
-
 
 <div align="center">
 
