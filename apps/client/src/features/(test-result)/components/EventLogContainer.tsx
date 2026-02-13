@@ -3,10 +3,10 @@
 import { useRef, useLayoutEffect } from 'react';
 //더 커스텀하려면 rrweb-player 패키지가 아니라 @rrweb/player를 사용해야 함(기본 UI가 제공되지 않고, 인터페이스도 다름)
 import rrwebPlayer from 'rrweb-player';
+import { useEventListener } from 'usehooks-ts';
 import type { eventWithTime } from '@rrweb/types';
 
 import { EventLogViewer } from '@/features/(test-result)/components/EventLogViewer';
-import { useEventListener } from '@/shared/hooks/useEventListener';
 
 import type { AnalyzerResult } from '../types';
 
