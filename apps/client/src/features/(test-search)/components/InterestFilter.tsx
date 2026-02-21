@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import { useToggle } from 'usehooks-ts';
 
 import { Interest } from '@/features/(auth)/types/persona';
 import { Label } from '@/shared/components/ui/label';
@@ -6,7 +7,6 @@ import { Badge } from '@/shared/components/ui/badge';
 import { cn } from '@/shared/utils';
 import { Button } from '@/shared/components/ui/button';
 import { ResponsiveDialog } from '@/shared/components/ResponsiveDialog';
-import { useToggle } from '@/shared/hooks/useToggle';
 
 const INTEREST_EMOJI_MAP: Record<Interest, string> = {
   [Interest.EDUCATION]: '📚',
