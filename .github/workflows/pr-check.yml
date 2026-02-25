@@ -1,6 +1,7 @@
 # PR 품질 검사 워크플로우
-# PR이 main 브랜치를 대상으로 열리거나 업데이트될 때 자동으로 실행됩니다.
-# 린트, 포맷, 타입 체크, 유닛 테스트를 병렬로 수행합니다.
+# PR이 열리거나 업데이트될 때 자동으로 실행됩니다.
+# 린트, 유닛 테스트, 빌드를 병렬로 수행합니다.
+# 빌드 시 next.config.ts의 loadEnvConfig로 루트 .env를 읽으므로 apps/client/.env 불필요
 name: PR Check
 
 on:
@@ -36,37 +37,6 @@ jobs:
 
       - name: Lint (${{ matrix.app }})
         run: pnpm --filter ${{ matrix.app }} lint
-
-      - name: Format check (${{ matrix.app }})
-        run: pnpm --filter ${{ matrix.app }} format:check
-
-  # TypeScript 타입 검사 (client / server / sdk 병렬 실행)
-  # next build 없이 tsc --noEmit만 실행하여 환경변수 의존성 제거
-  type-check:
-    name: Type Check
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        app: [client, server, sdk]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Type check (${{ matrix.app }})
-        working-directory: apps/${{ matrix.app }}
-        run: pnpm exec tsc --noEmit
 
   # Vitest 유닛 테스트 (jsdom 환경, 외부 서비스 불필요)
   test-client:
@@ -136,3 +106,46 @@ jobs:
 
       - name: Run unit tests
         run: pnpm --filter sdk test
+
+  # 빌드 검증 (client / server / sdk 병렬 실행)
+  # deploy.yml과 동일하게 ENV_FILE_CONTENT 시크릿으로 루트에 .env 파일 생성
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app: client
+            build-cmd: pnpm --filter client build
+            needs-env: true
+          - app: server
+            build-cmd: pnpm --filter server build
+            needs-env: false
+          - app: sdk
+            build-cmd: pnpm --filter sdk build
+            needs-env: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create .env from secret
+        if: matrix.needs-env == true
+        run: |
+          cat > .env << 'ENV_EOF'
+          ${{ secrets.ENV_FILE_CONTENT }}
+          ENV_EOF
+
+      - name: Build (${{ matrix.app }})
+        run: ${{ matrix.build-cmd }}
