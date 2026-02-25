@@ -1,0 +1,138 @@
+# PR 품질 검사 워크플로우
+# PR이 main 브랜치를 대상으로 열리거나 업데이트될 때 자동으로 실행됩니다.
+# 린트, 포맷, 타입 체크, 유닛 테스트를 병렬로 수행합니다.
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # ESLint + Prettier 검사 (client / server / sdk 병렬 실행)
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [client, server, sdk]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # pnpm 설치 (packageManager 필드에서 버전 자동 감지)
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      # Node.js 설치 및 pnpm 스토어 캐시 활성화
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      # lockfile 기준으로 의존성 설치 (불일치 시 CI 실패)
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (${{ matrix.app }})
+        run: pnpm --filter ${{ matrix.app }} lint
+
+      - name: Format check (${{ matrix.app }})
+        run: pnpm --filter ${{ matrix.app }} format:check
+
+  # TypeScript 타입 검사 (client / server / sdk 병렬 실행)
+  # next build 없이 tsc --noEmit만 실행하여 환경변수 의존성 제거
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [client, server, sdk]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check (${{ matrix.app }})
+        working-directory: apps/${{ matrix.app }}
+        run: pnpm exec tsc --noEmit
+
+  # Vitest 유닛 테스트 (jsdom 환경, 외부 서비스 불필요)
+  test-client:
+    name: Test (client)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests
+        run: pnpm --filter client test:run
+
+  # Jest 유닛 테스트 (DB/Redis 불필요한 유닛 테스트만 실행, e2e 제외)
+  test-server:
+    name: Test (server)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests
+        run: pnpm --filter server test
+
+  # Vitest 유닛 테스트 (브라우저 SDK, jsdom 환경)
+  test-sdk:
+    name: Test (sdk)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests
+        run: pnpm --filter sdk test
