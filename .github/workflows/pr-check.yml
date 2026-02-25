@@ -1,7 +1,6 @@
 # PR 품질 검사 워크플로우
 # PR이 열리거나 업데이트될 때 자동으로 실행됩니다.
 # 린트, 유닛 테스트, 빌드를 병렬로 수행합니다.
-# 빌드 시 next.config.ts의 loadEnvConfig로 루트 .env를 읽으므로 apps/client/.env 불필요
 name: PR Check
 
 on:
