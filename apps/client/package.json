@@ -57,6 +57,7 @@
   },
   "devDependencies": {
     "@org/prettier-config": "workspace:*",
+    "@next/env": "16.1.5",
     "@tailwindcss/postcss": "^4",
     "@tanstack/eslint-plugin-query": "^5.91.2",
     "@tanstack/react-query-devtools": "^5.91.1",
