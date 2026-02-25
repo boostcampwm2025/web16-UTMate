@@ -11,7 +11,7 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   prettier,
-  reactQuery,
+  ...reactQuery.configs['flat/recommended'],
   // 공통 규칙 추가
   {
     plugins: {
