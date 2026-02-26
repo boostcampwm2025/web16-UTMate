@@ -1,0 +1,122 @@
+# PR 품질 검사 워크플로우
+# PR이 열리거나 업데이트될 때 자동으로 실행됩니다.
+# 유닛 테스트, 빌드를 병렬로 수행합니다.
+# TODO: 린트 이슈 수정 후 lint job 재추가 예정
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # Vitest 유닛 테스트 (jsdom 환경, 외부 서비스 불필요)
+  test-client:
+    name: Test (client)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests
+        run: pnpm --filter client test:run
+
+  # Jest 유닛 테스트 (DB/Redis 불필요한 유닛 테스트만 실행, e2e 제외)
+  test-server:
+    name: Test (server)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests
+        run: pnpm --filter server test
+
+  # Vitest 유닛 테스트 (브라우저 SDK, jsdom 환경)
+  test-sdk:
+    name: Test (sdk)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests
+        run: pnpm --filter sdk test
+
+  # 빌드 검증 (client / server / sdk 병렬 실행)
+  # deploy.yml과 동일하게 ENV_FILE_CONTENT 시크릿으로 루트에 .env 파일 생성
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app: client
+            build-cmd: pnpm --filter client build
+            needs-env: true
+          - app: server
+            build-cmd: pnpm --filter server build
+            needs-env: false
+          - app: sdk
+            build-cmd: pnpm --filter sdk build
+            needs-env: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create .env from secret
+        if: matrix.needs-env == true
+        run: |
+          cat > .env << 'ENV_EOF'
+          ${{ secrets.ENV_FILE_CONTENT }}
+          ENV_EOF
+
+      - name: Build (${{ matrix.app }})
+        run: ${{ matrix.build-cmd }}
